@@ -1,6 +1,7 @@
 import { FunctionComponent, useEffect } from "react";
 import Hyperlink from "./components/Hyperlink";
 import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl } from "./config";
+import Logo from "./Logo";
 import { useMCMCMonitor } from "./MCMCMonitorData";
 import ChainPage from "./pages/ChainPage";
 import Home from "./pages/Home";
@@ -29,6 +30,8 @@ const MainWindow: FunctionComponent<Props> = () => {
 		
 		return (
 			<div style={{margin: 60}}>
+				<Logo />
+				<hr />
 				<div>Not connected to service {serviceBaseUrl}</div>
 				<hr />
 				<div>
@@ -40,7 +43,6 @@ const MainWindow: FunctionComponent<Props> = () => {
 						)
 					}
 				</div>
-				<hr />
 				{
 					serviceBaseUrl === defaultServiceBaseUrl && (
 						<p><a href="https://github.com/magland/mcmc-monitor" target="_blank" rel="noreferrer">How to run a local service</a></p>

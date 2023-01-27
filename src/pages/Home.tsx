@@ -2,13 +2,14 @@ import { FunctionComponent } from "react";
 import Hyperlink from "../components/Hyperlink";
 import RunsTable from "../components/RunsTable";
 import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl } from "../config";
+import Logo from "../Logo";
 
 type Props = any
 
 const Home: FunctionComponent<Props> = () => {
 	return (
 		<div style={{margin: 60}}>
-			<h1>MCMC Monitor</h1>
+			<Logo />
 			<h3>WIP</h3>
 			<div style={{color: 'green'}}>Connected to service: {serviceBaseUrl}</div>
 			{
