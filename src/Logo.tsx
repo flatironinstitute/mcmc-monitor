@@ -2,9 +2,16 @@ import { FunctionComponent } from "react";
 
 type Props = any
 
+// tricky
+const logoUrl = window.location.hostname.startsWith('magland.github.io') ? (
+	`/mcmc-monitor/mcmc-monitor-logo.png`
+) : (
+	`/mcmc-monitor-logo.png`
+)
+
 const Logo: FunctionComponent<Props> = () => {
 	return (
-		<img src="/mcmc-monitor-logo.png" width="600px" />
+		<img src={logoUrl} width="600px" />
 	)
 }
 
