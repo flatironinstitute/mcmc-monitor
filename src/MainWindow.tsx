@@ -35,7 +35,7 @@ const MainWindow: FunctionComponent<Props> = () => {
 					{
 						serviceBaseUrl !== exampleServiceBaseUrl && (
 							<Hyperlink
-								onClick={() => {;(window as any).location = `${window.location.protocol}//${window.location.host}?s=${exampleServiceBaseUrl}`}}
+								onClick={() => {;(window as any).location = `${window.location.protocol}//${window.location.host}${window.location.pathname}?s=${exampleServiceBaseUrl}`}}
 							>View example data</Hyperlink>
 						)
 					}

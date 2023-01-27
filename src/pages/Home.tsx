@@ -14,7 +14,7 @@ const Home: FunctionComponent<Props> = () => {
 			{
 				serviceBaseUrl === exampleServiceBaseUrl && (
 					<Hyperlink
-						onClick={() => {;(window as any).location = `${window.location.protocol}//${window.location.host}?s=${defaultServiceBaseUrl}`}}
+						onClick={() => {;(window as any).location = `${window.location.protocol}//${window.location.host}${window.location.pathname}?s=${exampleServiceBaseUrl}?s=${defaultServiceBaseUrl}`}}
 					>Connect to local service</Hyperlink>
 				)
 			}
