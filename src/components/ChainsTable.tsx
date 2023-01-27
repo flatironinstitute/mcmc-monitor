@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FunctionComponent, useMemo } from "react";
-import { MCMCChain } from "../MCMCMonitorData";
+import { MCMCChain } from "../MCMCMonitorTypes";
 import useRoute from "../useRoute";
 import Hyperlink from "./Hyperlink";
 
@@ -14,14 +14,14 @@ const ChainsTable: FunctionComponent<Props> = ({chains}) => {
 	const columns = useMemo(() => ([
 		{ key: 'runId', label: 'Run' },
 		{ key: 'chainId', label: 'Chain' },
-		{ key: 'variableNames', label: 'Variables' }
+		// { key: 'variableNames', label: 'Variables' }
 	]), [])
 	const rows = useMemo(() => (
 		chains.map(chain => ({
 			key: `${chain.chainId}`,
 			runId: chain.runId,
 			chainId: <Hyperlink onClick={() => setRoute({page: 'chain', runId: chain.runId, chainId: chain.chainId})}>{chain.chainId}</Hyperlink>,
-			variableNames: chain.variableNames.join(', ')
+			// variableNames: chain.variableNames.join(', ')
 		} as { [key: string]: any }))
 	), [chains, setRoute])
 	return (

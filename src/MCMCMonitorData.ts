@@ -1,14 +1,18 @@
 import React, { useCallback, useContext } from 'react'
-import { MCMCChain, MCMCRun } from './MCMCMonitorTypes'
+import { MCMCChain, MCMCRun, MCMCSequence } from './MCMCMonitorTypes'
 
 export type MCMCMonitorData = {
     runs: MCMCRun[]
     chains: MCMCChain[]
+    sequences: MCMCSequence[]
+    selectedVariableNames: string[]
 }
 
 export const initialMCMCMonitorData: MCMCMonitorData = {
     runs: [],
-    chains: []
+    chains: [],
+    sequences: [],
+    selectedVariableNames: []
 }
 
 export const MCMCMonitorContext = React.createContext<{ data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void }>({
@@ -27,6 +31,14 @@ export const useMCMCMonitor = () => {
         dispatch({ type: 'setChainsForRun', runId, chains })
     }, [dispatch])
 
+    const setSequence = useCallback((runId: string, chainId: string, variableName: string, sequence: MCMCSequence) => {
+        dispatch({ type: 'setSequence', runId, chainId, variableName, sequence })
+    }, [dispatch])
+
+    const setSelectedVariableNames = useCallback((variableNames: string[]) => {
+        dispatch({ type: 'setSelectedVariableNames', variableNames })
+    }, [dispatch])
+
     const updateRuns = useCallback(() => {
         ; (async () => {
             const resp = await fetch(`http://localhost:61542/getRuns`)
@@ -43,11 +55,23 @@ export const useMCMCMonitor = () => {
         })()
     }, [setChainsForRun])
 
+    const updateSequence = useCallback((runId: string, chainId: string, variableName: string) => {
+        ; (async () => {
+            const resp = await fetch(`http://localhost:61542/getSequence/${runId}/${chainId}/${variableName}`)
+            const x: {sequence: MCMCSequence} = await resp.json()
+            setSequence(runId, chainId, variableName, x.sequence)
+        })()
+    }, [setSequence])
+
     return {
         runs: data.runs,
         chains: data.chains,
+        sequences: data.sequences,
+        selectedVariableNames: data.selectedVariableNames,
         updateRuns,
-        updateChainsForRun
+        updateChainsForRun,
+        updateSequence,
+        setSelectedVariableNames
     }
 }
 
@@ -58,6 +82,15 @@ export type MCMCMonitorAction = {
     type: 'setChainsForRun'
     runId: string
     chains: MCMCChain[]
+} | {
+    type: 'setSequence'
+    runId: string
+    chainId: string
+    variableName: string
+    sequence: MCMCSequence
+} | {
+    type: 'setSelectedVariableNames'
+    variableNames: string[]
 }
 
 export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MCMCMonitorData => {
@@ -73,6 +106,18 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         return {
             ...s,
             chains: [...s.chains.filter(c => (c.runId !== a.runId)), ...a.chains]
+        }
+    }
+    else if (a.type === 'setSequence') {
+        return {
+            ...s,
+            sequences: [...s.sequences.filter(x => (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName)), a.sequence]
+        }
+    }
+    else if (a.type === 'setSelectedVariableNames') {
+        return {
+            ...s,
+            selectedVariableNames: a.variableNames
         }
     }
     else return s

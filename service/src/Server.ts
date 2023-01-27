@@ -43,6 +43,18 @@ class Server {
                 resp.status(200).send({chains})
             })()
         })
+        this.#expressApp.get('/getSequence/:runId/:chainId/:variableName', (req: Request, resp: Response) => {
+            const runId: string = req.params.runId
+            const chainId: string = req.params.chainId
+            const variableName: string = req.params.variableName
+            if (this.a.verbose) {
+                console.info(`${req.method} /getSequence ${runId} ${chainId} ${variableName}`)
+            }
+            ;(async () => {
+                const sequence = await this.#outputManager.getSequence(runId, chainId, variableName)
+                resp.status(200).send({sequence})
+            })()
+        })
     }
     start() {
         this.#expressServer.listen(this.a.port, () => {

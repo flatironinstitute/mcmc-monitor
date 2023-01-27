@@ -3,7 +3,6 @@ import { useMCMCMonitor } from "./MCMCMonitorData";
 import ChainPage from "./pages/ChainPage";
 import Home from "./pages/Home";
 import RunPage from "./pages/RunPage";
-import RecordingView from "./RecordingView";
 import useRoute from "./useRoute";
 
 type Props = any
@@ -18,7 +17,6 @@ const MainWindow: FunctionComponent<Props> = () => {
 
 	return (
 		<div>
-			<h1>MCMC Monitor</h1>
 			{
 				route.page === 'home' ? (
 					<Home />

@@ -10,3 +10,10 @@ export type MCMCChain = {
     variableNames: string[]
     rawHeader?: string
 }
+
+export type MCMCSequence = {
+    runId: string
+    chainId: string
+    variableName: string
+    data: number[]
+}

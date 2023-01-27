@@ -1,8 +1,8 @@
-import { MCMCChain, MCMCRun } from "./MCMCMonitorTypes"
+import { MCMCChain, MCMCRun, MCMCSequence } from "./MCMCMonitorTypes"
 import fs from 'fs'
 
 class OutputManager {
-    #chainFiles: {[key: string]: ChainFile} = {}
+    #chainFiles: {[key: string]: ChainFile} = {} // by runId/chainId
     constructor(private dir: string) {
 
     }
@@ -26,10 +26,11 @@ class OutputManager {
             if (fname.endsWith('.csv')) {
                 const chainId = chainIdFromCsvFileName(fname)
                 const p = `${path}/${fname}`
-                if (!this.#chainFiles[chainId]) {
-                    this.#chainFiles[chainId] = new ChainFile(p)
+                const kk = `${runId}/${chainId}`
+                if (!this.#chainFiles[kk]) {
+                    this.#chainFiles[kk] = new ChainFile(p)
                 }
-                const cf = this.#chainFiles[chainId]
+                const cf = this.#chainFiles[kk]
                 await cf.update()
                 chains.push({
                     runId,
@@ -40,6 +41,22 @@ class OutputManager {
             }
         }
         return chains
+    }
+    async getSequence(runId: string, chainId: string, variableName): Promise<MCMCSequence> {
+        const p = `${this.dir}/${runId}/${chainId}.csv`
+        const kk = `${runId}/${chainId}`
+        if (!this.#chainFiles[kk]) {
+            this.#chainFiles[kk] = new ChainFile(p)
+        }
+        const cf = this.#chainFiles[kk]
+        await cf.update()
+        const data = cf.sequenceData(variableName)
+        return {
+            runId,
+            chainId,
+            variableName,
+            data
+        }
     }
 }
 
@@ -54,6 +71,13 @@ class ChainFile {
     }
     public get rawHeader() {
         return this.#rawHeader
+    }
+    sequenceData(variableName: string): number[] {
+        const i = this.#columnNames.indexOf(variableName)
+        if (i < 0) return []
+        return this.#rows.map(r => (
+            r.values[i] !== undefined ? parseFloat(r.values[i]) : 0
+        ))
     }
     async update() {
         this.#columnNames = undefined

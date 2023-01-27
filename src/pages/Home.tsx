@@ -6,6 +6,7 @@ type Props = any
 const Home: FunctionComponent<Props> = () => {
 	return (
 		<div>
+			<h1>MCMC Monitor</h1>
 			<RunsTable />
 		</div>
 	)

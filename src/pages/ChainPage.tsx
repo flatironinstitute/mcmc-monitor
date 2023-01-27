@@ -1,5 +1,6 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { MCMCChain, useMCMCMonitor } from "../MCMCMonitorData";
+import { useMCMCMonitor } from "../MCMCMonitorData";
+import { MCMCChain } from "../MCMCMonitorTypes";
 
 type Props = {
 	runId: string
