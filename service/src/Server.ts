@@ -56,6 +56,14 @@ class Server {
             })()
         })
     }
+    async stop() {
+        return new Promise<void>((resolve) => {
+            this.#expressServer.close((err) => {
+                if (err) {console.warn(err)}
+                resolve()
+            })
+        })
+    }
     start() {
         this.#expressServer.listen(this.a.port, () => {
             return console.info(`Server is running on port ${this.a.port}`)

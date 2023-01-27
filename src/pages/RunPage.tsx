@@ -1,10 +1,12 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
 import ChainsTable from "../components/ChainsTable";
+import Hyperlink from "../components/Hyperlink";
 import SequencePlot from "../components/SequencePlot";
 import Splitter from "../components/Splitter";
 import VariablesSelector from "../components/VariablesSelector";
 import { useMCMCMonitor } from "../MCMCMonitorData";
 import { MCMCChain, MCMCRun } from "../MCMCMonitorTypes";
+import useRoute from "../useRoute";
 import useWindowDimensions from "../useWindowDimensions";
 
 type Props = {
@@ -34,28 +36,33 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 
 	const {width, height} = useWindowDimensions()
 
+	const {setRoute} = useRoute()
+
 	if (!run) return <span>Run not found: {runId}</span>
 	return (
-		<Splitter
-			width={width}
-			height={height}
-			initialPosition={500}
-		>
-			<div>
-				<h3>Run: {runId}</h3>
-				<ChainsTable
-					chains={chainsForRun}
+		<div style={{position: 'absolute', width: width - 60, margin: 30}}>
+			<Splitter
+				width={width - 60}
+				height={height}
+				initialPosition={500}
+			>
+				<div>
+					<Hyperlink onClick={() => setRoute({page: 'home'})}>Back to home</Hyperlink>
+					<h2>Run: {runId}</h2>
+					<ChainsTable
+						chains={chainsForRun}
+					/>
+					<VariablesSelector variableNames={allVariableNames} />
+				</div>
+				<RightContent
+					width={0}
+					height={0}
+					runId={runId}
+					chainsForRun={chainsForRun}
+					allVariableNames={allVariableNames}
 				/>
-				<VariablesSelector variableNames={allVariableNames} />
-			</div>
-			<RightContent
-				width={0}
-				height={0}
-				runId={runId}
-				chainsForRun={chainsForRun}
-				allVariableNames={allVariableNames}
-			/>
-		</Splitter>
+			</Splitter>
+		</div>
 	)
 }
 

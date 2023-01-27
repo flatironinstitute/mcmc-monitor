@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon src/index.ts start --v --dir ../examples/example-output",
+    "start-demo": "node src/index.ts start --v --dir ./example-output",
     "release": "yarn build && npm publish && git tag $npm_package_version && git push --tags"
   },
   "author": "Jeremy Magland",

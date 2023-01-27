@@ -24,9 +24,20 @@ const main = () => {
         .parse()
 }
 
+let server: Server
 function start({port, dir, verbose}: {port: number, dir: string, verbose: boolean}) {
-    const server = new Server({port, dir, verbose})
+    server = new Server({port, dir, verbose})
     server.start()
 }
+
+process.on('SIGINT', function() {
+    if (server) {
+        console.info('Stopping server.')
+        server.stop().then(() => {
+            console.info('Exiting.')
+            process.exit()
+        })
+    }
+})
 
 main()

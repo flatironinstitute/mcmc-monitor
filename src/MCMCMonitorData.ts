@@ -1,7 +1,9 @@
 import React, { useCallback, useContext } from 'react'
+import { serviceBaseUrl } from './config'
 import { MCMCChain, MCMCRun, MCMCSequence } from './MCMCMonitorTypes'
 
 export type MCMCMonitorData = {
+    connectedToService: boolean | undefined
     runs: MCMCRun[]
     chains: MCMCChain[]
     sequences: MCMCSequence[]
@@ -9,6 +11,7 @@ export type MCMCMonitorData = {
 }
 
 export const initialMCMCMonitorData: MCMCMonitorData = {
+    connectedToService: undefined,
     runs: [],
     chains: [],
     sequences: [],
@@ -41,7 +44,7 @@ export const useMCMCMonitor = () => {
 
     const updateRuns = useCallback(() => {
         ; (async () => {
-            const resp = await fetch(`http://localhost:61542/getRuns`)
+            const resp = await fetch(`${serviceBaseUrl}/getRuns`)
             const x: {runs: MCMCRun[]} = await resp.json()
             setRuns(x.runs)
         })()
@@ -49,7 +52,7 @@ export const useMCMCMonitor = () => {
 
     const updateChainsForRun = useCallback((runId: string) => {
         ; (async () => {
-            const resp = await fetch(`http://localhost:61542/getChainsForRun/${runId}`)
+            const resp = await fetch(`${serviceBaseUrl}/getChainsForRun/${runId}`)
             const x: {chains: MCMCChain[]} = await resp.json()
             setChainsForRun(runId, x.chains)
         })()
@@ -57,7 +60,7 @@ export const useMCMCMonitor = () => {
 
     const updateSequence = useCallback((runId: string, chainId: string, variableName: string) => {
         ; (async () => {
-            const resp = await fetch(`http://localhost:61542/getSequence/${runId}/${chainId}/${variableName}`)
+            const resp = await fetch(`${serviceBaseUrl}/getSequence/${runId}/${chainId}/${variableName}`)
             const x: {sequence: MCMCSequence} = await resp.json()
             setSequence(runId, chainId, variableName, x.sequence)
         })()
@@ -68,6 +71,7 @@ export const useMCMCMonitor = () => {
         chains: data.chains,
         sequences: data.sequences,
         selectedVariableNames: data.selectedVariableNames,
+        connectedToService: data.connectedToService,
         updateRuns,
         updateChainsForRun,
         updateSequence,
@@ -91,6 +95,9 @@ export type MCMCMonitorAction = {
 } | {
     type: 'setSelectedVariableNames'
     variableNames: string[]
+} | {
+    type: 'setConnectedToService'
+    connected: boolean
 }
 
 export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MCMCMonitorData => {
@@ -118,6 +125,12 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         return {
             ...s,
             selectedVariableNames: a.variableNames
+        }
+    }
+    else if (a.type === 'setConnectedToService') {
+        return {
+            ...s,
+            connectedToService: a.connected
         }
     }
     else return s
