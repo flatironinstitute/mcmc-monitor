@@ -1,11 +1,3 @@
-# mcmc-monitor service
-
-Run this server on the machine that contains the MCMC output files.
-
-## Prerequisites
-
-[A recent version of nodejs](https://nodejs.dev/en/learn/how-to-install-nodejs/)
-
 # MCMC Monitor
 
 This web-browser app enables you to track and visualize MCMC processes that have been executed with [Stan](https://mc-stan.org/).
