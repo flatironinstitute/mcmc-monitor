@@ -1,6 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 import * as http from 'http';
-import { MCMCChain, MCMCRun, protocolVersion } from './MCMCMonitorTypes';
+import { GetSequencesRequest, GetSequencesResponse, protocolVersion } from './MCMCMonitorTypes';
 import OutputManager from './OutputManager';
 
 class Server {
@@ -10,6 +10,7 @@ class Server {
     constructor(private a: {port: number, dir: string, verbose: boolean}) {
         this.#outputManager = new OutputManager(a.dir)
         this.#expressApp = express()
+        this.#expressApp.use(express.json())
         this.#expressServer = http.createServer(this.#expressApp)
         const allowedOrigins = ['https://magland.github.io', 'http://127.0.0.1:5173']
         this.#expressApp.use((req: Request, resp: Response, next: NextFunction) => {
@@ -43,16 +44,26 @@ class Server {
                 resp.status(200).send({chains})
             })()
         })
-        this.#expressApp.get('/getSequence/:runId/:chainId/:variableName', (req: Request, resp: Response) => {
-            const runId: string = req.params.runId
-            const chainId: string = req.params.chainId
-            const variableName: string = req.params.variableName
+        this.#expressApp.post('/getSequences', (req: Request, resp: Response) => {
+            const request: GetSequencesRequest = req.body
             if (this.a.verbose) {
-                console.info(`${req.method} /getSequence ${runId} ${chainId} ${variableName}`)
+                console.info(`${req.method} /getSequences ${request.sequences.length}`)
             }
+            const response: GetSequencesResponse = {sequences: []}
             ;(async () => {
-                const sequence = await this.#outputManager.getSequence(runId, chainId, variableName)
-                resp.status(200).send({sequence})
+                for (const s of request.sequences) {
+                    const {runId, chainId, variableName, position} = s
+                    
+                    const sd = await this.#outputManager.getSequenceData(runId, chainId, variableName, position)
+                    response.sequences.push({
+                        runId,
+                        chainId,
+                        variableName,
+                        position,
+                        data: sd.data
+                    })
+                }
+                resp.status(200).send(response)
             })()
         })
     }

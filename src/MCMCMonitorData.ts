@@ -1,6 +1,11 @@
 import React, { useCallback, useContext } from 'react'
+import { SequenceHistogramOpts } from './components/SequenceHistogram'
 import { serviceBaseUrl } from './config'
 import { MCMCChain, MCMCRun, MCMCSequence } from './MCMCMonitorTypes'
+
+export type GeneralOpts = {
+    updateMode: 'auto' | 'manual'
+}
 
 export type MCMCMonitorData = {
     connectedToService: boolean | undefined
@@ -8,6 +13,9 @@ export type MCMCMonitorData = {
     chains: MCMCChain[]
     sequences: MCMCSequence[]
     selectedVariableNames: string[]
+    selectedChainIds: string[]
+    sequenceHistogramOpts: SequenceHistogramOpts
+    generalOpts: GeneralOpts
 }
 
 export const initialMCMCMonitorData: MCMCMonitorData = {
@@ -15,7 +23,10 @@ export const initialMCMCMonitorData: MCMCMonitorData = {
     runs: [],
     chains: [],
     sequences: [],
-    selectedVariableNames: []
+    selectedVariableNames: [],
+    selectedChainIds: [],
+    sequenceHistogramOpts: {numIterations: 100},
+    generalOpts: {updateMode: 'manual'}
 }
 
 export const MCMCMonitorContext = React.createContext<{ data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void }>({
@@ -34,12 +45,12 @@ export const useMCMCMonitor = () => {
         dispatch({ type: 'setChainsForRun', runId, chains })
     }, [dispatch])
 
-    const setSequence = useCallback((runId: string, chainId: string, variableName: string, sequence: MCMCSequence) => {
-        dispatch({ type: 'setSequence', runId, chainId, variableName, sequence })
-    }, [dispatch])
-
     const setSelectedVariableNames = useCallback((variableNames: string[]) => {
         dispatch({ type: 'setSelectedVariableNames', variableNames })
+    }, [dispatch])
+
+    const setSelectedChainIds = useCallback((chainIds: string[]) => {
+        dispatch({ type: 'setSelectedChainIds', chainIds })
     }, [dispatch])
 
     const updateRuns = useCallback(() => {
@@ -59,23 +70,52 @@ export const useMCMCMonitor = () => {
     }, [setChainsForRun])
 
     const updateSequence = useCallback((runId: string, chainId: string, variableName: string) => {
-        ; (async () => {
-            const resp = await fetch(`${serviceBaseUrl}/getSequence/${runId}/${chainId}/${variableName}`)
-            const x: {sequence: MCMCSequence} = await resp.json()
-            setSequence(runId, chainId, variableName, x.sequence)
-        })()
-    }, [setSequence])
+        dispatch({
+            type: 'updateSequence',
+            runId,
+            chainId,
+            variableName
+        })
+    }, [dispatch])
+
+    const updateExistingSequences = useCallback((runId: string) => {
+        dispatch({
+            type: 'updateExistingSequences',
+            runId
+        })
+    }, [dispatch])
+
+    const setSequenceHistogramOpts = useCallback((opts: SequenceHistogramOpts) => {
+        dispatch({
+            type: 'setSequenceHistogramOpts',
+            opts
+        })
+    }, [dispatch])
+
+    const setGeneralOpts = useCallback((opts: GeneralOpts) => {
+        dispatch({
+            type: 'setGeneralOpts',
+            opts
+        })
+    }, [dispatch])
 
     return {
         runs: data.runs,
         chains: data.chains,
         sequences: data.sequences,
         selectedVariableNames: data.selectedVariableNames,
+        selectedChainIds: data.selectedChainIds,
         connectedToService: data.connectedToService,
+        sequenceHistogramOpts: data.sequenceHistogramOpts,
+        generalOpts: data.generalOpts,
         updateRuns,
         updateChainsForRun,
         updateSequence,
-        setSelectedVariableNames
+        updateExistingSequences,
+        setSelectedVariableNames,
+        setSelectedChainIds,
+        setSequenceHistogramOpts,
+        setGeneralOpts
     }
 }
 
@@ -87,17 +127,35 @@ export type MCMCMonitorAction = {
     runId: string
     chains: MCMCChain[]
 } | {
-    type: 'setSequence'
+    type: 'appendSequenceData'
     runId: string
     chainId: string
     variableName: string
-    sequence: MCMCSequence
+    position: number
+    data: number[]
 } | {
     type: 'setSelectedVariableNames'
     variableNames: string[]
 } | {
+    type: 'setSelectedChainIds'
+    chainIds: string[]
+} | {
     type: 'setConnectedToService'
     connected: boolean
+} | {
+    type: 'updateSequence'
+    runId: string
+    chainId: string
+    variableName: string
+} | {
+    type: 'updateExistingSequences'
+    runId: string
+} | {
+    type: 'setSequenceHistogramOpts'
+    opts: SequenceHistogramOpts
+} | {
+    type: 'setGeneralOpts'
+    opts: GeneralOpts
 }
 
 export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MCMCMonitorData => {
@@ -115,16 +173,16 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
             chains: [...s.chains.filter(c => (c.runId !== a.runId)), ...a.chains]
         }
     }
-    else if (a.type === 'setSequence') {
-        return {
-            ...s,
-            sequences: [...s.sequences.filter(x => (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName)), a.sequence]
-        }
-    }
     else if (a.type === 'setSelectedVariableNames') {
         return {
             ...s,
             selectedVariableNames: a.variableNames
+        }
+    }
+    else if (a.type === 'setSelectedChainIds') {
+        return {
+            ...s,
+            selectedChainIds: a.chainIds
         }
     }
     else if (a.type === 'setConnectedToService') {
@@ -133,5 +191,64 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
             connectedToService: a.connected
         }
     }
+    else if (a.type === 'appendSequenceData') {
+        return {
+            ...s,
+            sequences: s.sequences.map(x => (
+                (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
+                    x : {...x, updateRequested: false, data: appendData(x.data, a.position, a.data)}
+            ))
+        }
+    }
+    else if (a.type === 'updateSequence') {
+        if (!s.sequences.find(x => (x.runId === a.runId && x.chainId === a.chainId && x.variableName === a.variableName))) {
+            return {
+                ...s,
+                sequences: [...s.sequences, {
+                    runId: a.runId,
+                    chainId: a.chainId,
+                    variableName: a.variableName,
+                    data: [],
+                    updateRequested: true
+                }]
+            }
+        }
+        else {
+            return {
+                ...s,
+                sequences: s.sequences.map(x => (
+                    (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
+                        x : {...x, updateRequested: true}
+                ))
+            }
+        }
+    }
+    else if (a.type === 'updateExistingSequences') {
+        return {
+            ...s,
+            sequences: s.sequences.map(x => (
+                (x.runId !== a.runId) ?
+                    x : {...x, updateRequested: true}
+            ))
+        }
+    }
+    else if (a.type === 'setSequenceHistogramOpts') {
+        return {
+            ...s,
+            sequenceHistogramOpts: a.opts
+        }
+    }
+    else if (a.type === 'setGeneralOpts') {
+        return {
+            ...s,
+            generalOpts: a.opts
+        }
+    }
     else return s
+}
+
+function appendData(x: number[], position: number, y: number[]) {
+    if (position > x.length) return x
+    if (position + y.length <= x.length) return x
+    return [...x, ...y.slice(x.length - position)]
 }

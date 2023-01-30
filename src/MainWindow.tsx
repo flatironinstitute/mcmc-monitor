@@ -3,7 +3,6 @@ import Hyperlink from "./components/Hyperlink";
 import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl } from "./config";
 import Logo from "./Logo";
 import { useMCMCMonitor } from "./MCMCMonitorData";
-import ChainPage from "./pages/ChainPage";
 import Home from "./pages/Home";
 import RunPage from "./pages/RunPage";
 import useRoute from "./useRoute";
@@ -59,8 +58,6 @@ const MainWindow: FunctionComponent<Props> = () => {
 					<Home />
 				) : route.page === 'run' ? (
 					<RunPage runId={route.runId} />
-				) : route.page === 'chain' ? (
-					<ChainPage runId={route.runId} chainId={route.chainId} />
 				) : <span />
 			}
 		</div>
