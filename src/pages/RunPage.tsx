@@ -1,16 +1,11 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import ChainsSelector from "../components/ChainsSelector";
 import ConvergenceTab from "../components/ConvergenceTab";
-import GeneralOptsControl from "../components/GeneralOptsControl";
-import Hyperlink from "../components/Hyperlink";
+import RunControlPanel from "../components/RunControlPanel";
 import RunInfoTab from "../components/RunInfoTab";
-import SequenceHistogramOptsControl from "../components/SequenceHistogramOptsControl";
 import Splitter from "../components/Splitter";
 import TabWidget from "../components/TabWidget/TabWidget";
-import VariablesSelector from "../components/VariablesSelector";
 import { useMCMCMonitor } from "../MCMCMonitorData";
 import { MCMCChain, MCMCRun } from "../MCMCMonitorTypes";
-import useRoute from "../useRoute";
 import useWindowDimensions from "../useWindowDimensions";
 
 type Props = {
@@ -18,7 +13,7 @@ type Props = {
 }
 
 const RunPage: FunctionComponent<Props> = ({runId}) => {
-	const {runs, chains, sequences, updateChainsForRun, setSelectedVariableNames, setSelectedChainIds, generalOpts, updateExistingSequences} = useMCMCMonitor()
+	const {runs, chains, sequences, updateChainsForRun, setSelectedChainIds, generalOpts, updateExistingSequences} = useMCMCMonitor()
 
 	useEffect(() => {
 		let canceled = false
@@ -51,35 +46,12 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 
 	const chainsForRun = useMemo(() => (chains.filter(c => (c.runId === runId))), [chains, runId])
 
-	const allVariableNames = useMemo(() => {
-		const s = new Set<string>()
-		for (const c of chainsForRun) {
-			for (const v of c.variableNames) {
-				s.add(v)
-			}
-		}
-		return [...s].sort().sort((v1, v2) => {
-			if ((v1.includes('__')) && (!v2.includes('__'))) return -1
-			if ((!v1.includes('__')) && (v2.includes('__'))) return 1
-			return 0
-		})
-	}, [chainsForRun])
-
-	useEffect(() => {
-		// start with just lp__ selected
-		if (allVariableNames.includes('lp__')) {
-			setSelectedVariableNames(['lp__'])
-		}
-	}, [runId, setSelectedVariableNames, allVariableNames])
-
 	useEffect(() => {
 		// start with all chains selected
 		setSelectedChainIds(chainsForRun.map(c => (c.chainId)))
 	}, [runId, setSelectedChainIds, chainsForRun])
 
 	const {width, height} = useWindowDimensions()
-
-	const {setRoute} = useRoute()
 
 	if (!run) return <span>Run not found: {runId}</span>
 	return (
@@ -89,21 +61,10 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 				height={height}
 				initialPosition={500}
 			>
-				<div>
-					<Hyperlink onClick={() => setRoute({page: 'home'})}>Back to home</Hyperlink>
-					<h2>Run: {runId}</h2>
-					<p>Num. iterations: {numIterationsForRun}</p>
-					<h3>Chains</h3>
-					<ChainsSelector chains={chainsForRun} />
-					<h3>Variables</h3>
-					<div style={{position: 'relative', height: 300, overflowY: 'auto'}}>
-						<VariablesSelector variableNames={allVariableNames} />
-					</div>
-					<h3>Options</h3>
-					<SequenceHistogramOptsControl />
-					<div>&nbsp;</div>
-					<GeneralOptsControl runId={runId} />
-				</div>
+				<RunControlPanel
+					runId={runId}
+					numIterationsForRun={numIterationsForRun}
+				/>
 				<RightContent
 					width={0}
 					height={0}

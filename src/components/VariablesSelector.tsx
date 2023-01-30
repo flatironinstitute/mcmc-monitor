@@ -12,7 +12,11 @@ const VariablesSelector: FunctionComponent<Props> = ({variableNames}) => {
 		<div>
 			{
 				variableNames.map(v => (
-					<span key={v}><Checkbox onClick={() => setSelectedVariableNames(toggle(selectedVariableNames, v))} checked={selectedVariableNames.includes(v)} /><span>{v}</span></span>
+					<span key={v}>
+						<Checkbox style={{padding: 1, transform: 'scale(0.9)'}} onClick={() => setSelectedVariableNames(toggle(selectedVariableNames, v))} checked={selectedVariableNames.includes(v)} />
+						<span>{v}</span>
+						&nbsp;&nbsp;
+					</span>
 				))
 			}
 		</div>

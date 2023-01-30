@@ -9,7 +9,7 @@ const SequenceHistogramOptsControl: FunctionComponent<Props> = () => {
 	return (
 		<div>
 			Iterations to use for histograms
-			<FormControl fullWidth>
+			<FormControl fullWidth size="small">
 				<Select
 					value={sequenceHistogramOpts.numIterations}
 					onChange={(evt: SelectChangeEvent<number>) => {setSequenceHistogramOpts({...sequenceHistogramOpts, numIterations: evt.target.value as number})}}

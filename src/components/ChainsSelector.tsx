@@ -14,7 +14,7 @@ const ChainsSelector: FunctionComponent<Props> = ({chains}) => {
 			{
 				chains.map(c => (
 					<span key={c.chainId}>
-						<span><Checkbox onClick={() => setSelectedChainIds(toggle(selectedChainIds, c.chainId))} checked={selectedChainIds.includes(c.chainId)} /><span>{c.chainId}</span></span>
+						<span><Checkbox style={{padding: 1, transform: 'scale(0.9)'}} onClick={() => setSelectedChainIds(toggle(selectedChainIds, c.chainId))} checked={selectedChainIds.includes(c.chainId)} /><span>{c.chainId}</span></span>
 						<br />
 					</span>
 				))

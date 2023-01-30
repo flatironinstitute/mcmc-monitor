@@ -11,7 +11,7 @@ const GeneralOptsControl: FunctionComponent<Props> = ({runId}) => {
 	return (
 		<div>
 			Update mode
-			<FormControl fullWidth>
+			<FormControl fullWidth size="small">
 				<Select
 					value={generalOpts.updateMode}
 					onChange={(evt: SelectChangeEvent<string>) => {setGeneralOpts({...generalOpts, updateMode: evt.target.value as ('auto' | 'manual')})}}
@@ -22,7 +22,9 @@ const GeneralOptsControl: FunctionComponent<Props> = ({runId}) => {
 			</FormControl>
 			{
 				generalOpts.updateMode === 'manual' && (
-					<button onClick={() => {updateExistingSequences(runId)}}>Update</button>
+					<span style={{fontSize: 16}}>
+						<button onClick={() => {updateExistingSequences(runId)}}>Update</button>
+					</span>
 				)
 			}
 		</div>
