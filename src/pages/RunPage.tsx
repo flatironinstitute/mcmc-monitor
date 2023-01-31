@@ -2,6 +2,7 @@ import { FunctionComponent, useEffect, useMemo } from "react";
 import ConvergenceTab from "../components/ConvergenceTab";
 import RunControlPanel from "../components/RunControlPanel";
 import RunInfoTab from "../components/RunInfoTab";
+import ScatterplotsTab from "../components/ScatterplotsTab";
 import Splitter from "../components/Splitter";
 import TabWidget from "../components/TabWidget/TabWidget";
 import { useMCMCMonitor } from "../MCMCMonitorData";
@@ -57,7 +58,7 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 	return (
 		<div style={{position: 'absolute', width: width - 40, height: height - 40, margin: 20, overflow: 'hidden'}}>
 			<Splitter
-				width={width - 60}
+				width={width - 30}
 				height={height}
 				initialPosition={500}
 			>
@@ -87,7 +88,8 @@ type RightContentProps = {
 
 const tabs = [
 	{label: 'Convergence', closeable: false},
-	{label: 'Run Info', closeable: false}
+	{label: 'Run Info', closeable: false},
+	{label: 'Scatterplots', closeable: false}
 ]
 
 const RightContent: FunctionComponent<RightContentProps> = ({width, height, runId, numIterationsForRun}) => {
@@ -107,6 +109,12 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, runI
 				width={0}
 				height={0}
 				runId={runId}
+			/>
+			<ScatterplotsTab
+				width={0}
+				height={0}
+				runId={runId}
+				numIterationsForRun={numIterationsForRun}
 			/>
 		</TabWidget>
 	)

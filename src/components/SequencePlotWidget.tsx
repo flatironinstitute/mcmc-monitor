@@ -46,7 +46,8 @@ const SequencePlotWidget: FunctionComponent<Props> = ({ plotSequences, variableN
 						shapes,
 						margin: {
 							t: 30, b: 40, r: 0
-						}
+						},
+						showlegend: false
 					}}
 				/>
 			</Suspense>

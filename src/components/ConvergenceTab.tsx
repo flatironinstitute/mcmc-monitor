@@ -11,8 +11,8 @@ type Props = {
 	height: number
 }
 
-const ConvergenceTab: FunctionComponent<Props> = ({runId, numIterationsForRun, width, height}) => {
-	const {selectedVariableNames, selectedChainIds, sequenceHistogramOpts} = useMCMCMonitor()
+export const useSequenceHistogramIterationRange = (numIterationsForRun: number) => {
+	const {sequenceHistogramOpts} = useMCMCMonitor()
 
 	const sequenceHistogramIterationRange: [number, number] | undefined = useMemo(() => {
 		if (sequenceHistogramOpts.numIterations < 0) {
@@ -27,6 +27,14 @@ const ConvergenceTab: FunctionComponent<Props> = ({runId, numIterationsForRun, w
 			}
 		}
 	}, [numIterationsForRun, sequenceHistogramOpts.numIterations])
+
+	return sequenceHistogramIterationRange
+}
+
+const ConvergenceTab: FunctionComponent<Props> = ({runId, numIterationsForRun, width, height}) => {
+	const {selectedVariableNames, selectedChainIds, sequenceHistogramOpts} = useMCMCMonitor()
+
+	const sequenceHistogramIterationRange = useSequenceHistogramIterationRange(numIterationsForRun)
 
 	return (
 		<div style={{position: 'absolute', width, height, overflowY: 'auto'}}>

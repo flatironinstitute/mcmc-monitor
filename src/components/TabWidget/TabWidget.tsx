@@ -1,4 +1,4 @@
-import { FunctionComponent, PropsWithChildren, useState } from "react";
+import { FunctionComponent, PropsWithChildren, useEffect, useState } from "react";
 import TabWidgetTabBar from "./TabWidgetTabBar";
 
 type Props = {
@@ -23,6 +23,13 @@ const TabWidget: FunctionComponent<PropsWithChildren<Props>> = ({children, tabs,
     const vMargin = 8
     const W = (width || 300) - hMargin * 2
     const H = height - vMargin * 2
+    const [hasBeenVisible, setHasBeenVisible] = useState<number[]>([])
+    useEffect(() => {
+        if (currentTabIndex === undefined) return
+        if (!hasBeenVisible.includes(currentTabIndex)) {
+            setHasBeenVisible([...hasBeenVisible, currentTabIndex])
+        }
+    }, [currentTabIndex, hasBeenVisible])
     return (
         <div
             style={{position: 'absolute', left: hMargin, top: vMargin, width: W, height: H, overflow: 'hidden'}}
@@ -33,7 +40,6 @@ const TabWidget: FunctionComponent<PropsWithChildren<Props>> = ({children, tabs,
                     tabs={tabs}
                     currentTabIndex={currentTabIndex}
                     onCurrentTabIndexChanged={setCurrentTabIndex}
-                    onTabClosed={() => {}}
                 />
             </div>
             {
@@ -41,7 +47,9 @@ const TabWidget: FunctionComponent<PropsWithChildren<Props>> = ({children, tabs,
                     const visible = i === currentTabIndex
                     return (
                         <div key={`child-${i}`} style={{visibility: visible ? 'visible' : 'hidden', overflowY: 'hidden', overflowX: 'hidden', position: 'absolute', left: 0, top: tabBarHeight, width: W, height: H}}>
-                            <c.type {...c.props} width={W} height={H - tabBarHeight}/>
+                            {(visible || hasBeenVisible.includes(i)) && (
+                                <c.type {...c.props} width={W} height={H - tabBarHeight}/>
+                            )}
                         </div>
                     )
                 })

@@ -20,7 +20,7 @@ const SequencePlot: FunctionComponent<Props> = ({runId, chainIds, variableName, 
 			}
 		}
 	}, [sequences, runId, chainIds, updateSequence, variableName])
-	const plotSequeneces = useMemo(() => {
+	const plotSequences = useMemo(() => {
 		const ret: PlotSequence[] = []
 		for (const chainId of chainIds) {
 			const s = sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName))[0]
@@ -35,7 +35,7 @@ const SequencePlot: FunctionComponent<Props> = ({runId, chainIds, variableName, 
 	}, [chainIds, sequences, runId, variableName])
 	return (
 		<SequencePlotWidget
-			plotSequences={plotSequeneces}
+			plotSequences={plotSequences}
 			variableName={variableName}
 			width={width}
 			height={height}

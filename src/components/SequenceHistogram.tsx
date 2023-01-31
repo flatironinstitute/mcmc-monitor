@@ -37,7 +37,7 @@ const SequenceHistogram: FunctionComponent<Props> = ({runId, chainId, variableNa
 	)
 }
 
-function applyIterationRange(data: number[], iterationRange: [number, number] | undefined) {
+export function applyIterationRange(data: number[], iterationRange: [number, number] | undefined) {
 	if (!iterationRange) return data
 	return data.slice(iterationRange[0], iterationRange[1])
 }

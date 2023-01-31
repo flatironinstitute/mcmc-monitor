@@ -32,7 +32,6 @@ class OutputManager {
                 }
                 const cf = this.#chainFiles[kk]
                 await cf.update()
-                console.log('------------------ ', cf.rawFooter)
                 chains.push({
                     runId,
                     chainId,
