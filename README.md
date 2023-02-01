@@ -1,6 +1,6 @@
 # MCMC Monitor
 
-MCMC Monitor enables tracking and visualization of MCMC processes executed with Stan. When you run a [Stan](https://mc-stan.org/) program, you can configure Stan to generate output to a directory on your computer. MCMC Monitor then reads this output and displays it in the web app, with real-time updates. You can visualize the variables in the model, track the progress of the run, and examine the results.
+MCMC Monitor enables tracking and visualization of MCMC processes executed with Stan. When you run a [Stan](https://mc-stan.org/) program, you can configure Stan to generate output to a directory on your computer. MCMC Monitor then reads this output and displays it in the web app, with real-time updates. You can visualize the variables in the model, track the progress of the run, and examine the results. In future versions, you will be able to share those results through the cloud.
 
 This is a client-side web-browser app.
 
