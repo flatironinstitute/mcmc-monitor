@@ -1,6 +1,8 @@
 # MCMC Monitor
 
-This is a client-side web-browser app that enables tracking and visualization of MCMC processes executed with [Stan](https://mc-stan.org/).
+MCMC Monitor enables tracking and visualization of MCMC processes executed with Stan. When you run a [Stan](https://mc-stan.org/) program, you can configure Stan to generate output to a directory on your computer. MCMC Monitor then reads this output and displays it in the web app, with real-time updates. You can visualize the variables in the model, track the progress of the run, and examine the results.
+
+This is a client-side web-browser app.
 
 How it works:
 
@@ -12,7 +14,7 @@ How it works:
 
 Make sure you have a recent version of [NodeJS](https://nodejs.org/en/download/) installed.
 
-You do **not** need to clone this repo. Just run:
+There is no need to clone this repo. Just run:
 
 ```bash
 npx mcmc-monitor@latest start --dir /path/to/parent/output/directory --verbose
@@ -44,3 +46,7 @@ For more information see the [cmdstanpy documentation](https://mc-stan.org/cmdst
 ## What is Stan?
 
 [Stan](https://mc-stan.org/) is a statistical software package designed for Bayesian inference. To use Stan, the user must first write a Stan program, which contains a probabilistic model specification and a set of data-generating parameters. The program is then compiled and run on the Stan platform, which uses MCMC sampling to generate posterior distributions for the parameters in the model. With the posterior distributions, the user can then make inferences about the data and make predictions.
+
+## Why monitor a running Stan program?
+
+Monitoring a running Stan program provides insight into the progress of the run and the results of the sampling. By tracking the progress of the MCMC sampling, it is possible to detect and diagnose problems with the program and observe which parameters are converging or diverging. Additionally, monitoring the results of the sampling allows the user to gain a better understanding of the posterior distributions, even before the program completes, which can inform decisions and predictions.
