@@ -1,4 +1,5 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
+import { chainColorForIndex } from "../chainColorList";
 import ConvergenceTab from "../components/ConvergenceTab";
 import RunControlPanel from "../components/RunControlPanel";
 import RunInfoTab from "../components/RunInfoTab";
@@ -47,6 +48,14 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 
 	const chainsForRun = useMemo(() => (chains.filter(c => (c.runId === runId))), [chains, runId])
 
+	const chainColors = useMemo(() => {
+		const ret: {[chainId: string]: string} = {}
+		for (let i = 0; i < chainsForRun.length; i++) {
+			ret[chainsForRun[i].chainId] = chainColorForIndex(i)
+		}
+		return ret
+	}, [chainsForRun])
+
 	useEffect(() => {
 		// start with all chains selected
 		setSelectedChainIds(chainsForRun.map(c => (c.chainId)))
@@ -65,12 +74,14 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 				<RunControlPanel
 					runId={runId}
 					numIterationsForRun={numIterationsForRun}
+					chainColors={chainColors}
 				/>
 				<RightContent
 					width={0}
 					height={0}
 					runId={runId}
 					chainsForRun={chainsForRun}
+					chainColors={chainColors}
 					numIterationsForRun={numIterationsForRun}
 				/>
 			</Splitter>
@@ -82,6 +93,7 @@ type RightContentProps = {
 	runId: string
 	chainsForRun: MCMCChain[]
 	numIterationsForRun: number
+	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
@@ -92,7 +104,7 @@ const tabs = [
 	{label: 'Scatterplots', closeable: false}
 ]
 
-const RightContent: FunctionComponent<RightContentProps> = ({width, height, runId, numIterationsForRun}) => {
+const RightContent: FunctionComponent<RightContentProps> = ({width, height, runId, numIterationsForRun, chainColors}) => {
 	return (
 		<TabWidget
 			tabs={tabs}
@@ -103,6 +115,7 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, runI
 				width={0}
 				height={0}
 				runId={runId}
+				chainColors={chainColors}
 				numIterationsForRun={numIterationsForRun}
 			/>
 			<RunInfoTab
@@ -115,6 +128,7 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, runI
 				height={0}
 				runId={runId}
 				numIterationsForRun={numIterationsForRun}
+				chainColors={chainColors}
 			/>
 		</TabWidget>
 	)

@@ -4,6 +4,7 @@ import { SequenceHistogramOpts } from "./SequenceHistogram";
 export type PlotSequence = {
 	label: string
 	data: number[]
+	color: string
 }
 
 type Props = {
@@ -33,7 +34,7 @@ const SequencePlotWidget: FunctionComponent<Props> = ({ plotSequences, variableN
 								y: ps.data,
 								type: 'scatter',
 								mode: 'lines+markers',
-								// marker: {color: 'black'},
+								marker: {color: ps.color}
 							}
 						))
 					}

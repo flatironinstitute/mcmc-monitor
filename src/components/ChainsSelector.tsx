@@ -1,24 +1,39 @@
-import { Checkbox } from "@mui/material";
+import { Checkbox, FormControlLabel } from "@mui/material";
 import { FunctionComponent } from "react";
 import { useMCMCMonitor } from "../MCMCMonitorData";
 import { MCMCChain } from "../MCMCMonitorTypes";
 
 type Props = {
 	chains: MCMCChain[]
+	allChainIds: string[]
+	chainColors: {[chainId: string]: string}
 }
 
-const ChainsSelector: FunctionComponent<Props> = ({chains}) => {
+const ChainsSelector: FunctionComponent<Props> = ({chains, allChainIds, chainColors}) => {
 	const {selectedChainIds, setSelectedChainIds} = useMCMCMonitor()
 	return (
 		<div>
-			{
-				chains.map(c => (
-					<span key={c.chainId}>
-						<span><Checkbox style={{padding: 1, transform: 'scale(0.9)'}} onClick={() => setSelectedChainIds(toggle(selectedChainIds, c.chainId))} checked={selectedChainIds.includes(c.chainId)} /><span>{c.chainId}</span></span>
-						<br />
-					</span>
-				))
-			}
+			<button onClick={() => setSelectedChainIds([])}>clear</button>
+			&nbsp;
+			<button onClick={() => setSelectedChainIds(allChainIds)}>select all</button>
+			<div style={{paddingLeft: 8}}>
+				{
+					chains.map(c => (
+						<span key={c.chainId}>
+							<FormControlLabel
+								control={
+									<Checkbox
+										style={{padding: 1, transform: 'scale(0.8)'}}
+										onClick={() => setSelectedChainIds(toggle(selectedChainIds, c.chainId))}
+										checked={selectedChainIds.includes(c.chainId)} />
+								}
+								label={<span><span style={{color: chainColors[c.chainId] || 'black'}}>&#9632;</span> {c.chainId}</span>}
+							/>
+							<br />
+						</span>
+					))
+				}
+			</div>
 		</div>
 	)
 }

@@ -7,11 +7,12 @@ type Props = {
 	chainIds: string[]
 	variableName: string
 	highlightIterationRange?: [number, number]
+	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
 
-const SequencePlot: FunctionComponent<Props> = ({runId, chainIds, variableName, highlightIterationRange, width, height}) => {
+const SequencePlot: FunctionComponent<Props> = ({runId, chainIds, variableName, highlightIterationRange, chainColors, width, height}) => {
 	const {sequences, updateSequence} = useMCMCMonitor()
 	useEffect(() => {
 		for (const chainId of chainIds) {
@@ -27,12 +28,13 @@ const SequencePlot: FunctionComponent<Props> = ({runId, chainIds, variableName, 
 			if (s) {
 				ret.push({
 					label: chainId,
-					data: s.data
+					data: s.data,
+					color: chainColors[chainId] || 'black'
 				})
 			}
 		}
 		return ret
-	}, [chainIds, sequences, runId, variableName])
+	}, [chainIds, sequences, runId, variableName, chainColors])
 	return (
 		<SequencePlotWidget
 			plotSequences={plotSequences}

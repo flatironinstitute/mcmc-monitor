@@ -4,6 +4,7 @@ export type ScatterplotSequence = {
 	label: string
 	xData: number[]
 	yData: number[]
+	color: string
 }
 
 type Props = {
@@ -28,7 +29,7 @@ const SequenceScatterplotWidget: FunctionComponent<Props> = ({ scatterplotSequen
 								y: ss.yData,
 								type: 'scatter',
 								mode: 'markers',
-								// marker: {color: 'black'},
+								marker: {size: 5, color: ss.color}
 							}
 						))
 					}

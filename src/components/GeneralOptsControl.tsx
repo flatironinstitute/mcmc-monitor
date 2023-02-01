@@ -10,7 +10,7 @@ const GeneralOptsControl: FunctionComponent<Props> = ({runId}) => {
 	const { generalOpts, setGeneralOpts, updateExistingSequences } = useMCMCMonitor()
 	return (
 		<div>
-			Update mode
+			Data update mode
 			<FormControl fullWidth size="small">
 				<Select
 					value={generalOpts.updateMode}
@@ -20,10 +20,11 @@ const GeneralOptsControl: FunctionComponent<Props> = ({runId}) => {
 					<MenuItem key={'auto'} value={'auto'}>Auto</MenuItem>
 				</Select>
 			</FormControl>
+			<div>&nbsp;</div>
 			{
 				generalOpts.updateMode === 'manual' && (
 					<span style={{fontSize: 16}}>
-						<button onClick={() => {updateExistingSequences(runId)}}>Update</button>
+						<button onClick={() => {updateExistingSequences(runId)}}>update data</button>
 					</span>
 				)
 			}

@@ -7,6 +7,7 @@ import SequencePlot from "./SequencePlot";
 type Props = {
 	runId: string
 	numIterationsForRun: number
+	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
@@ -31,7 +32,7 @@ export const useSequenceHistogramIterationRange = (numIterationsForRun: number) 
 	return sequenceHistogramIterationRange
 }
 
-const ConvergenceTab: FunctionComponent<Props> = ({runId, numIterationsForRun, width, height}) => {
+const ConvergenceTab: FunctionComponent<Props> = ({runId, numIterationsForRun, chainColors, width, height}) => {
 	const {selectedVariableNames, selectedChainIds, sequenceHistogramOpts} = useMCMCMonitor()
 
 	const sequenceHistogramIterationRange = useSequenceHistogramIterationRange(numIterationsForRun)
@@ -48,6 +49,7 @@ const ConvergenceTab: FunctionComponent<Props> = ({runId, numIterationsForRun, w
 									<SequencePlot
 										runId={runId}
 										chainIds={selectedChainIds}
+										chainColors={chainColors}
 										variableName={v}
 										highlightIterationRange={sequenceHistogramIterationRange}
 										width={Math.min(width, 700)}

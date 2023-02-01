@@ -10,9 +10,10 @@ import VariablesSelector from "./VariablesSelector";
 type Props = {
 	runId: string
 	numIterationsForRun: number
+	chainColors: {[chainId: string]: string}
 }
 
-const RunControlPanel: FunctionComponent<Props> = ({runId, numIterationsForRun}) => {
+const RunControlPanel: FunctionComponent<Props> = ({runId, numIterationsForRun, chainColors}) => {
 	const {chains, setSelectedVariableNames} = useMCMCMonitor()
 	const {setRoute} = useRoute()
 	const chainsForRun = useMemo(() => (chains.filter(c => (c.runId === runId))), [chains, runId])
@@ -31,6 +32,8 @@ const RunControlPanel: FunctionComponent<Props> = ({runId, numIterationsForRun})
 		})
 	}, [chainsForRun])
 
+	const numTrueVariables = useMemo(() => (allVariableNames.filter(v => (!v.includes('__'))).length), [allVariableNames])
+
 	useEffect(() => {
 		// start with just lp__ selected
 		if (allVariableNames.includes('lp__')) {
@@ -42,10 +45,11 @@ const RunControlPanel: FunctionComponent<Props> = ({runId, numIterationsForRun})
 		<div style={{fontSize: 14}}>
 			<Hyperlink onClick={() => setRoute({page: 'home'})}>Back to home</Hyperlink>
 			<h2>Run: {runId}</h2>
-			<p>Num. iterations: {numIterationsForRun}</p>
+			<p>{numIterationsForRun} iterations | {numTrueVariables} variables | {chainsForRun.length} chains</p>
+
 			<h3>Chains</h3>
 			<div style={{position: 'relative', maxHeight: 200, overflowY: 'auto'}}>
-				<ChainsSelector chains={chainsForRun} />
+				<ChainsSelector chains={chainsForRun} allChainIds={chainsForRun.map(c => (c.chainId))} chainColors={chainColors} />
 			</div>
 			<h3>Variables</h3>
 			<div style={{position: 'relative', maxHeight: 200, overflowY: 'auto'}}>

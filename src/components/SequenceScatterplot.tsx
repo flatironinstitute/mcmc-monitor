@@ -10,11 +10,12 @@ type Props = {
 	xVariableName: string
 	yVariableName: string
 	highlightIterationRange?: [number, number]
+	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
 
-const SequenceScatterplot: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, highlightIterationRange, width, height}) => {
+const SequenceScatterplot: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, highlightIterationRange, chainColors, width, height}) => {
 	const {sequences, updateSequence} = useMCMCMonitor()
 	useEffect(() => {
 		for (const chainId of chainIds) {
@@ -35,12 +36,13 @@ const SequenceScatterplot: FunctionComponent<Props> = ({runId, chainIds, xVariab
 				ret.push({
 					label: chainId,
 					xData: applyIterationRange(sX.data, highlightIterationRange),
-					yData: applyIterationRange(sY.data, highlightIterationRange)
+					yData: applyIterationRange(sY.data, highlightIterationRange),
+					color: chainColors[chainId] || 'black'
 				})
 			}
 		}
 		return ret
-	}, [chainIds, sequences, runId, xVariableName, yVariableName, highlightIterationRange])
+	}, [chainIds, chainColors, sequences, runId, xVariableName, yVariableName, highlightIterationRange])
 	return (
 		<SequenceScatterplotWidget
 			scatterplotSequences={scatterplotSequences}

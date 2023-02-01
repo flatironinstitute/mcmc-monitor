@@ -8,7 +8,7 @@ const SequenceHistogramOptsControl: FunctionComponent<Props> = () => {
 	const { sequenceHistogramOpts, setSequenceHistogramOpts } = useMCMCMonitor()
 	return (
 		<div>
-			Iterations to use for histograms
+			Iterations to use for histograms and scatterplots
 			<FormControl fullWidth size="small">
 				<Select
 					value={sequenceHistogramOpts.numIterations}

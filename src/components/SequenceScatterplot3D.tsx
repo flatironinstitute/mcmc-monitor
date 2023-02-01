@@ -11,11 +11,12 @@ type Props = {
 	yVariableName: string
 	zVariableName: string
 	highlightIterationRange?: [number, number]
+	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
 
-const SequenceScatterplot3D: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, zVariableName, highlightIterationRange, width, height}) => {
+const SequenceScatterplot3D: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, zVariableName, highlightIterationRange, chainColors, width, height}) => {
 	const {sequences, updateSequence} = useMCMCMonitor()
 	useEffect(() => {
 		for (const chainId of chainIds) {
@@ -41,12 +42,13 @@ const SequenceScatterplot3D: FunctionComponent<Props> = ({runId, chainIds, xVari
 					label: chainId,
 					xData: applyIterationRange(sX.data, highlightIterationRange),
 					yData: applyIterationRange(sY.data, highlightIterationRange),
-					zData: applyIterationRange(sZ.data, highlightIterationRange)
+					zData: applyIterationRange(sZ.data, highlightIterationRange),
+					color: chainColors[chainId] || 'black'
 				})
 			}
 		}
 		return ret
-	}, [chainIds, sequences, runId, xVariableName, yVariableName, zVariableName, highlightIterationRange])
+	}, [chainIds, chainColors, sequences, runId, xVariableName, yVariableName, zVariableName, highlightIterationRange])
 	return (
 		<SequenceScatterplot3DWidget
 			scatterplot3DSequences={scatterplot3DSequences}
