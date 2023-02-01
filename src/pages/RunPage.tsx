@@ -5,6 +5,7 @@ import RunControlPanel from "../components/RunControlPanel";
 import RunInfoTab from "../components/RunInfoTab";
 import ScatterplotsTab from "../components/ScatterplotsTab";
 import Splitter from "../components/Splitter";
+import TablesTab from "../components/TablesTab";
 import TabWidget from "../components/TabWidget/TabWidget";
 import { useMCMCMonitor } from "../MCMCMonitorData";
 import { MCMCChain, MCMCRun } from "../MCMCMonitorTypes";
@@ -57,8 +58,8 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 	}, [chainsForRun])
 
 	useEffect(() => {
-		// start with all chains selected
-		setSelectedChainIds(chainsForRun.map(c => (c.chainId)))
+		// start with 5 chains selected
+		setSelectedChainIds(chainsForRun.slice(0, 5).map(c => (c.chainId)))
 	}, [runId, setSelectedChainIds, chainsForRun])
 
 	const {width, height} = useWindowDimensions()
@@ -100,6 +101,7 @@ type RightContentProps = {
 
 const tabs = [
 	{label: 'Convergence', closeable: false},
+	{label: 'Tables', closeable: false},
 	{label: 'Run Info', closeable: false},
 	{label: 'Scatterplots', closeable: false}
 ]
@@ -116,6 +118,12 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, runI
 				height={0}
 				runId={runId}
 				chainColors={chainColors}
+				numIterationsForRun={numIterationsForRun}
+			/>
+			<TablesTab
+				width={0}
+				height={0}
+				runId={runId}
 				numIterationsForRun={numIterationsForRun}
 			/>
 			<RunInfoTab
