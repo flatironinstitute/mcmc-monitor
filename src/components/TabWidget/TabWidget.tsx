@@ -47,7 +47,8 @@ const TabWidget: FunctionComponent<PropsWithChildren<Props>> = ({children, tabs,
                     const visible = i === currentTabIndex
                     return (
                         <div key={`child-${i}`} style={{visibility: visible ? 'visible' : 'hidden', overflowY: 'hidden', overflowX: 'hidden', position: 'absolute', left: 0, top: tabBarHeight, width: W, height: H}}>
-                            {(visible || hasBeenVisible.includes(i)) && (
+                            {/* {(visible || hasBeenVisible.includes(i)) && ( */}
+                            {visible && (
                                 <c.type {...c.props} width={W} height={H - tabBarHeight}/>
                             )}
                         </div>

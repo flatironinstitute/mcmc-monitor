@@ -83,7 +83,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numIterationsForRun,
 				&nbsp;
 				<PlotSizeSelector plotSize={plotSize} setPlotSize={setPlotSize} />
 			</Grid>
-			<div style={{ position: 'absolute', top: 70, width, height: height - 70, overflowY: 'auto' }}>
+			<div style={{ position: 'absolute', top: 70, width, height: height - 100, overflowY: 'auto' }}>
 				{
 					tooMany && (mode === '2d' || mode === 'both') && (
 						<div>Too many variables selected, only showing first 20 plots.</div>
@@ -138,8 +138,10 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numIterationsForRun,
 						</Grid>
 					)
 				}
+				<div>&nbsp;</div>
+				<div>&nbsp;</div>
+				<div>&nbsp;</div>
 			</div>
-			<div>&nbsp;</div>
 		</div>
 	)
 }
