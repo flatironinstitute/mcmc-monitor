@@ -8,7 +8,7 @@ How it works:
 
 1. Run the mcmc-monitor service on your local computer (see below), configuring it to monitor an output directory.
 2. Run a Stan program, configuring it to write output to a subdirectory of the output directory.
-3. [Open the web app](http://magland.github.io/mcmc-monitor) to monitor and visualize the Stan run.
+3. [Open the web app](http://flatironinstitute.github.io/mcmc-monitor) to monitor and visualize the Stan run.
 
 ## Running the local server
 
@@ -25,7 +25,7 @@ npx mcmc-monitor@latest start --dir /path/to/parent/output/directory --verbose
 
 ## Opening the web app
 
-The web app is hosted [here](http://magland.github.io/mcmc-monitor).
+The web app is hosted [here](http://flatironinstitute.github.io/mcmc-monitor).
 
 ## Installing cmdstan and cmdstanpy
 

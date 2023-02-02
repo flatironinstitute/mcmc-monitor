@@ -12,7 +12,7 @@ class Server {
         this.#expressApp = express()
         this.#expressApp.use(express.json())
         this.#expressServer = http.createServer(this.#expressApp)
-        const allowedOrigins = ['https://magland.github.io', 'http://127.0.0.1:5173']
+        const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173']
         this.#expressApp.use((req: Request, resp: Response, next: NextFunction) => {
             const origin = req.get('origin')
             const allowedOrigin = allowedOrigins.includes(origin) ? origin : undefined

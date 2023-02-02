@@ -80,8 +80,6 @@ async function computeAutocorrelationData(sequenceData: number[], n: number) {
 		y.push(y0)
 	}
 
-	console.log('---', dx, y)
-
 	return {dx, y}
 }
 
