@@ -67,6 +67,8 @@ async function computeAutocorrelationData(sequenceData: number[], n: number) {
 	if (v.length < 2) return undefined
 	const mu = computeMean(v)
 	if (mu === undefined) return undefined
+	const normalizationFactor = v.map(v => (v - mu)).reduce((a, b) => (a + b * b))
+
 	const sequenceData2 = sequenceData.map(a => (a - mu))
 
 	const dx: number[] = []
@@ -77,7 +79,7 @@ async function computeAutocorrelationData(sequenceData: number[], n: number) {
 			y0 += sequenceData2[i] * sequenceData2[i + dx0]
 		}
 		dx.push(dx0)
-		y.push(y0)
+		y.push(y0 / normalizationFactor)
 	}
 
 	return {dx, y}
