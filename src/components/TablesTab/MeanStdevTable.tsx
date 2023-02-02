@@ -1,60 +1,44 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
-import { FunctionComponent, useCallback, useEffect, useMemo } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
-import { useSequenceHistogramIterationRange } from "./DiagnosticsTab";
-import { applyIterationRange } from "./SequenceHistogram";
+import { FunctionComponent, useCallback, useMemo } from "react";
 
 type Props = {
-	runId: string
-	numIterationsForRun: number
-	width: number
-	height: number
+	chainIds: string[]
+    variableNames: string[]
+    sequenceData: {[chainVariableCode: string]: number[]}
 }
 
-const TablesTab: FunctionComponent<Props> = ({runId, numIterationsForRun}) => {
-	const {selectedVariableNames, selectedChainIds, updateSequence, sequences} = useMCMCMonitor()
-
-	const sequenceHistogramIterationRange = useSequenceHistogramIterationRange(numIterationsForRun)
-
+const MeanStdevTable: FunctionComponent<Props> = ({chainIds, variableNames, sequenceData}) => {
 	const columns = useMemo(() => ([
 		{
 			key: 'variableName',
 			label: 'Variable'
 		},
 		...(
-			selectedChainIds.map((chainId, ii) => ({
+			chainIds.map((chainId, ii) => ({
 				key: chainId,
 				label: ii + 1
 			}))
 		)
-	]), [selectedChainIds])
-
-	useEffect(() => {
-		for (const chainId of selectedChainIds) {
-			for (const variableName of selectedVariableNames) {
-				updateSequence(runId, chainId, variableName)
-			}
-		}
-	}, [runId, selectedChainIds, selectedVariableNames, updateSequence])
+	]), [chainIds])
 
 	const computeVariableMeanStdev = useCallback((variableName: string, chainId: string) => {
-		const s = sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName))[0]
-		if (s) {
-			const dd = applyIterationRange(s.data, sequenceHistogramIterationRange)
-			return {mean: computeMean(dd), stdev: computeStdev(dd)}
+		const cc = `${chainId}:${variableName}`
+		const sData = sequenceData[cc]
+		if (sData) {
+			return {mean: computeMean(sData), stdev: computeStdev(sData)}
 		}
 		else return {mean: undefined, stdev: undefined}
-	}, [sequences, runId, sequenceHistogramIterationRange])
+	}, [sequenceData])
 
 	const rows = useMemo(() => {
-		return selectedVariableNames.map(v => {
+		return variableNames.map(v => {
 			const a = {
 				key: v,
 				values: {
 					variableName: v
 				} as {[key: string]: any}
 			}
-			selectedChainIds.forEach(chainId => {
+			chainIds.forEach(chainId => {
 				let {mean, stdev} = computeVariableMeanStdev(v, chainId)
 				if (mean !== undefined) mean = parseFloat(mean.toPrecision(3))
 				if (stdev !== undefined) stdev = parseFloat(stdev.toPrecision(3))
@@ -64,7 +48,7 @@ const TablesTab: FunctionComponent<Props> = ({runId, numIterationsForRun}) => {
 			})
 			return a
 		})
-	}, [selectedVariableNames, selectedChainIds, computeVariableMeanStdev])
+	}, [variableNames, chainIds, computeVariableMeanStdev])
 
 	return (
 		<Table>
@@ -107,4 +91,4 @@ function computeStdev(d: number[]) {
 	return Math.sqrt(sumsqr / d.length - m0 * m0)
 }
 
-export default TablesTab
+export default MeanStdevTable

@@ -3,7 +3,7 @@ import { useMCMCMonitor } from "../MCMCMonitorData";
 import { MCMCSequence } from "../MCMCMonitorTypes";
 import AutocorrelationPlotWidget from "./AutocorrelationPlotWidget";
 import { applyIterationRange } from "./SequenceHistogram";
-import { computeMean } from "./TablesTab";
+import { autocorr } from "./stats/ess";
 
 type Props = {
 	runId: string
@@ -42,7 +42,7 @@ const AutocorrelationPlot: FunctionComponent<Props> = ({runId, chainId, variable
 		if (!sequenceData) return
 		if (!iterationRange) return
 		;(async () => {
-			const a = await computeAutocorrelationData(sequenceData, Math.min(50, (iterationRange[1] - iterationRange[0]) / 5))
+			const a = await computeAutocorrelationData(sequenceData, Math.min(100, (iterationRange[1] - iterationRange[0]) / 2))
 			if (canceled) return
 			setAutocorrelationData(a)
 		})()
@@ -60,29 +60,37 @@ const AutocorrelationPlot: FunctionComponent<Props> = ({runId, chainId, variable
 }
 
 async function computeAutocorrelationData(sequenceData: number[], n: number) {
-	const v: number[] = []
-	for (let i = n; i < sequenceData.length - n; i++) {
-		v.push(sequenceData[i])
-	}
-	if (v.length < 2) return undefined
-	const mu = computeMean(v)
-	if (mu === undefined) return undefined
-	const normalizationFactor = v.map(v => (v - mu)).reduce((a, b) => (a + b * b))
-
-	const sequenceData2 = sequenceData.map(a => (a - mu))
-
+	const acor = autocorr(sequenceData, n)
 	const dx: number[] = []
 	const y: number[] = []
-	for (let dx0 = -n; dx0 <= n; dx0++) {
-		let y0 = 0
-		for (let i = n; i < sequenceData.length - n; i++) {
-			y0 += sequenceData2[i] * sequenceData2[i + dx0]
-		}
-		dx.push(dx0)
-		y.push(y0 / normalizationFactor)
+	for (let i = 0; i < n; i++) {
+		dx.push(i)
+		y.push(acor[i])
 	}
-
 	return {dx, y}
+	// const v: number[] = []
+	// for (let i = n; i < sequenceData.length - n; i++) {
+	// 	v.push(sequenceData[i])
+	// }
+	// if (v.length < 2) return undefined
+	// const mu = computeMean(v)
+	// if (mu === undefined) return undefined
+	// const normalizationFactor = v.map(v => (v - mu)).reduce((a, b) => (a + b * b))
+
+	// const sequenceData2 = sequenceData.map(a => (a - mu))
+
+	// const dx: number[] = []
+	// const y: number[] = []
+	// for (let dx0 = -n; dx0 <= n; dx0++) {
+	// 	let y0 = 0
+	// 	for (let i = n; i < sequenceData.length - n; i++) {
+	// 		y0 += sequenceData2[i] * sequenceData2[i + dx0]
+	// 	}
+	// 	dx.push(dx0)
+	// 	y.push(y0 / normalizationFactor)
+	// }
+
+	// return {dx, y}
 }
 
 export default AutocorrelationPlot

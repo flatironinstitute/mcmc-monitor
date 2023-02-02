@@ -5,7 +5,7 @@ import RunControlPanel from "../components/RunControlPanel";
 import RunInfoTab from "../components/RunInfoTab";
 import ScatterplotsTab from "../components/ScatterplotsTab";
 import Splitter from "../components/Splitter";
-import TablesTab from "../components/TablesTab";
+import TablesTab from "../components/TablesTab/TablesTab";
 import TabWidget from "../components/TabWidget/TabWidget";
 import { useMCMCMonitor } from "../MCMCMonitorData";
 import { MCMCChain, MCMCRun } from "../MCMCMonitorTypes";
