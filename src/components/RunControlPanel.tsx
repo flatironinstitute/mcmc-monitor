@@ -32,7 +32,7 @@ const RunControlPanel: FunctionComponent<Props> = ({runId, numIterationsForRun, 
 		})
 	}, [chainsForRun])
 
-	const numTrueVariables = useMemo(() => (allVariableNames.filter(v => (!v.includes('__'))).length), [allVariableNames])
+	const numParameters = useMemo(() => (allVariableNames.filter(v => (!v.includes('__'))).length), [allVariableNames])
 
 	useEffect(() => {
 		// start with just lp__ selected
@@ -45,7 +45,7 @@ const RunControlPanel: FunctionComponent<Props> = ({runId, numIterationsForRun, 
 		<div style={{fontSize: 14}}>
 			<Hyperlink onClick={() => setRoute({page: 'home'})}>Back to home</Hyperlink>
 			<h2>Run: {runId}</h2>
-			<p>{numIterationsForRun} iterations | {numTrueVariables} variables | {chainsForRun.length} chains</p>
+			<p>{numIterationsForRun} iterations | {numParameters} parameters | {chainsForRun.length} chains</p>
 
 			<h3>Chains</h3>
 			<div style={{position: 'relative', maxHeight: 200, overflowY: 'auto'}}>

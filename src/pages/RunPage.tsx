@@ -1,6 +1,6 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
 import { chainColorForIndex } from "../chainColorList";
-import ConvergenceTab from "../components/ConvergenceTab";
+import Diagnostics from "../components/DiagnosticsTab";
 import RunControlPanel from "../components/RunControlPanel";
 import RunInfoTab from "../components/RunInfoTab";
 import ScatterplotsTab from "../components/ScatterplotsTab";
@@ -100,7 +100,7 @@ type RightContentProps = {
 }
 
 const tabs = [
-	{label: 'Convergence', closeable: false},
+	{label: 'Diagnostics', closeable: false},
 	{label: 'Tables', closeable: false},
 	{label: 'Run Info', closeable: false},
 	{label: 'Scatterplots', closeable: false}
@@ -113,7 +113,7 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, runI
 			width={width}
 			height={height}
 		>
-			<ConvergenceTab
+			<Diagnostics
 				width={0}
 				height={0}
 				runId={runId}

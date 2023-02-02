@@ -40,11 +40,13 @@ const SequenceScatterplot3DWidget: FunctionComponent<Props> = ({ scatterplot3DSe
 						width,
 						height,
 						title: '',
-						xaxis: {title: xVariableName},
-						yaxis: {title: yVariableName},
-						zaxis: {title: zVariableName},
+						scene: {
+							xaxis: {title: xVariableName},
+							yaxis: {title: yVariableName},
+							zaxis: {title: zVariableName}
+						},
 						showlegend: false
-					} as any}
+					}}
 				/>
 			</Suspense>
 		</div>

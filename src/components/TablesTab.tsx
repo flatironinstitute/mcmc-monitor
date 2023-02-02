@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FunctionComponent, useCallback, useEffect, useMemo } from "react";
 import { useMCMCMonitor } from "../MCMCMonitorData";
-import { useSequenceHistogramIterationRange } from "./ConvergenceTab";
+import { useSequenceHistogramIterationRange } from "./DiagnosticsTab";
 import { applyIterationRange } from "./SequenceHistogram";
 
 type Props = {
@@ -94,7 +94,7 @@ const TablesTab: FunctionComponent<Props> = ({runId, numIterationsForRun}) => {
 	)
 }
 
-function computeMean(d: number[]) {
+export function computeMean(d: number[]) {
 	if (d.length === 0) return undefined
 	return d.reduce((a, b) => (a + b), 0) / d.length
 }

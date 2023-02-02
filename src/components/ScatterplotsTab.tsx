@@ -1,7 +1,7 @@
 import { Grid, Select, SelectChangeEvent, MenuItem, FormControl } from "@mui/material";
 import { FunctionComponent, useMemo, useState } from "react";
 import { useMCMCMonitor } from "../MCMCMonitorData";
-import { useSequenceHistogramIterationRange } from "./ConvergenceTab";
+import { useSequenceHistogramIterationRange } from "./DiagnosticsTab";
 import SequenceScatterplot from "./SequenceScatterplot";
 import SequenceScatterplot3D from "./SequenceScatterplot3D";
 
