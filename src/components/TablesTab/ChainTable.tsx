@@ -1,47 +1,48 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useCallback, useMemo } from "react";
 import { useMCMCMonitor } from "../../useMCMCMonitor";
 
 type Props = {
-	chainIds: string[]
-    variableNames: string[]
+	chainId: string
+	variableNames: string[]
 }
 
-const ESSTable: FunctionComponent<Props> = ({chainIds, variableNames}) => {
+const ChainTable: FunctionComponent<Props> = ({chainId, variableNames}) => {
 	const {sequenceStats, selectedRunId: runId} = useMCMCMonitor()
+
 	const columns = useMemo(() => ([
 		{
 			key: 'variableName',
 			label: 'Variable'
 		},
-		...(
-			chainIds.map((chainId, ii) => ({
-				key: chainId,
-				label: ii + 1
-			}))
-		)
-	]), [chainIds])
+		{
+			key: 'meanStdev',
+			label: 'Mean (st.dev)'
+		},
+		{
+			key: 'ess',
+			label: 'ESS'
+		}
+	]), [])
 
 	const rows = useMemo(() => {
 		return variableNames.map(v => {
+			const k = `${runId}/${chainId}/${v}`
+			let {mean, stdev, ess} = sequenceStats[k] || {}
+			if (mean !== undefined) mean = parseFloat(mean.toPrecision(3))
+			if (stdev !== undefined) stdev = parseFloat(stdev.toPrecision(3))
+			if (ess !== undefined) ess = parseFloat(ess.toPrecision(3))
 			const a = {
 				key: v,
 				values: {
-					variableName: v
+					variableName: v,
+					meanStdev: mean !== undefined ? `${mean} (${stdev})` : '',
+					ess: ess !== undefined ? ess : ''
 				} as {[key: string]: any}
 			}
-			chainIds.forEach(chainId => {
-				const k = `${runId}/${chainId}/${v}`
-				// let {ess} = computeESS(v, chainId)
-				let {ess} = sequenceStats[k] || {}
-				if (ess !== undefined) ess = parseFloat(ess.toPrecision(3))
-				a.values[chainId] = ess === undefined ? undefined : (
-					`${ess}`
-				)
-			})
 			return a
 		})
-	}, [variableNames, chainIds, sequenceStats, runId])
+	}, [variableNames, chainId, runId, sequenceStats])
 
 	return (
 		<Table>
@@ -71,4 +72,4 @@ const ESSTable: FunctionComponent<Props> = ({chainIds, variableNames}) => {
 	)
 }
 
-export default ESSTable
+export default ChainTable

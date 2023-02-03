@@ -1,4 +1,4 @@
-import { ess } from "../components/stats/ess";
+import { ess } from "./stats/ess";
 import { MCMCMonitorAction, MCMCMonitorData, SequenceStats } from "./MCMCMonitorData";
 
 export default async function updateSequenceStats(data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void) {

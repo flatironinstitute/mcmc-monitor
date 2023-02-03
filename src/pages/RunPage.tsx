@@ -126,8 +126,6 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, numD
 			<TablesTab
 				width={0}
 				height={0}
-				runId={runId}
-				numDrawsForRun={numDrawsForRun}
 			/>
 			<RunInfoTab
 				width={0}

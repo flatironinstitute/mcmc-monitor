@@ -1,32 +1,28 @@
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent } from "react";
 import { useMCMCMonitor } from "../../useMCMCMonitor";
-import { useSequenceDrawRange } from "../DiagnosticsTab";
-import { applyDrawRange } from "../SequenceHistogram";
-import ESSTable from "./ESSTable";
-import MeanStdevTable from "./MeanStdevTable";
+import ChainTable from "./ChainTable";
 
 type Props = {
-	runId: string
-	numDrawsForRun: number
 	width: number
 	height: number
 }
 
-const TablesTab: FunctionComponent<Props> = ({runId, numDrawsForRun}) => {
+const TablesTab: FunctionComponent<Props> = ({width, height}) => {
 	const {selectedVariableNames, selectedChainIds} = useMCMCMonitor()
 
 	return (
-		<div>
-			<h3>Mean (Std.Dev)</h3>
-			<MeanStdevTable
-				chainIds={selectedChainIds}
-				variableNames={selectedVariableNames}
-			/>
-			<h3>Effective sample size (ESS)</h3>
-			<ESSTable
-				chainIds={selectedChainIds}
-				variableNames={selectedVariableNames}
-			/>
+		<div style={{position: 'absolute', width, height, overflowY: 'auto'}}>
+			{
+				selectedChainIds.map(chainId => (
+					<span key={chainId}>
+						<h3>Chain: {chainId}</h3>
+						<ChainTable
+							chainId={chainId}
+							variableNames={selectedVariableNames}
+						/>
+					</span>
+				))
+			}
 		</div>
 	)
 }
