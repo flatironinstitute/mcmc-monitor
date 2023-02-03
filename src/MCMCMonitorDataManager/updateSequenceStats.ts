@@ -1,5 +1,5 @@
 import { ess } from "../components/stats/ess";
-import { MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorData";
+import { MCMCMonitorAction, MCMCMonitorData, SequenceStats } from "./MCMCMonitorData";
 
 export default async function updateSequenceStats(data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void) {
     const runId = data.selectedRunId
@@ -26,14 +26,15 @@ export default async function updateSequenceStats(data: MCMCMonitorData, dispatc
     }
 }
 
-function computeStatsForSequence(seqData: number[]) {
+function computeStatsForSequence(seqData: number[]): SequenceStats {
     const mean = computeMean(seqData)
     const stdev = computeStdev(seqData)
-    const ess0 = ess(seqData)
+    const {ess: ess0, acor} = ess(seqData)
     return {
         mean,
         stdev,
-        ess: ess0
+        ess: ess0,
+        acor
     }
 }
 

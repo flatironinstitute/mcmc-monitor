@@ -10,6 +10,7 @@ export type SequenceStats = {
     mean?: number
     stdev?: number
     ess?: number
+    acor?: number[]
 }
 
 export type MCMCMonitorData = {

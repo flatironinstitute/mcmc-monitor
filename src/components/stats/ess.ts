@@ -50,10 +50,10 @@ export function ess_ipse(chain: number[]): number {
     return ess
 }
 
-export function ess_imse(chain: number[]): number {
+export function ess_imse(chain: number[]): {ess: number, acor: number[]} {
     if (chain.length < 4) {
         console.warn('ess requires chain.length >=4')
-        return 0
+        return {ess: 0, acor: []}
     }
     const acor = autocorr(chain, chain.length)
     const n = first_neg_pair_start(acor)
@@ -68,7 +68,7 @@ export function ess_imse(chain: number[]): number {
 
     const sigma_sq_hat = acor[0] + 2 * accum
     const ess = chain.length / sigma_sq_hat
-    return ess
+    return {ess, acor}
 }
 
 export function ess(chain: number[]) {
