@@ -1,6 +1,6 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
-import { applyIterationRange } from "./SequenceHistogram";
+import { useMCMCMonitor } from "../useMCMCMonitor";
+import { applyDrawRange } from "./SequenceHistogram";
 import SequenceScatterplot3DWidget from "./SequenceScatterplot3DWidget"
 import { Scatterplot3DSequence } from "./SequenceScatterplot3DWidget";
 
@@ -10,13 +10,13 @@ type Props = {
 	xVariableName: string
 	yVariableName: string
 	zVariableName: string
-	highlightIterationRange?: [number, number]
+	highlightDrawRange?: [number, number]
 	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
 
-const SequenceScatterplot3D: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, zVariableName, highlightIterationRange, chainColors, width, height}) => {
+const SequenceScatterplot3D: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, zVariableName, highlightDrawRange, chainColors, width, height}) => {
 	const {sequences, updateSequence} = useMCMCMonitor()
 	useEffect(() => {
 		for (const chainId of chainIds) {
@@ -40,15 +40,15 @@ const SequenceScatterplot3D: FunctionComponent<Props> = ({runId, chainIds, xVari
 			if ((sX) && (sY) && (sZ)) {
 				ret.push({
 					label: chainId,
-					xData: applyIterationRange(sX.data, highlightIterationRange),
-					yData: applyIterationRange(sY.data, highlightIterationRange),
-					zData: applyIterationRange(sZ.data, highlightIterationRange),
+					xData: applyDrawRange(sX.data, highlightDrawRange),
+					yData: applyDrawRange(sY.data, highlightDrawRange),
+					zData: applyDrawRange(sZ.data, highlightDrawRange),
 					color: chainColors[chainId] || 'black'
 				})
 			}
 		}
 		return ret
-	}, [chainIds, chainColors, sequences, runId, xVariableName, yVariableName, zVariableName, highlightIterationRange])
+	}, [chainIds, chainColors, sequences, runId, xVariableName, yVariableName, zVariableName, highlightDrawRange])
 	return (
 		<SequenceScatterplot3DWidget
 			scatterplot3DSequences={scatterplot3DSequences}

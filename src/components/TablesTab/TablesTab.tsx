@@ -1,21 +1,21 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { useMCMCMonitor } from "../../MCMCMonitorData";
-import { useSequenceHistogramIterationRange } from "../DiagnosticsTab";
+import { useMCMCMonitor } from "../../useMCMCMonitor";
 import MeanStdevTable from "./MeanStdevTable";
-import { applyIterationRange } from "../SequenceHistogram";
+import { applyDrawRange } from "../SequenceHistogram";
 import ESSTable from "./ESSTable";
+import { useSequenceDrawRange } from "../DiagnosticsTab";
 
 type Props = {
 	runId: string
-	numIterationsForRun: number
+	numDrawsForRun: number
 	width: number
 	height: number
 }
 
-const TablesTab: FunctionComponent<Props> = ({runId, numIterationsForRun}) => {
+const TablesTab: FunctionComponent<Props> = ({runId, numDrawsForRun}) => {
 	const {selectedVariableNames, selectedChainIds, updateSequence, sequences} = useMCMCMonitor()
 
-	const sequenceHistogramIterationRange = useSequenceHistogramIterationRange(numIterationsForRun)
+	const sequenceDrawRange = useSequenceDrawRange(numDrawsForRun)
 
 	useEffect(() => {
 		for (const chainId of selectedChainIds) {
@@ -32,12 +32,12 @@ const TablesTab: FunctionComponent<Props> = ({runId, numIterationsForRun}) => {
 				const s = sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName))[0]
 				if (s) {
 					const cc = `${chainId}:${variableName}`
-					ret[cc] = applyIterationRange(s.data, sequenceHistogramIterationRange)
+					ret[cc] = applyDrawRange(s.data, sequenceDrawRange)
 				}
 			}
 		}
 		return ret
-	}, [selectedChainIds, selectedVariableNames, sequenceHistogramIterationRange, runId, sequences])
+	}, [selectedChainIds, selectedVariableNames, sequenceDrawRange, runId, sequences])
 
 	return (
 		<div>
@@ -47,7 +47,7 @@ const TablesTab: FunctionComponent<Props> = ({runId, numIterationsForRun}) => {
 				variableNames={selectedVariableNames}
 				sequenceData={filteredSequenceData}
 			/>
-			<h3>Estimated sample size (ESS)</h3>
+			<h3>Effective sample size (ESS)</h3>
 			<ESSTable
 				chainIds={selectedChainIds}
 				variableNames={selectedVariableNames}

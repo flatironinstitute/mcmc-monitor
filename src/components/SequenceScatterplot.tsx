@@ -1,6 +1,6 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
-import { applyIterationRange } from "./SequenceHistogram";
+import { useMCMCMonitor } from "../useMCMCMonitor";
+import { applyDrawRange } from "./SequenceHistogram";
 import SequenceScatterplotWidget from "./SequenceScatterplotWidget";
 import { ScatterplotSequence } from "./SequenceScatterplotWidget";
 
@@ -9,13 +9,13 @@ type Props = {
 	chainIds: string[]
 	xVariableName: string
 	yVariableName: string
-	highlightIterationRange?: [number, number]
+	highlightDrawRange?: [number, number]
 	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
 
-const SequenceScatterplot: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, highlightIterationRange, chainColors, width, height}) => {
+const SequenceScatterplot: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, highlightDrawRange, chainColors, width, height}) => {
 	const {sequences, updateSequence} = useMCMCMonitor()
 	useEffect(() => {
 		for (const chainId of chainIds) {
@@ -35,14 +35,14 @@ const SequenceScatterplot: FunctionComponent<Props> = ({runId, chainIds, xVariab
 			if ((sX) && (sY)) {
 				ret.push({
 					label: chainId,
-					xData: applyIterationRange(sX.data, highlightIterationRange),
-					yData: applyIterationRange(sY.data, highlightIterationRange),
+					xData: applyDrawRange(sX.data, highlightDrawRange),
+					yData: applyDrawRange(sY.data, highlightDrawRange),
 					color: chainColors[chainId] || 'black'
 				})
 			}
 		}
 		return ret
-	}, [chainIds, chainColors, sequences, runId, xVariableName, yVariableName, highlightIterationRange])
+	}, [chainIds, chainColors, sequences, runId, xVariableName, yVariableName, highlightDrawRange])
 	return (
 		<SequenceScatterplotWidget
 			scatterplotSequences={scatterplotSequences}

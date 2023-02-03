@@ -1,36 +1,26 @@
 import { Checkbox, FormControlLabel, Grid } from "@mui/material";
 import { FunctionComponent, useMemo, useState } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
+import { useMCMCMonitor } from "../useMCMCMonitor";
 import AutocorrelationPlot from "./AutocorrelationPlot";
 import SequenceHistogram from "./SequenceHistogram";
 import SequencePlot from "./SequencePlot";
 
 type Props = {
 	runId: string
-	numIterationsForRun: number
+	numDrawsForRun: number
 	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
 
-export const useSequenceHistogramIterationRange = (numIterationsForRun: number) => {
-	const {sequenceHistogramOpts} = useMCMCMonitor()
+export const useSequenceDrawRange = (numDrawsForRun: number) => {
+	const {generalOpts} = useMCMCMonitor()
 
-	const sequenceHistogramIterationRange: [number, number] | undefined = useMemo(() => {
-		if (sequenceHistogramOpts.numIterations < 0) {
-			return undefined
-		}
-		else {
-			if (numIterationsForRun <= sequenceHistogramOpts.numIterations) {
-				return undefined // undefined might be preferable to [0, numIterationsForRun] because it reduces the number of state changes
-			}
-			else {
-				return [numIterationsForRun - sequenceHistogramOpts.numIterations, numIterationsForRun]
-			}
-		}
-	}, [numIterationsForRun, sequenceHistogramOpts.numIterations])
+	const sequenceDrawRange: [number, number] | undefined = useMemo(() => {
+		return [Math.min(generalOpts.excludeInitialDraws, numDrawsForRun), numDrawsForRun]
+	}, [numDrawsForRun, generalOpts.excludeInitialDraws])
 
-	return sequenceHistogramIterationRange
+	return sequenceDrawRange
 }
 
 type DiagnosticsSelection = {
@@ -45,10 +35,10 @@ const initialDiagnosticsSelection: DiagnosticsSelection = {
 	acf: true
 }
 
-const Diagnostics: FunctionComponent<Props> = ({runId, numIterationsForRun, chainColors, width, height}) => {
-	const {selectedVariableNames, selectedChainIds, sequenceHistogramOpts} = useMCMCMonitor()
+const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColors, width, height}) => {
+	const {selectedVariableNames, selectedChainIds} = useMCMCMonitor()
 
-	const sequenceHistogramIterationRange = useSequenceHistogramIterationRange(numIterationsForRun)
+	const sequenceHistogramDrawRange = useSequenceDrawRange(numDrawsForRun)
 
 	const [diagnosticsSelection, setDiagnosticsSelection] = useState<DiagnosticsSelection>(initialDiagnosticsSelection)
 
@@ -67,7 +57,7 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numIterationsForRun, chai
 										chainIds={selectedChainIds}
 										chainColors={chainColors}
 										variableName={v}
-										highlightIterationRange={sequenceHistogramIterationRange}
+										highlightDrawRange={sequenceHistogramDrawRange}
 										width={Math.min(width, 700)}
 										height={400}
 									/>}
@@ -79,8 +69,7 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numIterationsForRun, chai
 												runId={runId}
 												chainId={chainId}
 												variableName={v}
-												sequenceHistogramOpts={sequenceHistogramOpts}
-												iterationRange={sequenceHistogramIterationRange}
+												drawRange={sequenceHistogramDrawRange}
 												width={Math.min(width, 300)}
 												height={400}
 											/>
@@ -94,7 +83,7 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numIterationsForRun, chai
 												runId={runId}
 												chainId={chainId}
 												variableName={v}
-												iterationRange={sequenceHistogramIterationRange}
+												drawRange={sequenceHistogramDrawRange}
 												width={Math.min(width, 300)}
 												height={400}
 											/>

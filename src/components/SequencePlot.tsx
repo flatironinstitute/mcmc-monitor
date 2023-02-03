@@ -1,18 +1,18 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
+import { useMCMCMonitor } from "../useMCMCMonitor";
 import SequencePlotWidget, { PlotSequence } from "./SequencePlotWidget";
 
 type Props = {
 	runId: string
 	chainIds: string[]
 	variableName: string
-	highlightIterationRange?: [number, number]
+	highlightDrawRange?: [number, number]
 	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
 
-const SequencePlot: FunctionComponent<Props> = ({runId, chainIds, variableName, highlightIterationRange, chainColors, width, height}) => {
+const SequencePlot: FunctionComponent<Props> = ({runId, chainIds, variableName, highlightDrawRange, chainColors, width, height}) => {
 	const {sequences, updateSequence} = useMCMCMonitor()
 	useEffect(() => {
 		for (const chainId of chainIds) {
@@ -41,7 +41,7 @@ const SequencePlot: FunctionComponent<Props> = ({runId, chainIds, variableName, 
 			variableName={variableName}
 			width={width}
 			height={height}
-			highlightIterationRange={highlightIterationRange}
+			highlightDrawRange={highlightDrawRange}
 		/>
 	)
 }

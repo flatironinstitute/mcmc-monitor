@@ -1,13 +1,13 @@
 import { Grid, Select, SelectChangeEvent, MenuItem, FormControl } from "@mui/material";
 import { FunctionComponent, useMemo, useState } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
-import { useSequenceHistogramIterationRange } from "./DiagnosticsTab";
+import { useMCMCMonitor } from "../useMCMCMonitor";
+import { useSequenceDrawRange } from "./DiagnosticsTab";
 import SequenceScatterplot from "./SequenceScatterplot";
 import SequenceScatterplot3D from "./SequenceScatterplot3D";
 
 type Props = {
 	runId: string
-	numIterationsForRun: number
+	numDrawsForRun: number
 	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
@@ -33,7 +33,7 @@ function sizeForPlotSize3D(ps: PlotSize) {
 	else return { x: 600, y: 600 }
 }
 
-const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numIterationsForRun, chainColors, width, height }) => {
+const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chainColors, width, height }) => {
 	const { selectedVariableNames, selectedChainIds } = useMCMCMonitor()
 
 	const [mode, setMode] = useState<Mode>('2d')
@@ -41,7 +41,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numIterationsForRun,
 	const [tooMany, setTooMany] = useState(false)
 	const [tooMany3D, setTooMany3D] = useState(false)
 
-	const sequenceHistogramIterationRange = useSequenceHistogramIterationRange(numIterationsForRun)
+	const sequenceHistogramDrawRange = useSequenceDrawRange(numDrawsForRun)
 
 	const variablePairs = useMemo(() => {
 		let ret: { v1: string, v2: string }[] = []
@@ -109,7 +109,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numIterationsForRun,
 											chainIds={selectedChainIds}
 											xVariableName={v1}
 											yVariableName={v2}
-											highlightIterationRange={sequenceHistogramIterationRange}
+											highlightDrawRange={sequenceHistogramDrawRange}
 											chainColors={chainColors}
 											width={sizeForPlotSize(plotSize).x}
 											height={sizeForPlotSize(plotSize).y}
@@ -127,7 +127,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numIterationsForRun,
 											xVariableName={v1}
 											yVariableName={v2}
 											zVariableName={v3}
-											highlightIterationRange={sequenceHistogramIterationRange}
+											highlightDrawRange={sequenceHistogramDrawRange}
 											chainColors={chainColors}
 											width={sizeForPlotSize3D(plotSize).x}
 											height={sizeForPlotSize3D(plotSize).y}

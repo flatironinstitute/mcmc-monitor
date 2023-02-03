@@ -24,5 +24,6 @@ def autocorr_fft(chain: VectorType) -> VectorType:
     acorr = np.fft.ifft(pwr).real / var / N
     return acorr
 
-y = autocorr_fft([1, 0, 0, 0, 0, 0, 0])
+# x = np.random.normal(0, 1, (100,))
+y = autocorr_fft([1, 0, 0, 0])
 print(y)

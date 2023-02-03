@@ -1,24 +1,20 @@
 import { FunctionComponent, useEffect, useMemo, useState } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
-import { MCMCSequence } from "../MCMCMonitorTypes";
+import { useMCMCMonitor } from "../useMCMCMonitor";
+import { MCMCSequence } from "../MCMCMonitorDataManager/MCMCMonitorTypes";
 import AutocorrelationPlotWidget from "./AutocorrelationPlotWidget";
-import { applyIterationRange } from "./SequenceHistogram";
+import { applyDrawRange } from "./SequenceHistogram";
 import { autocorr } from "./stats/ess";
 
 type Props = {
 	runId: string
 	chainId: string
 	variableName: string
-	iterationRange: [number, number] | undefined
+	drawRange: [number, number] | undefined
 	width: number
 	height: number
 }
 
-export type SequenceHistogramOpts = {
-	numIterations: number
-}
-
-const AutocorrelationPlot: FunctionComponent<Props> = ({runId, chainId, variableName, iterationRange, width, height}) => {
+const AutocorrelationPlot: FunctionComponent<Props> = ({runId, chainId, variableName, drawRange, width, height}) => {
 	const {sequences, updateSequence} = useMCMCMonitor()
 	useEffect(() => {
 		if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName)).length === 0) {
@@ -32,22 +28,22 @@ const AutocorrelationPlot: FunctionComponent<Props> = ({runId, chainId, variable
 	), [chainId, runId, sequences, variableName])
 
 	const sequenceData = useMemo(() => (
-		sequence ? applyIterationRange(sequence.data, iterationRange) : undefined
-	), [sequence, iterationRange])
+		sequence ? applyDrawRange(sequence.data, drawRange) : undefined
+	), [sequence, drawRange])
 
 	const [autocorrelationData, setAutocorrelationData] = useState<{dx: number[], y: number[]} | undefined>()
 	useEffect(() => {
 		let canceled = false
 		setAutocorrelationData(undefined)
 		if (!sequenceData) return
-		if (!iterationRange) return
+		if (!drawRange) return
 		;(async () => {
-			const a = await computeAutocorrelationData(sequenceData, Math.min(100, (iterationRange[1] - iterationRange[0]) / 2))
+			const a = await computeAutocorrelationData(sequenceData, Math.min(100, (drawRange[1] - drawRange[0]) / 2))
 			if (canceled) return
 			setAutocorrelationData(a)
 		})()
 		return () => {canceled = true}
-	}, [sequenceData, iterationRange])
+	}, [sequenceData, drawRange])
 	return (
 		<AutocorrelationPlotWidget
 			autocorrelationData={autocorrelationData}

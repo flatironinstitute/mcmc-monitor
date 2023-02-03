@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
 import { FunctionComponent, useMemo } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
+import { useMCMCMonitor } from "../useMCMCMonitor";
 import SequenceHistogram from "./SequenceHistogram";
 import SequencePlot from "./SequencePlot";
 

@@ -1,5 +1,4 @@
 import React, { FunctionComponent, Suspense, useMemo } from "react";
-import { SequenceHistogramOpts } from "./SequenceHistogram";
 
 export type PlotSequence = {
 	label: string
@@ -10,19 +9,19 @@ export type PlotSequence = {
 type Props = {
 	plotSequences: PlotSequence[]
 	variableName: string
-	highlightIterationRange?: [number, number]
+	highlightDrawRange?: [number, number]
 	width: number
 	height: number
 }
 
 const Plot = React.lazy(() => (import('react-plotly.js')))
 
-const SequencePlotWidget: FunctionComponent<Props> = ({ plotSequences, variableName, highlightIterationRange, width, height }) => {
+const SequencePlotWidget: FunctionComponent<Props> = ({ plotSequences, variableName, highlightDrawRange, width, height }) => {
 	const shapes = useMemo(() => (
-		(highlightIterationRange ? (
-			[{type: 'rect', x0: highlightIterationRange[0], x1: highlightIterationRange[1], y0: 0, y1: 1, yref: 'paper', fillcolor: 'yellow', opacity: 0.1}]
+		(highlightDrawRange ? (
+			[{type: 'rect', x0: highlightDrawRange[0], x1: highlightDrawRange[1], y0: 0, y1: 1, yref: 'paper', fillcolor: 'yellow', opacity: 0.1}]
 		) : []) as any
-	), [highlightIterationRange])
+	), [highlightDrawRange])
 	return (
 		<div style={{ position: 'relative', width, height }}>
 			<Suspense fallback={<div>Loading plotly</div>}>
@@ -43,7 +42,7 @@ const SequencePlotWidget: FunctionComponent<Props> = ({ plotSequences, variableN
 						height,
 						title: '',
 						yaxis: {title: variableName},
-						xaxis: {title: 'Iteration'},
+						xaxis: {title: 'draw'},
 						shapes,
 						margin: {
 							t: 30, b: 40, r: 0

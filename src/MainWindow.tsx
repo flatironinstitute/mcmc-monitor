@@ -2,7 +2,7 @@ import { FunctionComponent, useEffect } from "react";
 import Hyperlink from "./components/Hyperlink";
 import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl } from "./config";
 import Logo from "./Logo";
-import { useMCMCMonitor } from "./MCMCMonitorData";
+import { useMCMCMonitor } from "./useMCMCMonitor";
 import Home from "./pages/Home";
 import RunPage from "./pages/RunPage";
 import useRoute from "./useRoute";

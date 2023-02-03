@@ -1,6 +1,6 @@
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { FunctionComponent } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
+import { useMCMCMonitor } from "../useMCMCMonitor";
 
 type Props = {
 	variableNames: string[]

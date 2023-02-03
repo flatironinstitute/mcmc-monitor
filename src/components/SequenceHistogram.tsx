@@ -1,22 +1,17 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { useMCMCMonitor } from "../MCMCMonitorData";
+import { useMCMCMonitor } from "../useMCMCMonitor";
 import SequenceHistogramWidget from "./SequenceHistogramWidget";
 
 type Props = {
 	runId: string
 	chainId: string
 	variableName: string
-	sequenceHistogramOpts: SequenceHistogramOpts
-	iterationRange: [number, number] | undefined
+	drawRange: [number, number] | undefined
 	width: number
 	height: number
 }
 
-export type SequenceHistogramOpts = {
-	numIterations: number
-}
-
-const SequenceHistogram: FunctionComponent<Props> = ({runId, chainId, variableName, sequenceHistogramOpts, iterationRange, width, height}) => {
+const SequenceHistogram: FunctionComponent<Props> = ({runId, chainId, variableName, drawRange, width, height}) => {
 	const {sequences, updateSequence} = useMCMCMonitor()
 	useEffect(() => {
 		if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName)).length === 0) {
@@ -26,20 +21,20 @@ const SequenceHistogram: FunctionComponent<Props> = ({runId, chainId, variableNa
 	const histData = useMemo(() => {
 		const s = sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName))[0]
 		if (s) {
-			return applyIterationRange(s.data, iterationRange)
+			return applyDrawRange(s.data, drawRange)
 		}
 		else {
 			return []
 		}
-	}, [chainId, sequences, runId, variableName, iterationRange])
+	}, [chainId, sequences, runId, variableName, drawRange])
 	return (
 		<SequenceHistogramWidget histData={histData} variableName={variableName} title={chainId} width={width} height={height} />
 	)
 }
 
-export function applyIterationRange(data: number[], iterationRange: [number, number] | undefined) {
-	if (!iterationRange) return data
-	return data.slice(iterationRange[0], iterationRange[1])
+export function applyDrawRange(data: number[], drawRange: [number, number] | undefined) {
+	if (!drawRange) return data
+	return data.slice(drawRange[0], drawRange[1])
 }
 
 export default SequenceHistogram

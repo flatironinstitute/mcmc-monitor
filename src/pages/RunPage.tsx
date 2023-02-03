@@ -7,8 +7,8 @@ import ScatterplotsTab from "../components/ScatterplotsTab";
 import Splitter from "../components/Splitter";
 import TablesTab from "../components/TablesTab/TablesTab";
 import TabWidget from "../components/TabWidget/TabWidget";
-import { useMCMCMonitor } from "../MCMCMonitorData";
-import { MCMCChain, MCMCRun } from "../MCMCMonitorTypes";
+import { useMCMCMonitor } from "../useMCMCMonitor";
+import { MCMCChain, MCMCRun } from "../MCMCMonitorDataManager/MCMCMonitorTypes";
 import useWindowDimensions from "../useWindowDimensions";
 
 type Props = {
@@ -37,7 +37,7 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 		updateChainsForRun(runId)
 	}, [runId, updateChainsForRun])
 
-	const numIterationsForRun: number = useMemo(() => {
+	const numDrawsForRun: number = useMemo(() => {
 		const a = sequences.filter(s => (s.runId === runId)).map(s => (
 			s.data.length
 		))
@@ -74,7 +74,7 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 			>
 				<RunControlPanel
 					runId={runId}
-					numIterationsForRun={numIterationsForRun}
+					numDrawsForRun={numDrawsForRun}
 					chainColors={chainColors}
 				/>
 				<RightContent
@@ -83,7 +83,7 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 					runId={runId}
 					chainsForRun={chainsForRun}
 					chainColors={chainColors}
-					numIterationsForRun={numIterationsForRun}
+					numDrawsForRun={numDrawsForRun}
 				/>
 			</Splitter>
 		</div>
@@ -93,7 +93,7 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 type RightContentProps = {
 	runId: string
 	chainsForRun: MCMCChain[]
-	numIterationsForRun: number
+	numDrawsForRun: number
 	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
@@ -106,7 +106,7 @@ const tabs = [
 	{label: 'Scatterplots', closeable: false}
 ]
 
-const RightContent: FunctionComponent<RightContentProps> = ({width, height, runId, numIterationsForRun, chainColors}) => {
+const RightContent: FunctionComponent<RightContentProps> = ({width, height, runId, numDrawsForRun, chainColors}) => {
 	return (
 		<TabWidget
 			tabs={tabs}
@@ -118,13 +118,13 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, runI
 				height={0}
 				runId={runId}
 				chainColors={chainColors}
-				numIterationsForRun={numIterationsForRun}
+				numDrawsForRun={numDrawsForRun}
 			/>
 			<TablesTab
 				width={0}
 				height={0}
 				runId={runId}
-				numIterationsForRun={numIterationsForRun}
+				numDrawsForRun={numDrawsForRun}
 			/>
 			<RunInfoTab
 				width={0}
@@ -135,7 +135,7 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, runI
 				width={0}
 				height={0}
 				runId={runId}
-				numIterationsForRun={numIterationsForRun}
+				numDrawsForRun={numDrawsForRun}
 				chainColors={chainColors}
 			/>
 		</TabWidget>
