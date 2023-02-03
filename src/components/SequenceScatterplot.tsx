@@ -16,17 +16,7 @@ type Props = {
 }
 
 const SequenceScatterplot: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, highlightDrawRange, chainColors, width, height}) => {
-	const {sequences, updateSequence} = useMCMCMonitor()
-	useEffect(() => {
-		for (const chainId of chainIds) {
-			if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === xVariableName)).length === 0) {
-				updateSequence(runId, chainId, xVariableName)
-			}
-			if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === yVariableName)).length === 0) {
-				updateSequence(runId, chainId, yVariableName)
-			}
-		}
-	}, [sequences, runId, chainIds, updateSequence, xVariableName, yVariableName])
+	const {sequences} = useMCMCMonitor()
 	const scatterplotSequences = useMemo(() => {
 		const ret: ScatterplotSequence[] = []
 		for (const chainId of chainIds) {

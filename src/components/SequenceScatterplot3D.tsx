@@ -17,20 +17,7 @@ type Props = {
 }
 
 const SequenceScatterplot3D: FunctionComponent<Props> = ({runId, chainIds, xVariableName, yVariableName, zVariableName, highlightDrawRange, chainColors, width, height}) => {
-	const {sequences, updateSequence} = useMCMCMonitor()
-	useEffect(() => {
-		for (const chainId of chainIds) {
-			if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === xVariableName)).length === 0) {
-				updateSequence(runId, chainId, xVariableName)
-			}
-			if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === yVariableName)).length === 0) {
-				updateSequence(runId, chainId, yVariableName)
-			}
-			if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === zVariableName)).length === 0) {
-				updateSequence(runId, chainId, zVariableName)
-			}
-		}
-	}, [sequences, runId, chainIds, updateSequence, xVariableName, yVariableName, zVariableName])
+	const {sequences} = useMCMCMonitor()
 	const scatterplot3DSequences = useMemo(() => {
 		const ret: Scatterplot3DSequence[] = []
 		for (const chainId of chainIds) {

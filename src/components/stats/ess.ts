@@ -67,7 +67,6 @@ export function ess_imse(chain: number[]): number {
     }
 
     const sigma_sq_hat = acor[0] + 2 * accum
-    console.log('---', sigma_sq_hat)
     const ess = chain.length / sigma_sq_hat
     return ess
 }

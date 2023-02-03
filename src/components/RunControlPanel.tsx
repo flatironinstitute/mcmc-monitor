@@ -7,13 +7,12 @@ import Hyperlink from "./Hyperlink";
 import VariablesSelector from "./VariablesSelector";
 
 type Props = {
-	runId: string
 	numDrawsForRun: number
 	chainColors: {[chainId: string]: string}
 }
 
-const RunControlPanel: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColors}) => {
-	const {chains, setSelectedVariableNames} = useMCMCMonitor()
+const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}) => {
+	const {chains, setSelectedVariableNames, selectedRunId: runId} = useMCMCMonitor()
 	const {setRoute} = useRoute()
 	const chainsForRun = useMemo(() => (chains.filter(c => (c.runId === runId))), [chains, runId])
 
@@ -55,7 +54,7 @@ const RunControlPanel: FunctionComponent<Props> = ({runId, numDrawsForRun, chain
 				<VariablesSelector variableNames={allVariableNames} />
 			</div>
 			<h3>Options</h3>
-			<GeneralOptsControl runId={runId} />
+			<GeneralOptsControl />
 		</div>
 	)
 }

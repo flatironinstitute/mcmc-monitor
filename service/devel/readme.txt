@@ -18,3 +18,6 @@ docker push registry.heroku.com/lit-bayou-76056/web
 heroku container:release web --app lit-bayou-76056
 
 heroku open --app lit-bayou-76056
+
+# to restart
+heroku ps:restart web --app lit-bayou-76056

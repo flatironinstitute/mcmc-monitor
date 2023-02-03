@@ -15,12 +15,7 @@ type Props = {
 }
 
 const AutocorrelationPlot: FunctionComponent<Props> = ({runId, chainId, variableName, drawRange, width, height}) => {
-	const {sequences, updateSequence} = useMCMCMonitor()
-	useEffect(() => {
-		if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName)).length === 0) {
-			updateSequence(runId, chainId, variableName)
-		}
-	}, [sequences, runId, chainId, updateSequence, variableName])
+	const {sequences} = useMCMCMonitor()
 
 	// important to do it this way so we don't recalculate every time any of the sequences change
 	const sequence: MCMCSequence | undefined = useMemo(() => (

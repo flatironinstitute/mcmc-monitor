@@ -22,6 +22,10 @@ export const useMCMCMonitor = () => {
         dispatch({ type: 'setSelectedChainIds', chainIds })
     }, [dispatch])
 
+    const setSelectedRunId = useCallback((runId: string) => {
+        dispatch({ type: 'setSelectedRunId', runId })
+    }, [dispatch])
+
     const updateRuns = useCallback(() => {
         ; (async () => {
             const resp = await fetch(`${serviceBaseUrl}/getRuns`)
@@ -37,15 +41,6 @@ export const useMCMCMonitor = () => {
             setChainsForRun(runId, x.chains)
         })()
     }, [setChainsForRun])
-
-    const updateSequence = useCallback((runId: string, chainId: string, variableName: string) => {
-        dispatch({
-            type: 'updateSequence',
-            runId,
-            chainId,
-            variableName
-        })
-    }, [dispatch])
 
     const updateExistingSequences = useCallback((runId: string) => {
         dispatch({
@@ -67,14 +62,16 @@ export const useMCMCMonitor = () => {
         sequences: data.sequences,
         selectedVariableNames: data.selectedVariableNames,
         selectedChainIds: data.selectedChainIds,
+        selectedRunId: data.selectedRunId,
         connectedToService: data.connectedToService,
         generalOpts: data.generalOpts,
+        sequenceStats: data.sequenceStats,
         updateRuns,
         updateChainsForRun,
-        updateSequence,
         updateExistingSequences,
         setSelectedVariableNames,
         setSelectedChainIds,
+        setSelectedRunId,
         setGeneralOpts
     }
 }

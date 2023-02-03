@@ -13,14 +13,7 @@ type Props = {
 }
 
 const SequencePlot: FunctionComponent<Props> = ({runId, chainIds, variableName, highlightDrawRange, chainColors, width, height}) => {
-	const {sequences, updateSequence} = useMCMCMonitor()
-	useEffect(() => {
-		for (const chainId of chainIds) {
-			if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName)).length === 0) {
-				updateSequence(runId, chainId, variableName)
-			}
-		}
-	}, [sequences, runId, chainIds, updateSequence, variableName])
+	const {sequences} = useMCMCMonitor()
 	const plotSequences = useMemo(() => {
 		const ret: PlotSequence[] = []
 		for (const chainId of chainIds) {

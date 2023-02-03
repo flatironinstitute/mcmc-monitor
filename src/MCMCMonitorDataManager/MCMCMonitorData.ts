@@ -6,11 +6,19 @@ export type GeneralOpts = {
     excludeInitialDraws: number
 }
 
+export type SequenceStats = {
+    mean?: number
+    stdev?: number
+    ess?: number
+}
+
 export type MCMCMonitorData = {
     connectedToService: boolean | undefined
     runs: MCMCRun[]
     chains: MCMCChain[]
     sequences: MCMCSequence[]
+    sequenceStats: {[key: string]: SequenceStats}
+    selectedRunId?: string
     selectedVariableNames: string[]
     selectedChainIds: string[]
     generalOpts: GeneralOpts
@@ -21,6 +29,7 @@ export const initialMCMCMonitorData: MCMCMonitorData = {
     runs: [],
     chains: [],
     sequences: [],
+    sequenceStats: {},
     selectedVariableNames: [],
     selectedChainIds: [],
     generalOpts: {updateMode: 'manual', excludeInitialDraws: 20}
@@ -49,6 +58,9 @@ export type MCMCMonitorAction = {
     type: 'setSelectedVariableNames'
     variableNames: string[]
 } | {
+    type: 'setSelectedRunId'
+    runId: string | undefined
+} | {
     type: 'setSelectedChainIds'
     chainIds: string[]
 } | {
@@ -65,6 +77,12 @@ export type MCMCMonitorAction = {
 } | {
     type: 'setGeneralOpts'
     opts: GeneralOpts
+} | {
+    type: 'setSequenceStats'
+    runId: string
+    chainId: string
+    variableName: string
+    stats: SequenceStats
 }
 
 export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MCMCMonitorData => {
@@ -94,6 +112,12 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
             selectedChainIds: a.chainIds
         }
     }
+    else if (a.type === 'setSelectedRunId') {
+        return {
+            ...s,
+            selectedRunId: a.runId
+        }
+    }
     else if (a.type === 'setConnectedToService') {
         return {
             ...s,
@@ -101,8 +125,13 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         }
     }
     else if (a.type === 'appendSequenceData') {
+        const k = `${a.runId}/${a.chainId}/${a.variableName}`
         return {
             ...s,
+            sequenceStats: {
+                ...s.sequenceStats,
+                [k]: {} // invalidate the sequence stats
+            },
             sequences: s.sequences.map(x => (
                 (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
                     x : {...x, updateRequested: false, data: appendData(x.data, a.position, a.data)}
@@ -110,6 +139,7 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         }
     }
     else if (a.type === 'updateSequence') {
+        const k = `${a.runId}/${a.chainId}/${a.variableName}`
         if (!s.sequences.find(x => (x.runId === a.runId && x.chainId === a.chainId && x.variableName === a.variableName))) {
             return {
                 ...s,
@@ -125,6 +155,10 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         else {
             return {
                 ...s,
+                sequenceStats: {
+                    ...s.sequenceStats,
+                    [k]: {}
+                },
                 sequences: s.sequences.map(x => (
                     (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
                         x : {...x, updateRequested: true}
@@ -144,7 +178,18 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
     else if (a.type === 'setGeneralOpts') {
         return {
             ...s,
+            sequenceStats: {}, // invalidate the sequence stats
             generalOpts: a.opts
+        }
+    }
+    else if (a.type === 'setSequenceStats') {
+        const k = `${a.runId}/${a.chainId}/${a.variableName}`
+        return {
+            ...s,
+            sequenceStats: {
+                ...s.sequenceStats,
+                [k]: a.stats
+            }
         }
     }
     else return s

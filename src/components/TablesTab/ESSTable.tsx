@@ -1,14 +1,14 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
-import { FunctionComponent, useCallback, useMemo } from "react";
-import { ess } from "../stats/ess";
+import { FunctionComponent, useMemo } from "react";
+import { useMCMCMonitor } from "../../useMCMCMonitor";
 
 type Props = {
 	chainIds: string[]
     variableNames: string[]
-    sequenceData: {[chainVariableCode: string]: number[]}
 }
 
-const ESSTable: FunctionComponent<Props> = ({chainIds, variableNames, sequenceData}) => {
+const ESSTable: FunctionComponent<Props> = ({chainIds, variableNames}) => {
+	const {sequenceStats, selectedRunId: runId} = useMCMCMonitor()
 	const columns = useMemo(() => ([
 		{
 			key: 'variableName',
@@ -22,15 +22,6 @@ const ESSTable: FunctionComponent<Props> = ({chainIds, variableNames, sequenceDa
 		)
 	]), [chainIds])
 
-	const computeESS = useCallback((variableName: string, chainId: string) => {
-		const cc = `${chainId}:${variableName}`
-		const sData = sequenceData[cc]
-		if (sData) {
-			return {ess: ess(sData)}
-		}
-		else return {ess: undefined}
-	}, [sequenceData])
-
 	const rows = useMemo(() => {
 		return variableNames.map(v => {
 			const a = {
@@ -40,7 +31,9 @@ const ESSTable: FunctionComponent<Props> = ({chainIds, variableNames, sequenceDa
 				} as {[key: string]: any}
 			}
 			chainIds.forEach(chainId => {
-				let {ess} = computeESS(v, chainId)
+				const k = `${runId}/${chainId}/${v}`
+				// let {ess} = computeESS(v, chainId)
+				let {ess} = sequenceStats[k] || {}
 				if (ess !== undefined) ess = parseFloat(ess.toPrecision(3))
 				a.values[chainId] = ess === undefined ? undefined : (
 					`${ess}`
@@ -48,7 +41,7 @@ const ESSTable: FunctionComponent<Props> = ({chainIds, variableNames, sequenceDa
 			})
 			return a
 		})
-	}, [variableNames, chainIds, computeESS])
+	}, [variableNames, chainIds, sequenceStats, runId])
 
 	return (
 		<Table>

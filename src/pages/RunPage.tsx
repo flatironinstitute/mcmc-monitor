@@ -16,7 +16,11 @@ type Props = {
 }
 
 const RunPage: FunctionComponent<Props> = ({runId}) => {
-	const {runs, chains, sequences, updateChainsForRun, setSelectedChainIds, generalOpts, updateExistingSequences} = useMCMCMonitor()
+	const {runs, chains, sequences, updateChainsForRun, setSelectedChainIds, generalOpts, updateExistingSequences, setSelectedRunId} = useMCMCMonitor()
+
+	useEffect(() => {
+		setSelectedRunId(runId)
+	}, [runId, setSelectedRunId])
 
 	useEffect(() => {
 		let canceled = false
@@ -73,14 +77,12 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 				initialPosition={500}
 			>
 				<RunControlPanel
-					runId={runId}
 					numDrawsForRun={numDrawsForRun}
 					chainColors={chainColors}
 				/>
 				<RightContent
 					width={0}
 					height={0}
-					runId={runId}
 					chainsForRun={chainsForRun}
 					chainColors={chainColors}
 					numDrawsForRun={numDrawsForRun}
@@ -91,7 +93,6 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 }
 
 type RightContentProps = {
-	runId: string
 	chainsForRun: MCMCChain[]
 	numDrawsForRun: number
 	chainColors: {[chainId: string]: string}
@@ -106,7 +107,9 @@ const tabs = [
 	{label: 'Scatterplots', closeable: false}
 ]
 
-const RightContent: FunctionComponent<RightContentProps> = ({width, height, runId, numDrawsForRun, chainColors}) => {
+const RightContent: FunctionComponent<RightContentProps> = ({width, height, numDrawsForRun, chainColors}) => {
+	const {selectedRunId: runId} = useMCMCMonitor()
+	if (!runId) return <div>No run ID</div>
 	return (
 		<TabWidget
 			tabs={tabs}

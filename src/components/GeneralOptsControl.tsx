@@ -2,12 +2,11 @@ import { FormControl, Select, MenuItem, SelectChangeEvent } from "@mui/material"
 import { FunctionComponent } from "react";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 
-type Props = {
-	runId: string
-}
+type Props = any
 
-const GeneralOptsControl: FunctionComponent<Props> = ({runId}) => {
-	const { generalOpts, setGeneralOpts, updateExistingSequences } = useMCMCMonitor()
+const GeneralOptsControl: FunctionComponent<Props> = () => {
+	const { generalOpts, setGeneralOpts, updateExistingSequences, selectedRunId: runId } = useMCMCMonitor()
+	if (!runId) return <div>No runId</div>
 	return (
 		<div>
 			Exclude draws

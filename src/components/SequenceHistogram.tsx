@@ -12,12 +12,7 @@ type Props = {
 }
 
 const SequenceHistogram: FunctionComponent<Props> = ({runId, chainId, variableName, drawRange, width, height}) => {
-	const {sequences, updateSequence} = useMCMCMonitor()
-	useEffect(() => {
-		if (sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName)).length === 0) {
-			updateSequence(runId, chainId, variableName)
-		}
-	}, [sequences, runId, chainId, updateSequence, variableName])
+	const {sequences} = useMCMCMonitor()
 	const histData = useMemo(() => {
 		const s = sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName))[0]
 		if (s) {
