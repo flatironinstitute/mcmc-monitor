@@ -1,5 +1,3 @@
-export const protocolVersion = '0.1.1'
-
 export type MCMCRun = {
     runId: string
 }
@@ -18,23 +16,4 @@ export type MCMCSequence = {
     variableName: string
     data: number[]
     updateRequested?: boolean
-}
-
-export type GetSequencesRequest = {
-    sequences: {
-        runId: string
-        chainId: string
-        variableName: string
-        position: number
-    }[]
-}
-
-export type GetSequencesResponse = {
-    sequences: {
-        runId: string
-        chainId: string
-        variableName: string
-        position: number
-        data: number[]
-    }[]
 }

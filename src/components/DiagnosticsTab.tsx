@@ -2,6 +2,7 @@ import { Checkbox, FormControlLabel, Grid } from "@mui/material";
 import { FunctionComponent, useMemo, useState } from "react";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 import AutocorrelationPlot from "./AutocorrelationPlot";
+import { PlotSize, PlotSizeSelector } from "./ScatterplotsTab";
 import SequenceHistogram from "./SequenceHistogram";
 import SequencePlot from "./SequencePlot";
 
@@ -42,9 +43,16 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 
 	const [diagnosticsSelection, setDiagnosticsSelection] = useState<DiagnosticsSelection>(initialDiagnosticsSelection)
 
+	const [plotSize, setPlotSize] = useState<PlotSize>('medium')
+
+	const sizeScale = plotSize === 'small' ? 0.7 : plotSize === 'medium' ? 1 : plotSize === 'large' ? 1.3 : plotSize === 'xlarge' ? 1.6 : 1
+
 	return (
 		<div style={{position: 'absolute', width, height, overflowY: 'auto'}}>
-			<DiagnosticsSelectionSelector diagnosticsSelection={diagnosticsSelection} setDiagnosticsSelection={setDiagnosticsSelection} />
+			<Grid container>
+				<DiagnosticsSelectionSelector diagnosticsSelection={diagnosticsSelection} setDiagnosticsSelection={setDiagnosticsSelection} />
+				<PlotSizeSelector plotSize={plotSize} setPlotSize={setPlotSize} />
+			</Grid>
 			{
 				selectedVariableNames.map(v => (
 					<div key={v}>
@@ -58,8 +66,8 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 										chainColors={chainColors}
 										variableName={v}
 										highlightDrawRange={sequenceHistogramDrawRange}
-										width={Math.min(width, 700)}
-										height={400}
+										width={Math.min(width, 700 * sizeScale)}
+										height={450 * sizeScale}
 									/>}
 								</Grid>
 								{
@@ -70,8 +78,8 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 												chainId={chainId}
 												variableName={v}
 												drawRange={sequenceHistogramDrawRange}
-												width={Math.min(width, 300)}
-												height={400}
+												width={Math.min(width, 300 * sizeScale)}
+												height={450 * sizeScale}
 											/>
 										</Grid>
 									))
@@ -84,8 +92,8 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 												chainId={chainId}
 												variableName={v}
 												drawRange={sequenceHistogramDrawRange}
-												width={Math.min(width, 300)}
-												height={400}
+												width={Math.min(width, 300 * sizeScale)}
+												height={450 * sizeScale}
 											/>
 										</Grid>
 									))

@@ -2,6 +2,7 @@ import { useCallback, useContext } from 'react'
 import { serviceBaseUrl } from './config'
 import { GeneralOpts, MCMCMonitorContext } from './MCMCMonitorDataManager/MCMCMonitorData'
 import { MCMCChain, MCMCRun } from './MCMCMonitorDataManager/MCMCMonitorTypes'
+import { GetChainsForRunRequest, GetRunsRequest, isGetChainsForRunResponse, isGetRunsResponse } from './MCMCMonitorRequest'
 
 export const useMCMCMonitor = () => {
     const { data, dispatch } = useContext(MCMCMonitorContext)
@@ -28,17 +29,46 @@ export const useMCMCMonitor = () => {
 
     const updateRuns = useCallback(() => {
         ; (async () => {
-            const resp = await fetch(`${serviceBaseUrl}/getRuns`)
-            const x: {runs: MCMCRun[]} = await resp.json()
-            setRuns(x.runs)
+            const req: GetRunsRequest = {
+                type: 'getRunsRequest'
+            }
+            const rr = await fetch(
+                `${serviceBaseUrl}/api`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(req)
+                }
+            )
+            const resp = await rr.json()
+            if (!isGetRunsResponse(resp)) {
+                console.warn(resp)
+                throw Error('Unexpected getRuns response')
+            }
+            setRuns(resp.runs)
         })()
     }, [setRuns])
 
     const updateChainsForRun = useCallback((runId: string) => {
         ; (async () => {
-            const resp = await fetch(`${serviceBaseUrl}/getChainsForRun/${runId}`)
-            const x: {chains: MCMCChain[]} = await resp.json()
-            setChainsForRun(runId, x.chains)
+            const req: GetChainsForRunRequest = {
+                type: 'getChainsForRunRequest',
+                runId
+            }
+            const rr = await fetch(
+                `${serviceBaseUrl}/api`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(req)
+                }
+            )
+            const resp = await rr.json()
+            if (!isGetChainsForRunResponse(resp)) {
+                console.warn(resp)
+                throw Error('Unexpected getChainsForRun response')
+            }
+            setChainsForRun(runId, resp.chains)
         })()
     }, [setChainsForRun])
 

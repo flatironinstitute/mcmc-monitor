@@ -4,17 +4,17 @@ import { useMCMCMonitor } from "../../useMCMCMonitor";
 import ChainOrVariableTable from "./ChainOrVariableTable";
 
 type Props = {
-	chainId: string
-	variableNames: string[]
+	chainIds: string[]
+	variableName: string
 }
 
-const ChainTable: FunctionComponent<Props> = ({chainId, variableNames}) => {
+const VariableTable: FunctionComponent<Props> = ({chainIds, variableName}) => {
 	return (
 		<ChainOrVariableTable
-			chainId={chainId}
-			variableNames={variableNames}
+			chainIds={chainIds}
+			variableName={variableName}
 		/>
 	)
 }
 
-export default ChainTable
+export default VariableTable

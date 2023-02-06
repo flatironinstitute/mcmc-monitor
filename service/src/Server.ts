@@ -1,6 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 import * as http from 'http';
-import { GetSequencesRequest, GetSequencesResponse, protocolVersion } from './MCMCMonitorTypes';
+import { GetChainsForRunResponse, GetRunsResponse, GetSequencesResponse, isMCMCMonitorRequest, ProbeResponse, protocolVersion } from './MCMCMonitorRequest';
 import OutputManager from './OutputManager';
 
 class Server {
@@ -25,45 +25,62 @@ class Server {
         this.#expressApp.get('/probe', (req: Request, resp: Response) => {
             resp.status(200).send({protocolVersion})
         })
-        this.#expressApp.get('/getRuns', (req: Request, resp: Response) => {
-            if (this.a.verbose) {
-                console.info(`${req.method} /getRuns`)
+        this.#expressApp.post('/api', (req: Request, resp: Response) => {
+            const request = req.body
+            if (!isMCMCMonitorRequest(request)) {
+                resp.status(500).send('Invalid request')
+                return
             }
             ;(async () => {
-                const runs = await this.#outputManager.getRuns()
-                resp.status(200).send({runs})
-            })()
-        })
-        this.#expressApp.get('/getChainsForRun/:runId', (req: Request, resp: Response) => {
-            const runId: string = req.params.runId
-            if (this.a.verbose) {
-                console.info(`${req.method} /getChainsForRun ${runId}`)
-            }
-            ;(async () => {
-                const chains = await this.#outputManager.getChainsForRun(runId)
-                resp.status(200).send({chains})
-            })()
-        })
-        this.#expressApp.post('/getSequences', (req: Request, resp: Response) => {
-            const request: GetSequencesRequest = req.body
-            if (this.a.verbose) {
-                console.info(`${req.method} /getSequences ${request.sequences.length}`)
-            }
-            const response: GetSequencesResponse = {sequences: []}
-            ;(async () => {
-                for (const s of request.sequences) {
-                    const {runId, chainId, variableName, position} = s
-                    
-                    const sd = await this.#outputManager.getSequenceData(runId, chainId, variableName, position)
-                    response.sequences.push({
-                        runId,
-                        chainId,
-                        variableName,
-                        position,
-                        data: sd.data
-                    })
+                if (request.type === 'probeRequest') {
+                    const response: ProbeResponse = {
+                        type: 'probeResponse',
+                        protocolVersion
+                    }
+                    resp.status(200).send(response)
                 }
-                resp.status(200).send(response)
+                else if (request.type === 'getRunsRequest') {
+                    if (this.a.verbose) {
+                        console.info(`${req.method} /getRuns`)
+                    }
+                    const runs = await this.#outputManager.getRuns()
+                    const response: GetRunsResponse = {type: 'getRunsResponse', runs}
+                    resp.status(200).send(response)
+                }
+                else if (request.type === 'getChainsForRunRequest') {
+                    const {runId} = request
+                    if (this.a.verbose) {
+                        console.info(`${req.method} /getChainsForRun ${runId}`)
+                    }
+                    const chains = await this.#outputManager.getChainsForRun(runId)
+                    const response: GetChainsForRunResponse ={
+                        type: 'getChainsForRunResponse',
+                        chains
+                    }
+                    resp.status(200).send(response)
+                }
+                else if (request.type === 'getSequencesRequest') {
+                    if (this.a.verbose) {
+                        console.info(`${req.method} /getSequences ${request.sequences.length}`)
+                    }
+                    const response: GetSequencesResponse = {type: 'getSequencesResponse', sequences: []}
+                    for (const s of request.sequences) {
+                        const {runId, chainId, variableName, position} = s
+                        
+                        const sd = await this.#outputManager.getSequenceData(runId, chainId, variableName, position)
+                        response.sequences.push({
+                            runId,
+                            chainId,
+                            variableName,
+                            position,
+                            data: sd.data
+                        })
+                    }
+                    resp.status(200).send(response)
+                }
+                else {
+                    resp.status(500).send('Unexpected request type')
+                }
             })()
         })
     }

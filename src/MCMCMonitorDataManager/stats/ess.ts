@@ -1,6 +1,26 @@
 // See: https://github.com/flatironinstitute/bayes-kit/blob/main/bayes_kit/ess.py
 
-export function autocorr(chain: number[], n: number): number[] {
+import { computeMean } from "../updateSequenceStats"
+import { transformRadix2 } from "./fft"
+
+export function autocorr_fft(chain: number[], n: number): number[] {
+    const size = Math.round(Math.pow(2, Math.ceil(Math.log2(2 * chain.length - 1))))
+    const variance = computeVariance(chain)
+    const mean = computeMean(chain)
+    const ndata = chain.map(x => (x - (mean || 0)))
+    const ndataFftReal = [...ndata]
+    const ndataFftImag = ndata.map(x => (0))
+    transformRadix2(ndataFftReal, ndataFftImag)
+    const pwr = ndataFftReal.map((r, i) => (r * r + ndataFftImag[i] * ndataFftImag[i]))
+    const N = ndata.length
+    const acorrReal = [...pwr]
+    const acorrImag = pwr.map(x => (0))
+    transformRadix2(acorrReal, acorrImag)
+    throw Error('need to do inverse here!!!!')
+    return acorrReal
+}
+
+export function autocorr_slow(chain: number[], n: number): number[] {
     // todo: use FFT
 
     const mu = chain.length ? sum(chain) / chain.length : 0
@@ -43,7 +63,7 @@ export function ess_ipse(chain: number[]): number {
         console.warn('ess requires chain.length >=4')
         return 0
     }
-    const acor = autocorr(chain, chain.length)
+    const acor = autocorr_slow(chain, chain.length)
     const n = first_neg_pair_start(acor)
     const sigma_sq_hat = acor[0] + 2 * sum(acor.slice(1, n))
     const ess = chain.length / sigma_sq_hat
@@ -55,7 +75,7 @@ export function ess_imse(chain: number[]): {ess: number, acor: number[]} {
         console.warn('ess requires chain.length >=4')
         return {ess: 0, acor: []}
     }
-    const acor = autocorr(chain, chain.length)
+    const acor = autocorr_slow(chain, chain.length)
     const n = first_neg_pair_start(acor)
     let prev_min = 1
     let accum = 0

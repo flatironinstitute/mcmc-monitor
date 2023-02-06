@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
-import { FunctionComponent, useEffect, useMemo } from "react";
+import { FunctionComponent, useMemo } from "react";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 import useRoute from "../useRoute";
 import Hyperlink from "./Hyperlink";

@@ -1,6 +1,6 @@
 import { serviceBaseUrl } from "../config";
+import { GetSequencesRequest, isGetSequencesResponse } from "../MCMCMonitorRequest";
 import { MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorData";
-import { GetSequencesRequest, GetSequencesResponse } from "./MCMCMonitorTypes";
 
 export default async function updateSequences(data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void) {
     // request updates for the non-existent sequences that are selected
@@ -22,21 +22,27 @@ export default async function updateSequences(data: MCMCMonitorData, dispatch: (
     }
 
     const X = data.sequences.filter(s => (s.updateRequested))
+    const timer = Date.now()
     if (X.length > 0) {
         const req: GetSequencesRequest = {
+            type: 'getSequencesRequest',
             sequences: X.map(s => ({
                 runId: s.runId, chainId: s.chainId, variableName: s.variableName, position: s.data.length
             }))
         }
         const rr = await fetch(
-            `${serviceBaseUrl}/getSequences`,
+            `${serviceBaseUrl}/api`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(req)
             }
         )
-        const resp: GetSequencesResponse = await rr.json()
+        const resp = await rr.json()
+        if (!isGetSequencesResponse(resp)) {
+            console.warn(resp)
+            throw Error('Unexpected getSequences response')
+        }
         for (const s of resp.sequences) {
             dispatch({
                 type: 'appendSequenceData',
@@ -46,6 +52,11 @@ export default async function updateSequences(data: MCMCMonitorData, dispatch: (
                 position: s.position,
                 data: s.data
             })
+        }
+        const elapsed = Date.now() - timer
+        if (elapsed > 200) {
+            // wait for next iteration
+            return
         }
     }
 }

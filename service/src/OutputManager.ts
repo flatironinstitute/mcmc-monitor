@@ -1,5 +1,16 @@
 import fs from 'fs'
-import { MCMCChain, MCMCRun } from "./MCMCMonitorTypes"
+
+type MCMCRun = {
+    runId: string
+}
+
+type MCMCChain = {
+    runId: string
+    chainId: string
+    variableNames: string[]
+    rawHeader?: string
+    rawFooter?: string
+}
 
 class OutputManager {
     #chainFiles: {[key: string]: ChainFile} = {} // by runId/chainId

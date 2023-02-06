@@ -4,6 +4,7 @@ import { MCMCMonitorAction, MCMCMonitorData, SequenceStats } from "./MCMCMonitor
 export default async function updateSequenceStats(data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void) {
     const runId = data.selectedRunId
     if (!runId) return
+    const timer = Date.now()
     for (const chainId of data.selectedChainIds) {
         for (const variableName of data.selectedVariableNames) {
             const k = `${runId}/${chainId}/${variableName}`
@@ -21,6 +22,11 @@ export default async function updateSequenceStats(data: MCMCMonitorData, dispatc
                         stats: newStats
                     })
                 }
+            }
+            const elapsed = Date.now() - timer
+            if (elapsed > 200) {
+                // wait for next iteration
+                return
             }
         }
     }

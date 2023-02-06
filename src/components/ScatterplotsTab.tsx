@@ -15,7 +15,7 @@ type Props = {
 
 type Mode = '2d' | '3d' | 'both'
 
-type PlotSize = 'small' | 'medium' | 'large' | 'xlarge'
+export type PlotSize = 'small' | 'medium' | 'large' | 'xlarge'
 
 function sizeForPlotSize(ps: PlotSize) {
 	if (ps === 'small') return { x: 200, y: 200 }
@@ -161,7 +161,7 @@ const ModeSelector: FunctionComponent<{ mode: Mode, setMode: (m: Mode) => void }
 	)
 }
 
-const PlotSizeSelector: FunctionComponent<{ plotSize: PlotSize, setPlotSize: (ps: PlotSize) => void }> = ({ plotSize, setPlotSize }) => {
+export const PlotSizeSelector: FunctionComponent<{ plotSize: PlotSize, setPlotSize: (ps: PlotSize) => void }> = ({ plotSize, setPlotSize }) => {
 	return (
 		<FormControl size="small">
 			<Select
