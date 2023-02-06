@@ -29,7 +29,7 @@
  * Computes the discrete Fourier transform (DFT) of the given complex vector, storing the result back into the vector.
  * The vector can have any length. This is a wrapper function.
  */
-function transform(real: Array<number>|Float64Array, imag: Array<number>|Float64Array): void {
+export function transform(real: Array<number>|Float64Array, imag: Array<number>|Float64Array): void {
 	const n: number = real.length;
 	if (n != imag.length)
 		throw new RangeError("Mismatched lengths");
@@ -46,7 +46,7 @@ function transform(real: Array<number>|Float64Array, imag: Array<number>|Float64
  * Computes the inverse discrete Fourier transform (IDFT) of the given complex vector, storing the result back into the vector.
  * The vector can have any length. This is a wrapper function. This transform does not perform scaling, so the inverse is not a true inverse.
  */
-function inverseTransform(real: Array<number>|Float64Array, imag: Array<number>|Float64Array): void {
+export function inverseTransform(real: Array<number>|Float64Array, imag: Array<number>|Float64Array): void {
 	transform(imag, real);
 }
 
@@ -55,7 +55,7 @@ function inverseTransform(real: Array<number>|Float64Array, imag: Array<number>|
  * Computes the discrete Fourier transform (DFT) of the given complex vector, storing the result back into the vector.
  * The vector's length must be a power of 2. Uses the Cooley-Tukey decimation-in-time radix-2 algorithm.
  */
-export function transformRadix2(real: Array<number>|Float64Array, imag: Array<number>|Float64Array): void {
+function transformRadix2(real: Array<number>|Float64Array, imag: Array<number>|Float64Array): void {
 	// Length variables
 	const n: number = real.length;
 	if (n != imag.length)

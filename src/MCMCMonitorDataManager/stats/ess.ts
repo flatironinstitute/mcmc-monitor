@@ -1,24 +1,47 @@
 // See: https://github.com/flatironinstitute/bayes-kit/blob/main/bayes_kit/ess.py
 
-// import { computeMean } from "../updateSequenceStats"
-// import { transformRadix2 } from "./fft"
+import { computeMean } from "../updateSequenceStats"
+import { inverseTransform, transform as transformFft } from "./fft"
 
-// export function autocorr_fft(chain: number[], n: number): number[] {
-//     const size = Math.round(Math.pow(2, Math.ceil(Math.log2(2 * chain.length - 1))))
-//     const variance = computeVariance(chain)
-//     const mean = computeMean(chain)
-//     const ndata = chain.map(x => (x - (mean || 0)))
-//     const ndataFftReal = [...ndata]
-//     const ndataFftImag = ndata.map(x => (0))
-//     transformRadix2(ndataFftReal, ndataFftImag)
-//     const pwr = ndataFftReal.map((r, i) => (r * r + ndataFftImag[i] * ndataFftImag[i]))
-//     const N = ndata.length
-//     const acorrReal = [...pwr]
-//     const acorrImag = pwr.map(x => (0))
-//     transformRadix2(acorrReal, acorrImag)
-//     throw Error('need to do inverse here!!!!')
-//     return acorrReal
-// }
+// def autocorr_fft(chain: VectorType) -> VectorType:
+//     """
+//     Return sample autocorrelations at all lags for the specified sequence.
+//     Algorithmically, this function calls a fast Fourier transform (FFT).
+//     Parameters:
+//     chain: sequence whose autocorrelation is returned
+//     Returns:
+//     autocorrelation estimates at all lags for the specified sequence
+//     """
+//     size = 2 ** np.ceil(np.log2(2 * len(chain) - 1)).astype("int")
+//     var = np.var(chain)
+//     ndata = chain - np.mean(chain)
+//     fft = np.fft.fft(ndata, size)
+//     pwr = np.abs(fft) ** 2
+//     N = len(ndata)
+//     acorr = np.fft.ifft(pwr).real / var / N
+//     return acorr
+
+export function autocorr_fft(chain: number[], n: number): number[] {
+    const size = Math.round(Math.pow(2, Math.ceil(Math.log2(2 * chain.length - 1))))
+    const variance = computeVariance(chain)
+    if (variance === undefined) return []
+    const mean = computeMean(chain)
+    const ndata = chain.map(x => (x - (mean || 0)))
+    while (ndata.length < size) {
+        ndata.push(0)
+    }
+    const ndataFftReal = [...ndata]
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const ndataFftImag = ndata.map(_x => (0))
+    transformFft(ndataFftReal, ndataFftImag)
+    const pwr = ndataFftReal.map((r, i) => (r * r + ndataFftImag[i] * ndataFftImag[i]))
+    const N = ndata.length
+    const acorrReal = [...pwr]
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const acorrImag = pwr.map(x => (0))
+    inverseTransform(acorrReal, acorrImag) // doesn't include scaling
+    return acorrReal.slice(0, n).map(x => (x / variance / N / chain.length))
+}
 
 export function autocorr_slow(chain: number[], n: number): number[] {
     // todo: use FFT
@@ -63,7 +86,13 @@ export function ess_ipse(chain: number[]): number {
         console.warn('ess requires chain.length >=4')
         return 0
     }
-    const acor = autocorr_slow(chain, chain.length)
+    
+    // for verifying we get the same answer with both methods
+    // console.log('test autocor_slow', autocorr_slow([1, 2, 3, 4, 0, 0, 0], 5))
+    // console.log('test autocor_fft', autocorr_fft([1, 2, 3, 4, 0, 0, 0], 5))
+
+    // const acor = autocorr_slow(chain, chain.length)
+    const acor = autocorr_fft(chain, chain.length)
     const n = first_neg_pair_start(acor)
     const sigma_sq_hat = acor[0] + 2 * sum(acor.slice(1, n))
     const ess = chain.length / sigma_sq_hat
@@ -98,4 +127,12 @@ export function ess(chain: number[]) {
 
 function sum(x: number[]) {
     return x.reduce((a, b) => (a + b), 0)
+}
+
+function computeVariance(x: number[]) {
+    const mu = computeMean(x)
+    if (mu === undefined) return undefined
+    return sum(x.map(a => (
+        (a - mu) * (a - mu)
+    ))) / x.length
 }
