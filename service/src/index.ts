@@ -4,7 +4,7 @@ import Server from './Server'
 
 const main = () => {
     yargs(hideBin(process.argv))
-        .command('start', 'Start the server', (yargs) => {
+        .command('start', 'Start monitoring', (yargs) => {
             return yargs
         }, (argv) => {
             const dir: string = argv.dir as string
@@ -17,7 +17,7 @@ const main = () => {
         })
         .option('dir', {
             type: 'string',
-            description: 'Parent directory where the output files live'
+            description: 'Parent directory where the output subdirectory lives'
         })
         .strictCommands()
         .demandCommand(1)
