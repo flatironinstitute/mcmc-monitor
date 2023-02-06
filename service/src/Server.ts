@@ -1,13 +1,16 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 import * as http from 'http';
-import { GetChainsForRunResponse, GetRunsResponse, GetSequencesResponse, isMCMCMonitorRequest, ProbeResponse, protocolVersion } from './MCMCMonitorRequest';
+import { handleApiRequest } from './handleApiRequest';
+import { isMCMCMonitorRequest, protocolVersion } from './MCMCMonitorRequest';
 import OutputManager from './OutputManager';
+import PeerManager from './PeerManager';
 
 class Server {
     #expressApp: Express
     #expressServer: http.Server
     #outputManager: OutputManager
-    constructor(private a: {port: number, dir: string, verbose: boolean}) {
+    #peerManager: PeerManager | undefined
+    constructor(private a: {port: number, dir: string, verbose: boolean, enableRemoteAccess: boolean}) {
         this.#outputManager = new OutputManager(a.dir)
         this.#expressApp = express()
         this.#expressApp.use(express.json())
@@ -32,57 +35,14 @@ class Server {
                 return
             }
             ;(async () => {
-                if (request.type === 'probeRequest') {
-                    const response: ProbeResponse = {
-                        type: 'probeResponse',
-                        protocolVersion
-                    }
-                    resp.status(200).send(response)
-                }
-                else if (request.type === 'getRunsRequest') {
-                    if (this.a.verbose) {
-                        console.info(`${req.method} /getRuns`)
-                    }
-                    const runs = await this.#outputManager.getRuns()
-                    const response: GetRunsResponse = {type: 'getRunsResponse', runs}
-                    resp.status(200).send(response)
-                }
-                else if (request.type === 'getChainsForRunRequest') {
-                    const {runId} = request
-                    if (this.a.verbose) {
-                        console.info(`${req.method} /getChainsForRun ${runId}`)
-                    }
-                    const chains = await this.#outputManager.getChainsForRun(runId)
-                    const response: GetChainsForRunResponse ={
-                        type: 'getChainsForRunResponse',
-                        chains
-                    }
-                    resp.status(200).send(response)
-                }
-                else if (request.type === 'getSequencesRequest') {
-                    if (this.a.verbose) {
-                        console.info(`${req.method} /getSequences ${request.sequences.length}`)
-                    }
-                    const response: GetSequencesResponse = {type: 'getSequencesResponse', sequences: []}
-                    for (const s of request.sequences) {
-                        const {runId, chainId, variableName, position} = s
-                        
-                        const sd = await this.#outputManager.getSequenceData(runId, chainId, variableName, position)
-                        response.sequences.push({
-                            runId,
-                            chainId,
-                            variableName,
-                            position,
-                            data: sd.data
-                        })
-                    }
-                    resp.status(200).send(response)
-                }
-                else {
-                    resp.status(500).send('Unexpected request type')
-                }
+                const response = await handleApiRequest(request, this.#outputManager, {verbose: this.a.verbose})
+                resp.status(200).send(response)
             })()
         })
+        if (a.enableRemoteAccess) {
+            this.#peerManager = new PeerManager(this.#outputManager, {verbose: this.a.verbose})
+            this.#peerManager.start()
+        }
     }
     async stop() {
         return new Promise<void>((resolve) => {
