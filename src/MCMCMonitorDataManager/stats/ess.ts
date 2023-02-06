@@ -1,24 +1,24 @@
 // See: https://github.com/flatironinstitute/bayes-kit/blob/main/bayes_kit/ess.py
 
-import { computeMean } from "../updateSequenceStats"
-import { transformRadix2 } from "./fft"
+// import { computeMean } from "../updateSequenceStats"
+// import { transformRadix2 } from "./fft"
 
-export function autocorr_fft(chain: number[], n: number): number[] {
-    const size = Math.round(Math.pow(2, Math.ceil(Math.log2(2 * chain.length - 1))))
-    const variance = computeVariance(chain)
-    const mean = computeMean(chain)
-    const ndata = chain.map(x => (x - (mean || 0)))
-    const ndataFftReal = [...ndata]
-    const ndataFftImag = ndata.map(x => (0))
-    transformRadix2(ndataFftReal, ndataFftImag)
-    const pwr = ndataFftReal.map((r, i) => (r * r + ndataFftImag[i] * ndataFftImag[i]))
-    const N = ndata.length
-    const acorrReal = [...pwr]
-    const acorrImag = pwr.map(x => (0))
-    transformRadix2(acorrReal, acorrImag)
-    throw Error('need to do inverse here!!!!')
-    return acorrReal
-}
+// export function autocorr_fft(chain: number[], n: number): number[] {
+//     const size = Math.round(Math.pow(2, Math.ceil(Math.log2(2 * chain.length - 1))))
+//     const variance = computeVariance(chain)
+//     const mean = computeMean(chain)
+//     const ndata = chain.map(x => (x - (mean || 0)))
+//     const ndataFftReal = [...ndata]
+//     const ndataFftImag = ndata.map(x => (0))
+//     transformRadix2(ndataFftReal, ndataFftImag)
+//     const pwr = ndataFftReal.map((r, i) => (r * r + ndataFftImag[i] * ndataFftImag[i]))
+//     const N = ndata.length
+//     const acorrReal = [...pwr]
+//     const acorrImag = pwr.map(x => (0))
+//     transformRadix2(acorrReal, acorrImag)
+//     throw Error('need to do inverse here!!!!')
+//     return acorrReal
+// }
 
 export function autocorr_slow(chain: number[], n: number): number[] {
     // todo: use FFT
