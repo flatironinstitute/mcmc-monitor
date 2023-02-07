@@ -1,17 +1,47 @@
 import WebSocket from 'ws'
 import { handleApiRequest } from './handleApiRequest'
-import { InitializeMessageFromService, isAcknowledgeMessageToService, isRequestFromClient, RequestFromClient, ResponseToClient } from './MCMCMonitorProxyTypes'
+import { InitializeMessageFromService, isAcknowledgeMessageToService, isRequestFromClient, PingMessageFromService, RequestFromClient, ResponseToClient } from './MCMCMonitorProxyTypes'
 import { isMCMCMonitorRequest, MCMCMonitorResponse } from './MCMCMonitorRequest'
 import OutputManager from './OutputManager'
 import SignalCommunicator from './SignalCommunicator'
 
-const proxyUrl = `http://localhost:3035`
-const proxySecret = 'mcmc-monitor-no-secret'
+const proxyUrl = process.env['MCMC_MONITOR_PROXY'] || `https://mcmc-monitor-proxy.herokuapp.com`
+const proxySecret = process.env['MCMC_MONITOR_PROXY_SECRET'] || 'mcmc-monitor-no-secret'
 
 class OutgoingProxyConnection {
     #acknowledged: boolean
     #webSocket: WebSocket
     constructor(private serviceName: string, private outputManager: OutputManager, private signalCommunicator: SignalCommunicator, private o: {verbose: boolean, webrtc?: boolean}) {
+        this.initializeWebSocket()
+        const keepAlive = () => {
+            if (this.#webSocket) {
+                if (this.#acknowledged) {
+                    const msg: PingMessageFromService = {
+                        type: 'ping'
+                    }
+                    try {
+                        this.#webSocket.send(JSON.stringify(msg))
+                    }
+                    catch(err) {
+                        console.error(err)
+                        console.warn('Problem sending ping message to proxy server')
+                    }
+                }
+            }
+            else {
+                try {
+                    this.initializeWebSocket()
+                }
+                catch(err) {
+                    console.error(err)
+                    console.warn('Problem initializing websocket')
+                }
+            }
+            setTimeout(keepAlive, 20 * 1000)
+        }
+        setTimeout(keepAlive, 1000)
+    }
+    initializeWebSocket() {
         this.#acknowledged = false
         console.info(`Connecting to ${proxyUrl}`)
         const wsUrl = proxyUrl.replace('http:','ws:').replace('https:','wss:')
@@ -29,6 +59,7 @@ class OutgoingProxyConnection {
         ws.on('close', () => {
             console.info('Websocket closed.')
             this.#webSocket = undefined
+            this.#acknowledged = false
         })
         ws.on('message', msg => {                
             const messageJson = msg.toString()

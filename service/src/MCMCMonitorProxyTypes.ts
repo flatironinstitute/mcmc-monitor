@@ -53,3 +53,13 @@ export const isAcknowledgeMessageToService = (x: any): x is AcknowledgeMessageTo
         type: isEqualTo('acknowledge')
     })
 }
+
+export type PingMessageFromService = {
+    type: 'ping'
+}
+
+export const isPingMessageFromService = (x: any): x is PingMessageFromService => {
+    return validateObject(x, {
+        type: isEqualTo('ping')
+    })
+}
