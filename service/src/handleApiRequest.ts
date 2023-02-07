@@ -50,6 +50,9 @@ export const handleApiRequest = async (request: MCMCMonitorRequest, outputManage
         return response
     }
     else if (request.type === 'webrtcSignalingRequest') {
+        if (o.verbose) {
+            console.info(`${o.webrtc ? "Webrtc " : ""}webrtcSignalingRequest`)
+        }
         return await signalCommunicator.handleRequest(request)
     }
     else {

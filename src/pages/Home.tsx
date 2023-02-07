@@ -13,9 +13,16 @@ const Home: FunctionComponent<Props> = () => {
 			<h3>WIP</h3>
 			<div style={{color: 'green'}}>Connected to service: {serviceBaseUrl}</div>
 			{
+				serviceBaseUrl !== exampleServiceBaseUrl && (
+					<Hyperlink
+						onClick={() => {;(window as any).location = `${window.location.protocol}//${window.location.host}${window.location.pathname}?s=${exampleServiceBaseUrl}`}}
+					>View example data</Hyperlink>
+				)
+			}
+			{
 				serviceBaseUrl === exampleServiceBaseUrl && (
 					<Hyperlink
-						onClick={() => {;(window as any).location = `${window.location.protocol}//${window.location.host}${window.location.pathname}?s=${exampleServiceBaseUrl}?s=${defaultServiceBaseUrl}`}}
+						onClick={() => {;(window as any).location = `${window.location.protocol}//${window.location.host}${window.location.pathname}?s=${defaultServiceBaseUrl}`}}
 					>Connect to local service</Hyperlink>
 				)
 			}

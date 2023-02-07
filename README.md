@@ -17,6 +17,9 @@ Make sure you have a recent version of [NodeJS](https://nodejs.org/en/download/)
 There is no need to clone this repo. Just run:
 
 ```bash
+# prerequisite
+npm install -g @mapbox/node-pre-gyp
+
 npx mcmc-monitor@latest start --dir /path/to/parent/output/directory --verbose
 # The server will start listening for requests
 # Keep this terminal open
@@ -57,8 +60,7 @@ Monitoring a running Stan program provides insight into the progress of the run 
 
 To allow remote computers to access your monitor, do the following
 
-* Setup a free account on ngrok and store the secret ngrok API authorization token to the NGROK_AUTH_TOKEN environment variable.
 * Use the --enable-remote-access flag when starting the service.
 * Follow the link printed in the console output.
 
-In order to avoid using up bandwidth on your ngrok account, the remote access system uses WebRTC to connect the browser on the remote computer to the running MCMC Monitor service. Since is not always possible to establish a WebRTC connection, you may need to disable WebRTC by changing `webrtc=1` to `webrtc=0` in the query parameters of the URL.
+In order to avoid using excessive bandwidth on our proxy server, the remote access system uses WebRTC to connect the browser on the remote computer to the running MCMC Monitor service. Since is not always possible to establish a WebRTC connection, you may need to disable WebRTC by changing `webrtc=1` to `webrtc=0` in the query parameters of the URL. Note that in the case of `webrtc=0`, our proxy service may be limited in terms of how much traffic we allow.

@@ -3,22 +3,25 @@ import * as http from 'http';
 import { handleApiRequest } from './handleApiRequest';
 import { isMCMCMonitorRequest, protocolVersion } from './MCMCMonitorRequest';
 import OutputManager from './OutputManager';
-import ngrok from 'ngrok'
 import SimplePeer from 'simple-peer';
 import wrtc from 'wrtc'
 import { isMCMCMonitorPeerRequest, MCMCMonitorPeerResponse } from './MCMCMonitorPeerRequest';
 import SignalCommunicator from './SignalCommunicator';
+import OutgoingProxyConnection from './OutgoingProxyConnection';
+import fs from 'fs'
+import YAML from 'js-yaml'
 
 class Server {
     #expressApp: Express
     #expressServer: http.Server
     #outputManager: OutputManager
+    #outgoingProxyConnection: OutgoingProxyConnection | undefined
     constructor(private a: {port: number, dir: string, verbose: boolean, enableRemoteAccess: boolean}) {
         this.#outputManager = new OutputManager(a.dir)
         this.#expressApp = express()
         this.#expressApp.use(express.json())
         this.#expressServer = http.createServer(this.#expressApp)
-        const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173']
+        const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173', 'http://localhost:5173']
         this.#expressApp.use((req: Request, resp: Response, next: NextFunction) => {
             const origin = req.get('origin')
             const allowedOrigin = allowedOrigins.includes(origin) ? origin : undefined
@@ -83,17 +86,22 @@ class Server {
                 })
             })
         }
+        const urlLocal = `https://flatironinstitute.github.io/mcmc-monitor?s=http://localhost:${this.a.port}`
+        console.info('')
+        console.info(`Connect on local machine: ${urlLocal}`)
+        console.info('')
         if (a.enableRemoteAccess) {
             ;(async () => {
-                if (!process.env.NGROK_AUTH_TOKEN) {
-                    console.error('Env variable not set: NGROK_AUTH_TOKEN')
-                    console.error('Exiting')
-                    process.exit()
-                }
-                console.info('Connecting to ngrok')
-                await ngrok.authtoken(process.env.NGROK_AUTH_TOKEN)
-                const url = await ngrok.connect({proto: 'http', addr: this.a.port, host_header: 'rewrite', ngrok_skip_browser_warning: true})
-                console.info(`Connect remotely: https://flatironinstitute.github.io/mcmc-monitor?s=${url}&webrtc=1`)
+                console.info('Connecting to proxy')
+                // const serviceName = randomAlphaString(10)
+                const serviceName = await getServiceNameFromDir(this.a.dir)
+                const outgoingProxyConnection = new OutgoingProxyConnection(serviceName, this.#outputManager, signalCommunicator, {verbose: this.a.verbose, webrtc: true})
+                this.#outgoingProxyConnection = outgoingProxyConnection
+                const proxyUrl = outgoingProxyConnection.url
+                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=1`
+                console.info('')
+                console.info(`Connect on remote machine: ${urlRemote}`)
+                console.info('')
             })()
         }
         // if (a.enableRemoteAccess) {
@@ -103,6 +111,9 @@ class Server {
     }
     async stop() {
         return new Promise<void>((resolve) => {
+            if (this.#outgoingProxyConnection) {
+                this.#outgoingProxyConnection.close()
+            }
             this.#expressServer.close((err) => {
                 if (err) {console.warn(err)}
                 resolve()
@@ -114,6 +125,33 @@ class Server {
             return console.info(`Server is running on port ${this.a.port}`)
         })
     }
+}
+
+async function getServiceNameFromDir(dir: string): Promise<string> {
+    const yamlPath = `${dir}/mcmc-monitor.yaml`
+    let config: {[key: string]: any} = {}
+    if (fs.existsSync(yamlPath)) {
+        const yaml = await fs.promises.readFile(yamlPath, 'utf8')
+        config = YAML.load(yaml)
+    }
+    if (!config.serviceName) {
+        config.serviceName = `s-${randomAlphaStringLower(12)}`
+        const newYaml = YAML.dump(config)
+        await fs.promises.writeFile(yamlPath, newYaml)
+    }
+    return config.serviceName
+}
+
+export const randomAlphaStringLower = (num_chars: number) => {
+    if (!num_chars) {
+        /* istanbul ignore next */
+        throw Error('randomAlphaString: num_chars needs to be a positive integer.')
+    }
+    let text = "";
+    const possible = "abcdefghijklmnopqrstuvwxyz";
+    for (let i = 0; i < num_chars; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
 }
 
 export default Server
