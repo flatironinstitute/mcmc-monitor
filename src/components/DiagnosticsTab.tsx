@@ -1,5 +1,6 @@
-import { Checkbox, FormControlLabel, Grid } from "@mui/material";
-import { FunctionComponent, useMemo, useState } from "react";
+import { KeyboardArrowDown, KeyboardArrowRight } from "@mui/icons-material";
+import { Checkbox, FormControlLabel, Grid, IconButton } from "@mui/material";
+import { FunctionComponent, useMemo, useReducer, useState } from "react";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 import AutocorrelationPlot from "./AutocorrelationPlot";
 import { PlotSize, PlotSizeSelector } from "./ScatterplotsTab";
@@ -36,8 +37,27 @@ const initialDiagnosticsSelection: DiagnosticsSelection = {
 	acf: true
 }
 
+type CollapsedVariablesState = {[variableName: string]: boolean}
+
+type CollapsedVariablesAction = {
+	type: 'toggle'
+	variableName: string
+}
+
+const collapsedVariablesReducer = (s: CollapsedVariablesState, a: CollapsedVariablesAction): CollapsedVariablesState => {
+	if (a.type === 'toggle') {
+		return {
+			...s,
+			[a.variableName]: s[a.variableName] ? false : true
+		}
+	}
+	else return s
+}
+
 const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColors, width, height}) => {
 	const {selectedVariableNames, selectedChainIds} = useMCMCMonitor()
+
+	const [collapsedVariables, collapsedVariablesDispatch] = useReducer(collapsedVariablesReducer, {})
 
 	const sequenceHistogramDrawRange = useSequenceDrawRange(numDrawsForRun)
 
@@ -57,48 +77,54 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 				selectedVariableNames.map(v => (
 					<div key={v}>
 						<div style={{position: 'relative', border: 'solid 2px gray', paddingLeft: 12}}>
-							<h2>{v}</h2>
-							<Grid container spacing={3}>
-								<Grid item key="sequence-plot">
-									{diagnosticsSelection.timeseries && <SequencePlot
-										runId={runId}
-										chainIds={selectedChainIds}
-										chainColors={chainColors}
-										variableName={v}
-										highlightDrawRange={sequenceHistogramDrawRange}
-										width={Math.min(width, 700 * sizeScale)}
-										height={450 * sizeScale}
-									/>}
+							<h2>
+								<CollapseControl collapsed={collapsedVariables[v]} onToggle={() => collapsedVariablesDispatch({type: 'toggle', variableName: v})} />
+								{v}
+							</h2>
+							{
+								!collapsedVariables[v] &&
+								<Grid container spacing={3}>
+									<Grid item key="sequence-plot">
+										{diagnosticsSelection.timeseries && <SequencePlot
+											runId={runId}
+											chainIds={selectedChainIds}
+											chainColors={chainColors}
+											variableName={v}
+											highlightDrawRange={sequenceHistogramDrawRange}
+											width={Math.min(width, 700 * sizeScale)}
+											height={450 * sizeScale}
+										/>}
+									</Grid>
+									{
+										diagnosticsSelection.histogram && selectedChainIds.map(chainId => (
+											<Grid item key={chainId}>
+												<SequenceHistogram
+													runId={runId}
+													chainId={chainId}
+													variableName={v}
+													drawRange={sequenceHistogramDrawRange}
+													width={Math.min(width, 300 * sizeScale)}
+													height={450 * sizeScale}
+												/>
+											</Grid>
+										))
+									}
+									{
+										diagnosticsSelection.acf && selectedChainIds.map(chainId => (
+											<Grid item key={chainId}>
+												<AutocorrelationPlot
+													runId={runId}
+													chainId={chainId}
+													variableName={v}
+													drawRange={sequenceHistogramDrawRange}
+													width={Math.min(width, 300 * sizeScale)}
+													height={450 * sizeScale}
+												/>
+											</Grid>
+										))
+									}
 								</Grid>
-								{
-									diagnosticsSelection.histogram && selectedChainIds.map(chainId => (
-										<Grid item key={chainId}>
-											<SequenceHistogram
-												runId={runId}
-												chainId={chainId}
-												variableName={v}
-												drawRange={sequenceHistogramDrawRange}
-												width={Math.min(width, 300 * sizeScale)}
-												height={450 * sizeScale}
-											/>
-										</Grid>
-									))
-								}
-								{
-									diagnosticsSelection.acf && selectedChainIds.map(chainId => (
-										<Grid item key={chainId}>
-											<AutocorrelationPlot
-												runId={runId}
-												chainId={chainId}
-												variableName={v}
-												drawRange={sequenceHistogramDrawRange}
-												width={Math.min(width, 300 * sizeScale)}
-												height={450 * sizeScale}
-											/>
-										</Grid>
-									))
-								}
-							</Grid>
+							}
 						</div>
 						<div>&nbsp;</div>
 					</div>
@@ -109,6 +135,15 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 	)
 }
 
+const CollapseControl: FunctionComponent<{collapsed: boolean, onToggle: () => void}> = ({collapsed, onToggle}) => {
+	if (collapsed) {
+		return <IconButton onClick={onToggle}><KeyboardArrowRight /></IconButton>
+	}
+	else {
+		return <IconButton onClick={onToggle}><KeyboardArrowDown /></IconButton>
+	}
+}
+
 const selectorItems = [
 	{
 		key: 'timeseries',
@@ -116,11 +151,11 @@ const selectorItems = [
 	},
 	{
 		key: 'histogram',
-		label: 'show histogram'
+		label: 'show histograms'
 	},
 	{
 		key: 'acf',
-		label: 'show ACF'
+		label: 'show ACFs'
 	}
 ]
 

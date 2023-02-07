@@ -2,6 +2,8 @@ import { Grid, Select, SelectChangeEvent, MenuItem, FormControl } from "@mui/mat
 import { FunctionComponent, useMemo, useState } from "react";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 import { useSequenceDrawRange } from "./DiagnosticsTab";
+import MatrixOfPlots from "./MatrixOfPlots";
+import SequenceHistogram from "./SequenceHistogram";
 import SequenceScatterplot from "./SequenceScatterplot";
 import SequenceScatterplot3D from "./SequenceScatterplot3D";
 
@@ -13,7 +15,7 @@ type Props = {
 	height: number
 }
 
-type Mode = '2d' | '3d' | 'both'
+type Mode = '2d-matrix' | '2d' | '3d'
 
 export type PlotSize = 'small' | 'medium' | 'large' | 'xlarge'
 
@@ -36,7 +38,7 @@ function sizeForPlotSize3D(ps: PlotSize) {
 const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chainColors, width, height }) => {
 	const { selectedVariableNames, selectedChainIds } = useMCMCMonitor()
 
-	const [mode, setMode] = useState<Mode>('2d')
+	const [mode, setMode] = useState<Mode>('2d-matrix')
 	const [plotSize, setPlotSize] = useState<PlotSize>('medium')
 	const [tooMany, setTooMany] = useState(false)
 	const [tooMany3D, setTooMany3D] = useState(false)
@@ -44,19 +46,37 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 	const sequenceHistogramDrawRange = useSequenceDrawRange(numDrawsForRun)
 
 	const variablePairs = useMemo(() => {
-		let ret: { v1: string, v2: string }[] = []
-		for (let i = 0; i < selectedVariableNames.length; i++) {
-			for (let j = i + 1; j < selectedVariableNames.length; j++) {
-				ret.push({ v1: selectedVariableNames[i], v2: selectedVariableNames[j] })
+		let ret: { v1: string, v2: string, show: boolean }[] = []
+		const vnames = mode === '2d-matrix' ? selectedVariableNames.slice(0, 5) : selectedVariableNames
+		if (mode === '2d-matrix') {
+			if (vnames.length > 1) {
+				for (let i = 0; i < vnames.length; i++) {
+					for (let j = 0; j < vnames.length; j++) {
+						ret.push({ v1: selectedVariableNames[j], v2: selectedVariableNames[i], show: j >= i })
+					}
+				}
 			}
 		}
-		if (ret.length > 20) {
+		else if (mode === '2d') {
+			for (let i = 0; i < vnames.length; i++) {
+				for (let j = i + 1; j < vnames.length; j++) {
+					ret.push({ v1: selectedVariableNames[j], v2: selectedVariableNames[i], show: true })
+				}
+			}
+		}
+
+		if (mode === '2d-matrix') {
+			if (selectedVariableNames.length > 5) {
+				setTooMany(true)	
+			}
+		}
+		else if (ret.length > 20) {
 			ret = ret.slice(0, 20)
 			setTooMany(true)
 		}
 		else setTooMany(false)
 		return ret
-	}, [selectedVariableNames])
+	}, [selectedVariableNames, mode])
 
 	const variableTriplets = useMemo(() => {
 		let ret: { v1: string, v2: string, v3: string }[] = []
@@ -81,28 +101,76 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 			<Grid container>
 				<ModeSelector mode={mode} setMode={setMode} />
 				&nbsp;
-				<PlotSizeSelector plotSize={plotSize} setPlotSize={setPlotSize} />
+				{mode !== '2d-matrix' && <PlotSizeSelector plotSize={plotSize} setPlotSize={setPlotSize} />}
 			</Grid>
 			<div style={{ position: 'absolute', top: 70, width, height: height - 100, overflowY: 'auto' }}>
 				{
-					tooMany && (mode === '2d' || mode === 'both') && (
+					tooMany && (mode === '2d') && (
 						<div>Too many variables selected, only showing first 20 plots.</div>
 					)
 				}
 				{
-					tooMany3D && (mode === '3d' || mode === 'both') && (
+					tooMany && (mode === '2d-matrix') && (
+						<div>Too many variables selected, only showing first 5 variables.</div>
+					)
+				}
+				{
+					tooMany3D && (mode === '3d') && (
 						<div>Too many variables selected, only showing first 10 3D plots.</div>
 					)
 				}
 				{
-					(variablePairs.length === 0) ? (
+					(['2d', '2d-matrix'].includes(mode)) && (variablePairs.length === 0) ? (
 						<div>Select 2 or more variables to view scatterplots</div>
 					) : ((mode === '3d') && (variableTriplets.length === 0)) ? (
 						<div>Select 3 or more variables to view 3D scatterplots</div>
 					) : (
 						<Grid container spacing={3}>
 							{
-								['2d', 'both'].includes(mode) && variablePairs.map(({ v1, v2 }, ii) => (
+								['2d-matrix'].includes(mode) &&
+								<MatrixOfPlots
+									numColumns={Math.min(5, selectedVariableNames.length)}
+									width={width}
+								>
+									{
+										variablePairs.map(({ v1, v2, show }, ii) => (
+											show ? (
+												v1 != v2 ? (
+													<SequenceScatterplot
+														key={ii}
+														runId={runId}
+														chainIds={selectedChainIds}
+														xVariableName={v1}
+														yVariableName={v2}
+														highlightDrawRange={sequenceHistogramDrawRange}
+														chainColors={chainColors}
+														width={0}
+														height={0}
+													/>
+												) : (
+													<SequenceHistogram
+														key={ii}
+														runId={runId}
+														chainId={selectedChainIds}
+														variableName={v1}
+														drawRange={sequenceHistogramDrawRange}
+														width={0}
+														height={0}
+													/>
+												)
+											) : (
+												<EmptyPlotItem
+													key={ii}
+													width={0}
+													height={0}
+												/>
+											)
+										))
+									}
+								</MatrixOfPlots>
+							}
+							{
+								['2d'].includes(mode) && variablePairs.map(({ v1, v2 }, ii) => (
 									<Grid item key={ii}>
 										<SequenceScatterplot
 											runId={runId}
@@ -119,7 +187,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 								))
 							}
 							{
-								['3d', 'both'].includes(mode) && variableTriplets.map(({ v1, v2, v3 }, ii) => (
+								['3d'].includes(mode) && variableTriplets.map(({ v1, v2, v3 }, ii) => (
 									<Grid item key={ii}>
 										<SequenceScatterplot3D
 											runId={runId}
@@ -146,6 +214,14 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 	)
 }
 
+const EmptyPlotItem: FunctionComponent<{width: number, height: number}> = ({width, height}) => {
+	return (
+		<div
+			style={{position: 'relative', width, height}}
+		/>
+	)
+}
+
 const ModeSelector: FunctionComponent<{ mode: Mode, setMode: (m: Mode) => void }> = ({ mode, setMode }) => {
 	return (
 		<FormControl size="small">
@@ -153,9 +229,9 @@ const ModeSelector: FunctionComponent<{ mode: Mode, setMode: (m: Mode) => void }
 				value={mode}
 				onChange={(evt: SelectChangeEvent<string>) => { setMode(evt.target.value as Mode) }}
 			>
+				<MenuItem key="2d-matrix" value={'2d-matrix'}>2D scatterplots matrix</MenuItem>
 				<MenuItem key="2d" value={'2d'}>2D scatterplots</MenuItem>
 				<MenuItem key="3d" value={'3d'}>3D scatterplots</MenuItem>
-				<MenuItem key="both" value={'both'}>2D and 3D scatterplots</MenuItem>
 			</Select>
 		</FormControl>
 	)

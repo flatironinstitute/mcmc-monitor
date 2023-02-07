@@ -23,6 +23,8 @@ npx mcmc-monitor@latest start --dir /path/to/parent/output/directory --verbose
 # Open the web app linked above
 ```
 
+To enable remote access (i.e., access this monitor service from a different computer) follow the instructions in the section below.
+
 ## Opening the web app
 
 The web app is hosted [here](http://flatironinstitute.github.io/mcmc-monitor).
@@ -50,3 +52,13 @@ For more information see the [cmdstanpy documentation](https://mc-stan.org/cmdst
 ## Why monitor a running Stan program?
 
 Monitoring a running Stan program provides insight into the progress of the run and the results of the sampling. By tracking the progress of the MCMC sampling, it is possible to detect and diagnose problems with the program and observe whether the iterations are converging to the equilibrium distribution. Additionally, monitoring the results of the sampling allows the user to gain a better understanding of the posterior distributions, even before the program completes, which can inform decisions and predictions.
+
+## Enabling remote access
+
+To allow remote computers to access your monitor, do the following
+
+* Setup a free account on ngrok and store the secret ngrok API authorization token to the NGROK_AUTH_TOKEN environment variable.
+* Use the --enable-remote-access flag when starting the service.
+* Follow the link printed in the console output.
+
+In order to avoid using up bandwidth on your ngrok account, the remote access system uses WebRTC to connect the browser on the remote computer to the running MCMC Monitor service. Since is not always possible to establish a WebRTC connection, you may need to disable WebRTC by changing `webrtc=1` to `webrtc=0` in the query parameters of the URL.

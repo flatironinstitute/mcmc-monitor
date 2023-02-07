@@ -1,10 +1,10 @@
-import { FunctionComponent, useEffect, useMemo } from "react";
+import { FunctionComponent, useMemo } from "react";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 import SequenceHistogramWidget from "./SequenceHistogramWidget";
 
 type Props = {
 	runId: string
-	chainId: string
+	chainId: string | string[]
 	variableName: string
 	drawRange: [number, number] | undefined
 	width: number
@@ -14,16 +14,24 @@ type Props = {
 const SequenceHistogram: FunctionComponent<Props> = ({runId, chainId, variableName, drawRange, width, height}) => {
 	const {sequences} = useMCMCMonitor()
 	const histData = useMemo(() => {
-		const s = sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName))[0]
-		if (s) {
-			return applyDrawRange(s.data, drawRange)
+		function getDataForChain(ch: string) {
+			const s = sequences.filter(s => (s.runId === runId && s.chainId === ch && s.variableName === variableName))[0]
+			if (s) {
+				return applyDrawRange(s.data, drawRange)
+			}
+			else {
+				return []
+			}
+		}
+		if (!Array.isArray(chainId)) {
+			return getDataForChain(chainId)
 		}
 		else {
-			return []
+			return chainId.map(ch => (getDataForChain(ch))).flat()
 		}
 	}, [chainId, sequences, runId, variableName, drawRange])
 	return (
-		<SequenceHistogramWidget histData={histData} variableName={variableName} title={chainId} width={width} height={height} />
+		<SequenceHistogramWidget histData={histData} variableName={variableName} title={!Array.isArray(chainId) ? chainId : ''} width={width} height={height} />
 	)
 }
 
