@@ -1,5 +1,6 @@
 import { serviceBaseUrl } from "../config";
 import { GetSequencesRequest, isGetSequencesResponse } from "../MCMCMonitorRequest";
+import postApiRequest from "../postApiRequest";
 import { MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorData";
 
 export default async function updateSequences(data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void) {
@@ -30,15 +31,7 @@ export default async function updateSequences(data: MCMCMonitorData, dispatch: (
                 runId: s.runId, chainId: s.chainId, variableName: s.variableName, position: s.data.length
             }))
         }
-        const rr = await fetch(
-            `${serviceBaseUrl}/api`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(req)
-            }
-        )
-        const resp = await rr.json()
+        const resp = await postApiRequest(req)
         if (!isGetSequencesResponse(resp)) {
             console.warn(resp)
             throw Error('Unexpected getSequences response')

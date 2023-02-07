@@ -8,7 +8,7 @@ const main = () => {
             return yargs
         }, (argv) => {
             const dir: string = argv.dir as string
-            start({port: parseInt(process.env.PORT || "61542"), dir, verbose: argv.verbose ? true : false, enable_remote_access: argv.enable_remote_access ? true : false})
+            start({port: parseInt(process.env.PORT || "61542"), dir, verbose: argv.verbose ? true : false, enableRemoteAccess: argv['enable-remote-access'] ? true : false})
         })
         .option('verbose', {
             alias: 'v',
@@ -29,8 +29,8 @@ const main = () => {
 }
 
 let server: Server
-function start({port, dir, verbose, enable_remote_access}: {port: number, dir: string, verbose: boolean, enable_remote_access: boolean}) {
-    server = new Server({port, dir, verbose, enableRemoteAccess: enable_remote_access})
+function start({port, dir, verbose, enableRemoteAccess}: {port: number, dir: string, verbose: boolean, enableRemoteAccess: boolean}) {
+    server = new Server({port, dir, verbose, enableRemoteAccess})
     server.start()
 }
 

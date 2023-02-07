@@ -1,7 +1,7 @@
 import { GetChainsForRunResponse, GetRunsResponse, GetSequencesResponse, MCMCMonitorRequest, MCMCMonitorResponse, ProbeResponse, protocolVersion } from "./MCMCMonitorRequest";
 import OutputManager from "./OutputManager";
 
-export const handleApiRequest = async (request: MCMCMonitorRequest, outputManager: OutputManager, o: {verbose: boolean}): Promise<MCMCMonitorResponse> => {
+export const handleApiRequest = async (request: MCMCMonitorRequest, outputManager: OutputManager, o: {verbose: boolean, webrtc?: boolean}): Promise<MCMCMonitorResponse> => {
     if (request.type === 'probeRequest') {
         const response: ProbeResponse = {
             type: 'probeResponse',
@@ -11,7 +11,7 @@ export const handleApiRequest = async (request: MCMCMonitorRequest, outputManage
     }
     else if (request.type === 'getRunsRequest') {
         if (o.verbose) {
-            console.info(`getRuns`)
+            console.info(`${o.webrtc ? "Webrtc " : ""}getRuns`)
         }
         const runs = await outputManager.getRuns()
         const response: GetRunsResponse = {type: 'getRunsResponse', runs}
@@ -20,7 +20,7 @@ export const handleApiRequest = async (request: MCMCMonitorRequest, outputManage
     else if (request.type === 'getChainsForRunRequest') {
         const {runId} = request
         if (o.verbose) {
-            console.info(`getChainsForRun ${runId}`)
+            console.info(`${o.webrtc ? "Webrtc " : ""}getChainsForRun ${runId}`)
         }
         const chains = await outputManager.getChainsForRun(runId)
         const response: GetChainsForRunResponse ={
@@ -31,7 +31,7 @@ export const handleApiRequest = async (request: MCMCMonitorRequest, outputManage
     }
     else if (request.type === 'getSequencesRequest') {
         if (o.verbose) {
-            console.info(`getSequences ${request.sequences.length}`)
+            console.info(`${o.webrtc ? "Webrtc " : ""}getSequences ${request.sequences.length}`)
         }
         const response: GetSequencesResponse = {type: 'getSequencesResponse', sequences: []}
         for (const s of request.sequences) {

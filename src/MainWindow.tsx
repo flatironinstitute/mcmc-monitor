@@ -1,6 +1,6 @@
 import { FunctionComponent, useEffect } from "react";
 import Hyperlink from "./components/Hyperlink";
-import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl } from "./config";
+import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl, useWebrtc } from "./config";
 import Logo from "./Logo";
 import { useMCMCMonitor } from "./useMCMCMonitor";
 import Home from "./pages/Home";
@@ -26,7 +26,6 @@ const MainWindow: FunctionComponent<Props> = () => {
 	}
 
 	if (connectedToService === false) {
-		
 		return (
 			<div style={{margin: 60}}>
 				<Logo />

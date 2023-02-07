@@ -1,8 +1,9 @@
 import { FunctionComponent, PropsWithChildren, useEffect, useMemo, useReducer, useState } from "react"
-import { serviceBaseUrl } from "./config"
+import { useWebrtc, webrtcConnectionToService } from "./config"
 import { initialMCMCMonitorData, MCMCMonitorContext, mcmcMonitorReducer } from "./MCMCMonitorDataManager/MCMCMonitorData"
 import MCMCDataManager from "./MCMCMonitorDataManager/MCMCMonitorDataManager"
 import { isProbeResponse, ProbeRequest, protocolVersion } from "./MCMCMonitorRequest"
+import postApiRequest from "./postApiRequest"
 
 const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
     const [data, dataDispatch] = useReducer(mcmcMonitorReducer, initialMCMCMonitorData)
@@ -30,37 +31,58 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
         dispatch: dataDispatch
     }), [data, dataDispatch])
 
+    // wait for webrtc connection (if using)
+    const [webrtcConnectionStatus, setWebrtcConnectionStatus] = useState<'pending' | 'connected' | 'error' | 'unused'>('pending')
+    useEffect(() => {
+        let canceled = false
+        if (!useWebrtc) {
+            setWebrtcConnectionStatus('unused')
+            return
+        }
+        function check() {
+            if (canceled) return
+            const ss = webrtcConnectionToService?.status || 'pending'
+            if ((ss === 'connected') || (ss === 'error')) {
+                setWebrtcConnectionStatus('connected')
+                return
+            }
+            setTimeout(() => {
+                check()
+            }, 100)
+        }
+        check()
+        return () => {canceled = true}
+    }, [])
+
+    useEffect(() => {
+        dataDispatch({type: 'setWebrtcConnectionStatus', status: webrtcConnectionStatus})
+    }, [webrtcConnectionStatus])
+
     // check whether we are connected
     useEffect(() => {
-        ;(async () => {
-            try {
-                const req: ProbeRequest = {
-                    type: 'probeRequest'
-                }
-                const rr = await fetch(
-                    `${serviceBaseUrl}/api`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(req)
+        if ((webrtcConnectionStatus === 'connected') || (webrtcConnectionStatus === 'unused')) {
+            ;(async () => {
+                try {
+                    const req: ProbeRequest = {
+                        type: 'probeRequest'
                     }
-                )
-                const resp = await rr.json()
-                if (!isProbeResponse(resp)) {
-                    console.warn(resp)
-                    throw Error('Unexpected probe response')
+                    const resp = await postApiRequest(req)
+                    if (!isProbeResponse(resp)) {
+                        console.warn(resp)
+                        throw Error('Unexpected probe response')
+                    }
+                    if (resp.protocolVersion !== protocolVersion) {
+                        throw Error(`Unexpected protocol version: ${resp.protocolVersion} <> ${protocolVersion}`)
+                    }
+                    dataDispatch({type: 'setConnectedToService', connected: true})
                 }
-                if (resp.protocolVersion !== protocolVersion) {
-                    throw Error(`Unexpected protocol version: ${resp.protocolVersion} <> ${protocolVersion}`)
+                catch(err) {
+                    console.warn(err)
+                    dataDispatch({type: 'setConnectedToService', connected: false})
                 }
-                dataDispatch({type: 'setConnectedToService', connected: true})
-            }
-            catch(err) {
-                console.warn(err)
-                dataDispatch({type: 'setConnectedToService', connected: false})
-            }
-        })()
-    }, [])
+            })()
+        }
+    }, [webrtcConnectionStatus])
 
     return (
         <MCMCMonitorContext.Provider value={value}>

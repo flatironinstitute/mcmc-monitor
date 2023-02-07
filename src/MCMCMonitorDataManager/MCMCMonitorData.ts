@@ -15,6 +15,7 @@ export type SequenceStats = {
 
 export type MCMCMonitorData = {
     connectedToService: boolean | undefined
+    webrtcConnectionStatus: 'unused' | 'pending' | 'connected' | 'error'
     runs: MCMCRun[]
     chains: MCMCChain[]
     sequences: MCMCSequence[]
@@ -27,6 +28,7 @@ export type MCMCMonitorData = {
 
 export const initialMCMCMonitorData: MCMCMonitorData = {
     connectedToService: undefined,
+    webrtcConnectionStatus: 'pending',
     runs: [],
     chains: [],
     sequences: [],
@@ -67,6 +69,9 @@ export type MCMCMonitorAction = {
 } | {
     type: 'setConnectedToService'
     connected: boolean
+} | {
+    type: 'setWebrtcConnectionStatus'
+    status: 'unused' | 'pending' | 'connected' | 'error'
 } | {
     type: 'updateSequence'
     runId: string
@@ -123,6 +128,12 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         return {
             ...s,
             connectedToService: a.connected
+        }
+    }
+    else if (a.type === 'setWebrtcConnectionStatus') {
+        return {
+            ...s,
+            webrtcConnectionStatus: a.status
         }
     }
     else if (a.type === 'appendSequenceData') {

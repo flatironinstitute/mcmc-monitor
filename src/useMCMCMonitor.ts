@@ -1,8 +1,8 @@
 import { useCallback, useContext } from 'react'
-import { serviceBaseUrl } from './config'
 import { GeneralOpts, MCMCMonitorContext } from './MCMCMonitorDataManager/MCMCMonitorData'
 import { MCMCChain, MCMCRun } from './MCMCMonitorDataManager/MCMCMonitorTypes'
 import { GetChainsForRunRequest, GetRunsRequest, isGetChainsForRunResponse, isGetRunsResponse } from './MCMCMonitorRequest'
+import postApiRequest from './postApiRequest'
 
 export const useMCMCMonitor = () => {
     const { data, dispatch } = useContext(MCMCMonitorContext)
@@ -32,15 +32,7 @@ export const useMCMCMonitor = () => {
             const req: GetRunsRequest = {
                 type: 'getRunsRequest'
             }
-            const rr = await fetch(
-                `${serviceBaseUrl}/api`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(req)
-                }
-            )
-            const resp = await rr.json()
+            const resp = await postApiRequest(req)
             if (!isGetRunsResponse(resp)) {
                 console.warn(resp)
                 throw Error('Unexpected getRuns response')
@@ -55,15 +47,7 @@ export const useMCMCMonitor = () => {
                 type: 'getChainsForRunRequest',
                 runId
             }
-            const rr = await fetch(
-                `${serviceBaseUrl}/api`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(req)
-                }
-            )
-            const resp = await rr.json()
+            const resp = await postApiRequest(req)
             if (!isGetChainsForRunResponse(resp)) {
                 console.warn(resp)
                 throw Error('Unexpected getChainsForRun response')
