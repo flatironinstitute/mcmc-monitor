@@ -37,14 +37,16 @@ export default async function updateSequences(data: MCMCMonitorData, dispatch: (
             throw Error('Unexpected getSequences response')
         }
         for (const s of resp.sequences) {
-            dispatch({
-                type: 'appendSequenceData',
-                runId: s.runId,
-                chainId: s.chainId,
-                variableName: s.variableName,
-                position: s.position,
-                data: s.data
-            })
+            if (s.data.length > 0) {
+                dispatch({
+                    type: 'appendSequenceData',
+                    runId: s.runId,
+                    chainId: s.chainId,
+                    variableName: s.variableName,
+                    position: s.position,
+                    data: s.data
+                })
+            }
         }
         const elapsed = Date.now() - timer
         if (elapsed > 200) {
