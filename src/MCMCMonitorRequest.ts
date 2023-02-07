@@ -132,18 +132,46 @@ export const isGetSequencesResponse = (x: any): x is GetSequencesResponse => (
     })
 )
 
+export type WebrtcSignalingRequest = {
+    type: 'webrtcSignalingRequest'
+    clientId: string
+    signal?: string
+}
+
+export const isWebrtcSignalingRequest = (x: any): x is WebrtcSignalingRequest => (
+    validateObject(x, {
+        type: isEqualTo('webrtcSignalingRequest'),
+        clientId: isString,
+        signal: optional(isString)
+    })
+)
+
+export type WebrtcSignalingResponse = {
+    type: 'webrtcSignalingResponse'
+    signals: string[]
+}
+
+export const isWebrtcSignalingResponse = (x: any): x is WebrtcSignalingResponse => (
+    validateObject(x, {
+        type: isEqualTo('webrtcSignalingResponse'),
+        signals: isArrayOf(isString)
+    })
+)
+
 export type MCMCMonitorRequest =
     ProbeRequest |
     GetRunsRequest |
     GetChainsForRunRequest |
-    GetSequencesRequest
+    GetSequencesRequest |
+    WebrtcSignalingRequest
 
 export const isMCMCMonitorRequest = (x: any): x is MCMCMonitorRequest => (
     isOneOf([
         isProbeRequest,
         isGetRunsRequest,
         isGetChainsForRunRequest,
-        isGetSequencesRequest
+        isGetSequencesRequest,
+        isWebrtcSignalingRequest
     ])(x)
 )
 
@@ -151,13 +179,15 @@ export type MCMCMonitorResponse =
     ProbeResponse |
     GetRunsResponse |
     GetChainsForRunResponse |
-    GetSequencesResponse
+    GetSequencesResponse |
+    WebrtcSignalingResponse
 
 export const isMCMCMonitorResponse = (x: any): x is MCMCMonitorResponse => (
     isOneOf([
         isProbeResponse,
         isGetRunsResponse,
         isGetChainsForRunResponse,
-        isGetSequencesResponse
+        isGetSequencesResponse,
+        isWebrtcSignalingResponse
     ])(x)
 )

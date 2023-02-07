@@ -1,7 +1,8 @@
 import { GetChainsForRunResponse, GetRunsResponse, GetSequencesResponse, MCMCMonitorRequest, MCMCMonitorResponse, ProbeResponse, protocolVersion } from "./MCMCMonitorRequest";
 import OutputManager from "./OutputManager";
+import SignalCommunicator from "./SignalCommunicator";
 
-export const handleApiRequest = async (request: MCMCMonitorRequest, outputManager: OutputManager, o: {verbose: boolean, webrtc?: boolean}): Promise<MCMCMonitorResponse> => {
+export const handleApiRequest = async (request: MCMCMonitorRequest, outputManager: OutputManager, signalCommunicator: SignalCommunicator, o: {verbose: boolean, webrtc?: boolean}): Promise<MCMCMonitorResponse> => {
     if (request.type === 'probeRequest') {
         const response: ProbeResponse = {
             type: 'probeResponse',
@@ -47,6 +48,9 @@ export const handleApiRequest = async (request: MCMCMonitorRequest, outputManage
             })
         }
         return response
+    }
+    else if (request.type === 'webrtcSignalingRequest') {
+        return await signalCommunicator.handleRequest(request)
     }
     else {
         throw Error('Unexpected request type')

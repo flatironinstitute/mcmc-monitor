@@ -2,7 +2,7 @@ import { serviceBaseUrl, useWebrtc, webrtcConnectionToService } from "./config"
 import { isMCMCMonitorResponse, MCMCMonitorRequest, MCMCMonitorResponse } from "./MCMCMonitorRequest"
 
 const postApiRequest = async (request: MCMCMonitorRequest): Promise<MCMCMonitorResponse> => {
-    if ((useWebrtc) && (request.type !== 'probeRequest')) {
+    if ((useWebrtc) && (request.type !== 'probeRequest') && (request.type !== 'webrtcSignalingRequest')) {
         if (!webrtcConnectionToService) {
             throw Error('No webrtc connection to service')
         }

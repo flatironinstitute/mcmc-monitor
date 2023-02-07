@@ -18,6 +18,5 @@ export const useWebrtc = queryParams.webrtc === '1'
 export let webrtcConnectionToService: WebrtcConnectionToService | undefined
 
 if ((useWebrtc) && (!webrtcConnectionToService)) {
-    const wsUrl = serviceBaseUrl.replace('http://', 'ws://').replace('https://', 'wss://')
-    webrtcConnectionToService = new WebrtcConnectionToService(wsUrl)
+    webrtcConnectionToService = new WebrtcConnectionToService()
 }
