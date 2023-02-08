@@ -16,6 +16,7 @@ export type SequenceStats = {
 export type MCMCMonitorData = {
     connectedToService: boolean | undefined
     webrtcConnectionStatus: 'unused' | 'pending' | 'connected' | 'error'
+    usingProxy: boolean | undefined
     runs: MCMCRun[]
     chains: MCMCChain[]
     sequences: MCMCSequence[]
@@ -29,6 +30,7 @@ export type MCMCMonitorData = {
 export const initialMCMCMonitorData: MCMCMonitorData = {
     connectedToService: undefined,
     webrtcConnectionStatus: 'pending',
+    usingProxy: undefined,
     runs: [],
     chains: [],
     sequences: [],
@@ -38,9 +40,10 @@ export const initialMCMCMonitorData: MCMCMonitorData = {
     generalOpts: {updateMode: 'manual', excludeInitialDraws: 20}
 }
 
-export const MCMCMonitorContext = React.createContext<{ data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void }>({
+export const MCMCMonitorContext = React.createContext<{ data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void, checkConnectionStatus: () => void }>({
     data: initialMCMCMonitorData,
-    dispatch: () => { }
+    dispatch: () => { },
+    checkConnectionStatus: () => {}
 })
 
 export type MCMCMonitorAction = {
@@ -68,10 +71,13 @@ export type MCMCMonitorAction = {
     chainIds: string[]
 } | {
     type: 'setConnectedToService'
-    connected: boolean
+    connected: boolean | undefined
 } | {
     type: 'setWebrtcConnectionStatus'
     status: 'unused' | 'pending' | 'connected' | 'error'
+} | {
+    type: 'setUsingProxy'
+    usingProxy: boolean | undefined
 } | {
     type: 'updateSequence'
     runId: string
@@ -134,6 +140,12 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         return {
             ...s,
             webrtcConnectionStatus: a.status
+        }
+    }
+    else if (a.type === 'setUsingProxy') {
+        return {
+            ...s,
+            usingProxy: a.usingProxy
         }
     }
     else if (a.type === 'appendSequenceData') {

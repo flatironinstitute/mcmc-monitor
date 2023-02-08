@@ -2,7 +2,6 @@ import SimplePeer from "simple-peer";
 import { isMCMCMonitorPeerResponse, MCMCMonitorPeerRequest } from "./MCMCMonitorPeerRequest";
 import { MCMCMonitorRequest, MCMCMonitorResponse, WebrtcSignalingRequest } from "./MCMCMonitorRequest";
 import postApiRequest from "./postApiRequest";
-import { isWebsocketMessage, WebsocketMessage } from "./WebsocketMessage";
 
 class WebrtcConnectionToService {
     #peer: SimplePeer.Instance | undefined
@@ -49,6 +48,7 @@ class WebrtcConnectionToService {
             while (this.#status === 'pending') {
                 const elapsed = Date.now() - timer
                 if (elapsed > 15000) {
+                    this.#status = 'error'
                     console.warn('Unable to establish webrtc connection.')
                     break   
                 }

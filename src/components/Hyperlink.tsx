@@ -6,7 +6,7 @@ type Props ={
 
 const Hyperlink: FunctionComponent<PropsWithChildren<Props>> = ({children, onClick}) => {
 	return (
-		<a onClick={onClick} style={{cursor: 'pointer'}}>{children}</a>
+		<a onClick={onClick} style={{cursor: 'pointer', color: 'darkblue'}}>{children}</a>
 	)
 }
 

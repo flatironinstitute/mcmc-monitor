@@ -2,11 +2,14 @@ import { GetChainsForRunResponse, GetRunsResponse, GetSequencesResponse, MCMCMon
 import OutputManager from "./OutputManager";
 import SignalCommunicator from "./SignalCommunicator";
 
-export const handleApiRequest = async (request: MCMCMonitorRequest, outputManager: OutputManager, signalCommunicator: SignalCommunicator, o: {verbose: boolean, webrtc?: boolean}): Promise<MCMCMonitorResponse> => {
+export const handleApiRequest = async (request: MCMCMonitorRequest, outputManager: OutputManager, signalCommunicator: SignalCommunicator, o: {verbose: boolean, webrtc?: boolean, proxy?: boolean}): Promise<MCMCMonitorResponse> => {
     if (request.type === 'probeRequest') {
         const response: ProbeResponse = {
             type: 'probeResponse',
             protocolVersion: protocolVersion
+        }
+        if (o.proxy) {
+            response.proxy = true
         }
         return response
     }

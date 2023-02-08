@@ -41,7 +41,7 @@ class Server {
                 return
             }
             ;(async () => {
-                const response = await handleApiRequest(request, this.#outputManager, signalCommunicator, {verbose: this.a.verbose})
+                const response = await handleApiRequest(request, this.#outputManager, signalCommunicator, {verbose: this.a.verbose, proxy: false})
                 resp.status(200).send(response)
             })()
         })

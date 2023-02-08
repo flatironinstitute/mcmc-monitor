@@ -1,4 +1,4 @@
-import validateObject, { isArrayOf, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
+import validateObject, { isArrayOf, isBoolean, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 export const protocolVersion = '0.1.3'
 
@@ -15,12 +15,14 @@ export const isProbeRequest = (x: any): x is ProbeRequest => (
 export type ProbeResponse = {
     type: 'probeResponse'
     protocolVersion: string
+    proxy?: boolean
 }
 
 export const isProbeResponse = (x: any): x is ProbeResponse => (
     validateObject(x, {
         type: isEqualTo('probeResponse'),
-        protocolVersion: isString
+        protocolVersion: isString,
+        proxy: optional(isBoolean)
     })
 )
 

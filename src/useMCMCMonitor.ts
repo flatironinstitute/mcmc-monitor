@@ -5,7 +5,7 @@ import { GetChainsForRunRequest, GetRunsRequest, isGetChainsForRunResponse, isGe
 import postApiRequest from './postApiRequest'
 
 export const useMCMCMonitor = () => {
-    const { data, dispatch } = useContext(MCMCMonitorContext)
+    const { data, dispatch, checkConnectionStatus } = useContext(MCMCMonitorContext)
 
     const setRuns = useCallback((runs: MCMCRun[]) => {
         dispatch({ type: 'setRuns', runs })
@@ -78,6 +78,8 @@ export const useMCMCMonitor = () => {
         selectedChainIds: data.selectedChainIds,
         selectedRunId: data.selectedRunId,
         connectedToService: data.connectedToService,
+        webrtcConnectionStatus: data.webrtcConnectionStatus,
+        usingProxy: data.usingProxy,
         generalOpts: data.generalOpts,
         sequenceStats: data.sequenceStats,
         updateRuns,
@@ -86,6 +88,7 @@ export const useMCMCMonitor = () => {
         setSelectedVariableNames,
         setSelectedChainIds,
         setSelectedRunId,
-        setGeneralOpts
+        setGeneralOpts,
+        checkConnectionStatus
     }
 }

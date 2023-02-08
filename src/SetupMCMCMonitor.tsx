@@ -1,4 +1,4 @@
-import { FunctionComponent, PropsWithChildren, useEffect, useMemo, useReducer, useState } from "react"
+import { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo, useReducer, useState } from "react"
 import { useWebrtc, webrtcConnectionToService } from "./config"
 import { initialMCMCMonitorData, MCMCMonitorContext, mcmcMonitorReducer } from "./MCMCMonitorDataManager/MCMCMonitorData"
 import MCMCDataManager from "./MCMCMonitorDataManager/MCMCMonitorDataManager"
@@ -8,6 +8,7 @@ import postApiRequest from "./postApiRequest"
 const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
     const [data, dataDispatch] = useReducer(mcmcMonitorReducer, initialMCMCMonitorData)
     const [dataManager, setDataManager] = useState<MCMCDataManager | undefined>()
+    const [usingProxy, setUsingProxy] = useState<boolean | undefined>(undefined)
 
     // instantiate the data manager
     useEffect(() => {
@@ -26,10 +27,16 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
         dataManager && dataManager.setData(data)
     }, [data, dataManager])
 
+    const [connectionCheckRefreshCode, setConnectionCheckRefreshCode] = useState(0)
+    const checkConnectionStatus = useCallback(() => {
+        setConnectionCheckRefreshCode(c => (c + 1))
+    }, [])
+
     const value = useMemo(() => ({
         data,
-        dispatch: dataDispatch
-    }), [data, dataDispatch])
+        dispatch: dataDispatch,
+        checkConnectionStatus
+    }), [data, dataDispatch, checkConnectionStatus])
 
     // wait for webrtc connection (if using)
     const [webrtcConnectionStatus, setWebrtcConnectionStatus] = useState<'pending' | 'connected' | 'error' | 'unused'>('pending')
@@ -43,7 +50,7 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
             if (canceled) return
             const ss = webrtcConnectionToService?.status || 'pending'
             if ((ss === 'connected') || (ss === 'error')) {
-                setWebrtcConnectionStatus('connected')
+                setWebrtcConnectionStatus(ss)
                 return
             }
             setTimeout(() => {
@@ -58,9 +65,17 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
         dataDispatch({type: 'setWebrtcConnectionStatus', status: webrtcConnectionStatus})
     }, [webrtcConnectionStatus])
 
+    useEffect(() => {
+        dataDispatch({type: 'setUsingProxy', usingProxy})
+    }, [usingProxy])
+
     // check whether we are connected
     useEffect(() => {
         if ((webrtcConnectionStatus === 'connected') || (webrtcConnectionStatus === 'unused')) {
+            // the following line causes some undesired effects in the GUI when clicking the "check connection status" button
+            // dataDispatch({type: 'setConnectedToService', connected: undefined})
+
+            setUsingProxy(undefined)
             ;(async () => {
                 try {
                     const req: ProbeRequest = {
@@ -71,6 +86,7 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
                         console.warn(resp)
                         throw Error('Unexpected probe response')
                     }
+                    setUsingProxy(resp.proxy ? true : false)
                     if (resp.protocolVersion !== protocolVersion) {
                         throw Error(`Unexpected protocol version: ${resp.protocolVersion} <> ${protocolVersion}`)
                     }
@@ -82,7 +98,7 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
                 }
             })()
         }
-    }, [webrtcConnectionStatus])
+    }, [webrtcConnectionStatus, connectionCheckRefreshCode])
 
     return (
         <MCMCMonitorContext.Provider value={value}>

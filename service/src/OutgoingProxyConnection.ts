@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import { handleApiRequest } from './handleApiRequest'
-import { InitializeMessageFromService, isAcknowledgeMessageToService, isRequestFromClient, PingMessageFromService, RequestFromClient, ResponseToClient } from './MCMCMonitorProxyTypes'
+import { InitializeMessageFromService, isAcknowledgeMessageToService, isRequestFromClient, PingMessageFromService, RequestFromClient, ResponseToClient } from './ConnectorHttpProxyTypes'
 import { isMCMCMonitorRequest, MCMCMonitorResponse } from './MCMCMonitorRequest'
 import OutputManager from './OutputManager'
 import SignalCommunicator from './SignalCommunicator'
@@ -106,7 +106,7 @@ class OutgoingProxyConnection {
         }
         let mcmcMonitorResponse: MCMCMonitorResponse
         try {
-            mcmcMonitorResponse = await handleApiRequest(rr, this.outputManager, this.signalCommunicator, this.o)
+            mcmcMonitorResponse = await handleApiRequest(rr, this.outputManager, this.signalCommunicator, {...this.o, proxy: true})
         }
         catch(err) {
             const resp: ResponseToClient = {

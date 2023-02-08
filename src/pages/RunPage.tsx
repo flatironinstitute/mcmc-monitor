@@ -10,6 +10,7 @@ import TabWidget from "../components/TabWidget/TabWidget";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 import { MCMCChain, MCMCRun } from "../MCMCMonitorDataManager/MCMCMonitorTypes";
 import useWindowDimensions from "../useWindowDimensions";
+import ConnectionTab from "../components/ConnectionTab";
 
 type Props = {
 	runId: string
@@ -104,7 +105,8 @@ const tabs = [
 	{label: 'Diagnostics', closeable: false},
 	{label: 'Tables', closeable: false},
 	{label: 'Run Info', closeable: false},
-	{label: 'Scatterplots', closeable: false}
+	{label: 'Scatterplots', closeable: false},
+	{label: 'Connection', closeable: false},
 ]
 
 const RightContent: FunctionComponent<RightContentProps> = ({width, height, numDrawsForRun, chainColors}) => {
@@ -138,6 +140,10 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, numD
 				runId={runId}
 				numDrawsForRun={numDrawsForRun}
 				chainColors={chainColors}
+			/>
+			<ConnectionTab
+				width={0}
+				height={0}
 			/>
 		</TabWidget>
 	)

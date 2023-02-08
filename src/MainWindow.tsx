@@ -17,11 +17,17 @@ const MainWindow: FunctionComponent<Props> = () => {
 		updateRuns()
 	}, [updateRuns])
 
-	const {connectedToService} = useMCMCMonitor()
+	const {connectedToService, webrtcConnectionStatus} = useMCMCMonitor()
+
+	if (webrtcConnectionStatus === 'error') {
+		return (
+			<div>Unable to connect to service using WebRTC: {serviceBaseUrl}</div>
+		)
+	}
 
 	if (connectedToService === undefined) {
 		return (
-			<div>Connecting to service {serviceBaseUrl}</div>
+			<div>Connecting to service{useWebrtc ? ' using WebRTC' : ''}: {serviceBaseUrl}</div>
 		)
 	}
 
@@ -30,7 +36,7 @@ const MainWindow: FunctionComponent<Props> = () => {
 			<div style={{margin: 60}}>
 				<Logo />
 				<hr />
-				<div>Not connected to service {serviceBaseUrl}</div>
+				<div style={{color: 'darkred'}}>Not connected to service {serviceBaseUrl}</div>
 				<hr />
 				<div>
 					{
@@ -43,7 +49,7 @@ const MainWindow: FunctionComponent<Props> = () => {
 				</div>
 				{
 					serviceBaseUrl === defaultServiceBaseUrl && (
-						<p><a href="https://github.com/magland/mcmc-monitor" target="_blank" rel="noreferrer">How to run a local service</a></p>
+						<p><a href="https://github.com/flatironinstitute/mcmc-monitor" target="_blank" rel="noreferrer">How to run a local service</a></p>
 					)
 				}
 			</div>
