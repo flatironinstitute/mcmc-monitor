@@ -9,8 +9,17 @@ export type GeneralOpts = {
 export type SequenceStats = {
     mean?: number
     stdev?: number
+    count?: number
     ess?: number
     acor?: number[]
+}
+
+export type VariableStats = {
+    mean?: number
+    stdev?: number
+    ess?: number
+    count?: number
+    rhat?: number
 }
 
 export type MCMCMonitorData = {
@@ -21,6 +30,7 @@ export type MCMCMonitorData = {
     chains: MCMCChain[]
     sequences: MCMCSequence[]
     sequenceStats: {[key: string]: SequenceStats}
+    variableStats: {[key: string]: VariableStats}
     selectedRunId?: string
     selectedVariableNames: string[]
     selectedChainIds: string[]
@@ -35,6 +45,7 @@ export const initialMCMCMonitorData: MCMCMonitorData = {
     chains: [],
     sequences: [],
     sequenceStats: {},
+    variableStats: {},
     selectedVariableNames: [],
     selectedChainIds: [],
     generalOpts: {updateMode: 'manual', excludeInitialDraws: 20}
@@ -95,6 +106,11 @@ export type MCMCMonitorAction = {
     chainId: string
     variableName: string
     stats: SequenceStats
+} | {
+    type: 'setVariableStats'
+    runId: string
+    variableName: string
+    stats: VariableStats
 }
 
 export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MCMCMonitorData => {
@@ -150,11 +166,16 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
     }
     else if (a.type === 'appendSequenceData') {
         const k = `${a.runId}/${a.chainId}/${a.variableName}`
+        const k2 = `${a.runId}/${a.variableName}`
         return {
             ...s,
             sequenceStats: {
                 ...s.sequenceStats,
                 [k]: {} // invalidate the sequence stats
+            },
+            variableStats: {
+                ...s.variableStats,
+                [k2]: {} //invalidate the variable stats
             },
             sequences: s.sequences.map(x => (
                 (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
@@ -164,6 +185,7 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
     }
     else if (a.type === 'updateSequence') {
         const k = `${a.runId}/${a.chainId}/${a.variableName}`
+        const k2 = `${a.runId}/${a.variableName}`
         if (!s.sequences.find(x => (x.runId === a.runId && x.chainId === a.chainId && x.variableName === a.variableName))) {
             return {
                 ...s,
@@ -181,7 +203,11 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
                 ...s,
                 sequenceStats: {
                     ...s.sequenceStats,
-                    [k]: {}
+                    [k]: {} // invalidate
+                },
+                variableStats: {
+                    ...s.variableStats,
+                    [k2]: {} // invalidate
                 },
                 sequences: s.sequences.map(x => (
                     (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
@@ -203,6 +229,7 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         return {
             ...s,
             sequenceStats: {}, // invalidate the sequence stats
+            variableStats: {}, // invalidate the variable stats
             generalOpts: a.opts
         }
     }
@@ -212,6 +239,16 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
             ...s,
             sequenceStats: {
                 ...s.sequenceStats,
+                [k]: a.stats
+            }
+        }
+    }
+    else if (a.type === 'setVariableStats') {
+        const k = `${a.runId}/${a.variableName}`
+        return {
+            ...s,
+            variableStats: {
+                ...s.variableStats,
                 [k]: a.stats
             }
         }

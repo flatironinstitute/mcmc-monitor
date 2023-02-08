@@ -1,6 +1,7 @@
 import { initialMCMCMonitorData, MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorData";
 import updateSequences from "./updateSequences";
 import updateSequenceStats from "./updateSequenceStats";
+import updateVariableStats from "./updateVariableStats";
 
 class MCMCDataManager {
     #data: MCMCMonitorData = initialMCMCMonitorData
@@ -24,7 +25,10 @@ class MCMCDataManager {
     async _iterate() {
         try {
             await updateSequences(this.#data, this.dispatch)
+            await sleepMsec(10) // allow the new data to be set onto this.#data
             await updateSequenceStats(this.#data, this.dispatch)
+            await sleepMsec(10)
+            await updateVariableStats(this.#data, this.dispatch)
         }
         catch(err) {
             console.error('Error in data manager iteration.')

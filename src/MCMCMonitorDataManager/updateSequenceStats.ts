@@ -40,7 +40,8 @@ function computeStatsForSequence(seqData: number[]): SequenceStats {
         mean,
         stdev,
         ess: ess0,
-        acor
+        acor,
+        count: seqData.length
     }
 }
 
@@ -49,7 +50,7 @@ export function computeMean(d: number[]) {
 	return d.reduce((a, b) => (a + b), 0) / d.length
 }
 
-function computeStdev(d: number[]) {
+export function computeStdev(d: number[]) {
 	if (d.length <= 1) return undefined
 	const sumsqr = d.reduce((a, b) => (a + b * b), 0)
 	const m0 = computeMean(d)

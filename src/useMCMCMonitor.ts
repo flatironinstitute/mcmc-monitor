@@ -82,6 +82,7 @@ export const useMCMCMonitor = () => {
         usingProxy: data.usingProxy,
         generalOpts: data.generalOpts,
         sequenceStats: data.sequenceStats,
+        variableStats: data.variableStats,
         updateRuns,
         updateChainsForRun,
         updateExistingSequences,

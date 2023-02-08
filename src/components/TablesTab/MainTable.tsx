@@ -2,18 +2,15 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material"
 import { FunctionComponent, useMemo } from "react";
 import { useMCMCMonitor } from "../../useMCMCMonitor";
 
-type Props = {
-	variableName: string
-	chainIds: string[]
-}
+type Props = any
 
-const VariableTable: FunctionComponent<Props> = ({variableName, chainIds}) => {
-	const {sequenceStats, selectedRunId: runId} = useMCMCMonitor()
+const MainTable: FunctionComponent<Props> = () => {
+	const {variableStats, selectedRunId: runId, selectedVariableNames} = useMCMCMonitor()
 
 	const columns = useMemo(() => ([
 		{
-			key: 'chainId',
-			label: 'Chain'
+			key: 'variableName',
+			label: 'Variable'
 		},
 		{
 			key: 'meanStdev',
@@ -22,28 +19,34 @@ const VariableTable: FunctionComponent<Props> = ({variableName, chainIds}) => {
 		{
 			key: 'ess',
 			label: 'ESS'
+		},
+		{
+			key: 'rhat',
+			label: 'R-hat'
 		}
 	]), [])
 
 	const rows = useMemo(() => {
-		function getValuesForRow(chainId: string, variableName: string) {
-			const k = `${runId}/${chainId}/${variableName}`
-			let {mean, stdev, ess} = sequenceStats[k] || {}
+		function getValuesForRow(variableName: string) {
+			const k = `${runId}/${variableName}`
+			let {mean, stdev, ess, rhat} = variableStats[k] || {}
 			if (mean !== undefined) mean = parseFloat(mean.toPrecision(3))
 			if (stdev !== undefined) stdev = parseFloat(stdev.toPrecision(3))
 			if (ess !== undefined) ess = parseFloat(ess.toPrecision(3))
+			if (rhat !== undefined) rhat = parseFloat(rhat.toPrecision(3))
 			return {
 				meanStdev: mean !== undefined ? `${mean} (${stdev})` : '',
-				ess: ess !== undefined ? ess : ''
+				ess: ess !== undefined ? ess : '',
+				rhat: rhat !== undefined ? rhat : ''
 			}
 		}
-		return chainIds.map(ch => {
+		return selectedVariableNames.map(variableName => {
 			return {
-				key: ch,
-				values: {...getValuesForRow(ch, variableName), chainId: ch} as any
+				key: variableName,
+				values: {...getValuesForRow(variableName), variableName} as any
 			}
 		})
-	}, [variableName, chainIds, runId, sequenceStats])
+	}, [selectedVariableNames, runId, variableStats])
 
 	return (
 		<Table style={{maxWidth: 600}}>
@@ -73,4 +76,4 @@ const VariableTable: FunctionComponent<Props> = ({variableName, chainIds}) => {
 	)
 }
 
-export default VariableTable
+export default MainTable
