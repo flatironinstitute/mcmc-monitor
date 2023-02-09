@@ -20,6 +20,10 @@ const VariableTable: FunctionComponent<Props> = ({variableName, chainIds}) => {
 			label: 'Mean (st.dev)'
 		},
 		{
+			key: 'numSamples',
+			label: 'Num. samples'
+		},
+		{
 			key: 'ess',
 			label: 'ESS'
 		}
@@ -28,13 +32,15 @@ const VariableTable: FunctionComponent<Props> = ({variableName, chainIds}) => {
 	const rows = useMemo(() => {
 		function getValuesForRow(chainId: string, variableName: string) {
 			const k = `${runId}/${chainId}/${variableName}`
-			let {mean, stdev, ess} = sequenceStats[k] || {}
+			// eslint-disable-next-line prefer-const
+			let {mean, stdev, ess, count} = sequenceStats[k] || {}
 			if (mean !== undefined) mean = parseFloat(mean.toPrecision(3))
 			if (stdev !== undefined) stdev = parseFloat(stdev.toPrecision(3))
 			if (ess !== undefined) ess = parseFloat(ess.toPrecision(3))
 			return {
 				meanStdev: mean !== undefined ? `${mean} (${stdev})` : '',
-				ess: ess !== undefined ? ess : ''
+				ess: ess !== undefined ? ess : '',
+				numSamples: count !== undefined ? count : ''
 			}
 		}
 		return chainIds.map(ch => {
@@ -62,7 +68,7 @@ const VariableTable: FunctionComponent<Props> = ({variableName, chainIds}) => {
 						<TableRow key={row.key}>
 							{
 								columns.map(c => (
-									<TableCell key={c.key}>{row.values[c.key]}</TableCell>
+									<TableCell key={c.key}>{`${row.values[c.key]}`}</TableCell>
 								))
 							}
 						</TableRow>

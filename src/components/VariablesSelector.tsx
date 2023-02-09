@@ -4,12 +4,20 @@ import { useMCMCMonitor } from "../useMCMCMonitor";
 
 type Props = {
 	variableNames: string[]
+	variablePrefixesExcluded: string[]
 }
 
-const VariablesSelector: FunctionComponent<Props> = ({variableNames}) => {
+const VariablesSelector: FunctionComponent<Props> = ({variableNames, variablePrefixesExcluded}) => {
 	const {selectedVariableNames, setSelectedVariableNames} = useMCMCMonitor()
 	return (
 		<div>
+			{
+				variablePrefixesExcluded.length > 0 && (
+					<div style={{color: 'darkred'}}>
+						The following variables were excluded: {`${variablePrefixesExcluded.join(', ')}`}
+					</div>
+				)
+			}
 			<button onClick={() => setSelectedVariableNames([])}>clear</button>
 			<div style={{paddingLeft: 8}}>
 				{

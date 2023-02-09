@@ -10,6 +10,7 @@ type MCMCChain = {
     variableNames: string[]
     rawHeader?: string
     rawFooter?: string
+    variablePrefixesExcluded?: string[]
 }
 
 class OutputManager {
@@ -39,7 +40,7 @@ class OutputManager {
                 const p = `${path}/${fname}`
                 const kk = `${runId}/${chainId}`
                 if (!this.#chainFiles[kk]) {
-                    this.#chainFiles[kk] = new ChainFile(p)
+                    this.#chainFiles[kk] = new ChainFile(p, chainId)
                 }
                 const cf = this.#chainFiles[kk]
                 await cf.update()
@@ -48,17 +49,20 @@ class OutputManager {
                     chainId,
                     variableNames: cf.variableNames,
                     rawHeader: cf.rawHeader,
-                    rawFooter: cf.rawFooter
+                    rawFooter: cf.rawFooter,
+                    variablePrefixesExcluded: cf.variablePrefixesExcluded
                 })
             }
         }
         return chains
     }
     async getSequenceData(runId: string, chainId: string, variableName: string, startPosition: number): Promise<{data: number[]}> {
-        const p = `${this.dir}/${runId}/${chainId}.csv`
         const kk = `${runId}/${chainId}`
+        const p = await this._getPathForChainId(runId, chainId)
+        if (!p) return {data: []}
+        
         if (!this.#chainFiles[kk]) {
-            this.#chainFiles[kk] = new ChainFile(p)
+            this.#chainFiles[kk] = new ChainFile(p, chainId)
         }
         const cf = this.#chainFiles[kk]
         await cf.update()
@@ -67,10 +71,26 @@ class OutputManager {
             data
         }
     }
+    async _getPathForChainId(runId: string, chainId: string) {
+        const p = `${this.dir}/${runId}/${chainId}.csv`
+        if (fs.existsSync(p)) return p
+        const x = await fs.promises.readdir(`${this.dir}/${runId}`)
+        for (const fname of x) {
+            if (fname.endsWith('.csv')) {
+                const chainId2 = chainIdFromCsvFileName(fname)
+                if (chainId2 === chainId) {
+                    return `${this.dir}/${runId}/${fname}`
+                }
+            }
+        }
+        return undefined
+    }
 }
 
 class ChainFile {
     #columnNames: string[] | undefined = undefined
+    #columnIndicesToInclude: number[] | undefined = undefined
+    #variablePrefixesExcluded: string[] | undefined = undefined
     #rows: {values: string[]}[] = []
     #rawHeaderLines: string[] = []
     #rawFooterLines: string[] = []
@@ -79,7 +99,7 @@ class ChainFile {
     #filePosition = 0
     #updating = false
     #timestampLastUpdate = 0
-    constructor(private path: string) {
+    constructor(private path: string, public chainId: string) {
     }
     public get variableNames() {
         return [...(this.#columnNames || [])]
@@ -90,7 +110,11 @@ class ChainFile {
     public get rawFooter() {
         return this.#rawFooterLines.join('\n')
     }
+    public get variablePrefixesExcluded() {
+        return this.#variablePrefixesExcluded
+    }
     sequenceData(variableName: string, startPosition: number): number[] {
+        if (!this.#columnNames) return []
         const i = this.#columnNames.indexOf(variableName)
         if (i < 0) return []
         return this.#rows.slice(startPosition).map(r => (
@@ -167,10 +191,14 @@ class ChainFile {
                         this.#inHeader = false
                         const vals = line.trim().split(',')
                         if (!this.#columnNames) {
-                            this.#columnNames = vals
+                            const {inds, excludedPrefixes} = determineColumnIndicesToInclude(vals)
+                            this.#columnIndicesToInclude = inds
+                            this.#variablePrefixesExcluded = excludedPrefixes
+                            this.#columnNames = this.#columnIndicesToInclude.map(i => (vals[i]))
                         }
                         else {
-                            this.#rows.push({values: vals})
+                            const vals2 = this.#columnIndicesToInclude.map(i => (vals[i]))
+                            this.#rows.push({values: vals2})
                         }
                     }
                 }
@@ -184,8 +212,35 @@ class ChainFile {
     }
 }
 
+function determineColumnIndicesToInclude(vars: string[]): {inds: number[], excludedPrefixes: string[]} {
+    const prefixCounts: {[prefix: string]: number} = {}
+    for (const v of vars) {
+        const prefix = v.split('.')[0] || ''
+        prefixCounts[prefix] = (prefixCounts[prefix] || 0) + 1
+    }
+    const excludedPrefixes = Object.keys(prefixCounts).filter(prefix => (prefixCounts[prefix] > 100)).sort()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const inds = vars.map((v, i) => ({v, i})).filter(({v, i}) => {
+        const prefix = v.split('.')[0] || ''
+        return !excludedPrefixes.includes(prefix)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    }).map(({v, i}) => (i))
+    return {inds, excludedPrefixes}
+}
+
 function chainIdFromCsvFileName(path: string) {
-    return path.slice(0, path.length - '.csv'.length)
+    const a = path.slice(0, path.length - '.csv'.length)
+    const ii = a.lastIndexOf('_')
+    if (ii >= 0) {
+        if (isIntString(a.slice(ii + 1))) {
+            return `chain_${a.slice(ii + 1)}`
+        }
+    }
+    return a
+}
+
+function isIntString(x: string) {
+    return (parseInt(x) + '') === x
 }
 
 function sleepMsec(msec: number) {

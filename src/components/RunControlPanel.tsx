@@ -30,7 +30,15 @@ const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}
 		})
 	}, [chainsForRun])
 
-	const numParameters = useMemo(() => (allVariableNames.filter(v => (!v.includes('__'))).length), [allVariableNames])
+	const allVariablePrefixesExcluded = useMemo(() => {
+		const s = new Set<string>()
+		for (const c of chainsForRun) {
+			for (const v of (c.variablePrefixesExcluded || [])) {
+				s.add(v)
+			}
+		}
+		return [...s].sort()
+	}, [chainsForRun])
 
 	useEffect(() => {
 		// start with just lp__ selected
@@ -43,7 +51,7 @@ const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}
 		<div style={{fontSize: 14}}>
 			<Hyperlink onClick={() => setRoute({page: 'home'})}>Back to home</Hyperlink>
 			<h2>Run: {runId}</h2>
-			<p>{numDrawsForRun} draws | {numParameters} parameters | {chainsForRun.length} chains</p>
+			<p>{numDrawsForRun} draws | {chainsForRun.length} chains</p>
 
 			<h3>Chains</h3>
 			<div style={{position: 'relative', maxHeight: 200, overflowY: 'auto'}}>
@@ -51,7 +59,7 @@ const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}
 			</div>
 			<h3>Variables</h3>
 			<div style={{position: 'relative', maxHeight: 200, overflowY: 'auto'}}>
-				<VariablesSelector variableNames={allVariableNames} />
+				<VariablesSelector variableNames={allVariableNames} variablePrefixesExcluded={allVariablePrefixesExcluded} />
 			</div>
 			<h3>Options</h3>
 			<GeneralOptsControl />

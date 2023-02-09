@@ -42,6 +42,10 @@ process.on('SIGINT', function() {
             process.exit()
         })
     }
+    setTimeout(() => {
+        // exit no matter what after a few seconds
+        process.exit()
+    }, 3000)
 })
 
 main()

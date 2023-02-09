@@ -8,6 +8,7 @@ export type MCMCChain = {
     variableNames: string[]
     rawHeader?: string
     rawFooter?: string
+    variablePrefixesExcluded?: string[]
 }
 
 export type MCMCSequence = {

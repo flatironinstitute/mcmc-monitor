@@ -24,19 +24,39 @@ const GeneralOptsControl: FunctionComponent<Props> = () => {
 				</Select>
 			</FormControl>
 			<div>&nbsp;</div>
-			Data update mode
+			Data refresh
 			<FormControl fullWidth size="small">
 				<Select
-					value={generalOpts.updateMode}
-					onChange={(evt: SelectChangeEvent<string>) => {setGeneralOpts({...generalOpts, updateMode: evt.target.value as ('auto' | 'manual')})}}
+					value={generalOpts.dataRefreshMode}
+					onChange={(evt: SelectChangeEvent<string>) => {setGeneralOpts({...generalOpts, dataRefreshMode: evt.target.value as ('auto' | 'manual')})}}
 				>
 					<MenuItem key={'manual'} value={'manual'}>Manual</MenuItem>
 					<MenuItem key={'auto'} value={'auto'}>Auto</MenuItem>
 				</Select>
 			</FormControl>
+			{
+				generalOpts.dataRefreshMode === 'auto' && (
+					<span>
+						<div>&nbsp;</div>
+						Refresh interval
+						<FormControl fullWidth size="small">
+							<Select
+								value={generalOpts.dataRefreshIntervalSec}
+								onChange={(evt: SelectChangeEvent<number>) => {setGeneralOpts({...generalOpts, dataRefreshIntervalSec: evt.target.value as number})}}
+							>
+								{
+									[2, 5, 10, 30, 60, 120, 300].map(n => (
+										<MenuItem key={n} value={n}>{n} sec</MenuItem>
+									))
+								}
+							</Select>
+						</FormControl>
+					</span>
+				)
+			}
 			<div>&nbsp;</div>
 			{
-				generalOpts.updateMode === 'manual' && (
+				generalOpts.dataRefreshMode === 'manual' && (
 					<span style={{fontSize: 16}}>
 						<button onClick={() => {updateExistingSequences(runId)}}>update data</button>
 					</span>

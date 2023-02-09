@@ -28,15 +28,15 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 		function update() {
 			if (canceled) return
 			setTimeout(() => {
-				if (generalOpts.updateMode === 'auto') {
+				if (generalOpts.dataRefreshMode === 'auto') {
 					updateExistingSequences(runId)
 				}
 				update()
-			}, 5000)
+			}, generalOpts.dataRefreshIntervalSec * 1000)
 		}
 		update()
 		return () => {canceled = true}
-	}, [runId, generalOpts.updateMode, updateExistingSequences])
+	}, [runId, generalOpts.dataRefreshMode, generalOpts.dataRefreshIntervalSec, updateExistingSequences])
 
 	useEffect(() => {
 		updateChainsForRun(runId)
@@ -63,8 +63,11 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 	}, [chainsForRun])
 
 	useEffect(() => {
-		// start with 5 chains selected
-		setSelectedChainIds(chainsForRun.slice(0, 5).map(c => (c.chainId)))
+		// // start with 5 chains selected
+		// setSelectedChainIds(chainsForRun.slice(0, 5).map(c => (c.chainId)))
+
+		// start with all chains selected
+		setSelectedChainIds(chainsForRun.map(c => (c.chainId)))
 	}, [runId, setSelectedChainIds, chainsForRun])
 
 	const {width, height} = useWindowDimensions()

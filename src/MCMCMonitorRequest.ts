@@ -72,6 +72,7 @@ export type GetChainsForRunResponse = {
         variableNames: string[]
         rawHeader?: string
         rawFooter?: string
+        variablePrefixesExcluded?: string[]
     }[]
 }
 
@@ -83,7 +84,8 @@ export const isGetChainsForRunResponse = (x: any): x is GetChainsForRunResponse 
             chainId: isString,
             variableNames: isArrayOf(isString),
             rawHeader: optional(isString),
-            rawFooter: optional(isString)
+            rawFooter: optional(isString),
+            variablePrefixesExcluded: optional(isArrayOf(isString))
         })))
     })
 )

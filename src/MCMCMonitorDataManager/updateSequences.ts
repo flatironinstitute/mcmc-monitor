@@ -1,4 +1,3 @@
-import { serviceBaseUrl } from "../config";
 import { GetSequencesRequest, isGetSequencesResponse } from "../MCMCMonitorRequest";
 import postApiRequest from "../postApiRequest";
 import { MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorData";
@@ -47,6 +46,13 @@ export default async function updateSequences(data: MCMCMonitorData, dispatch: (
                     data: s.data
                 })
             }
+            // important to do this separately from 'appendSequenceData' action because this one should not be conditional on whether we received data
+            dispatch({
+                type: 'markSequenceAsUpdated',
+                runId: s.runId,
+                chainId: s.chainId,
+                variableName: s.variableName
+            })
         }
         const elapsed = Date.now() - timer
         if (elapsed > 200) {
