@@ -1,6 +1,6 @@
 # MCMC Monitor
 
-MCMC Monitor enables tracking and visualization of MCMC processes executed with [Stan](https://mc-stan.org/) in a local or remote web browser. When you run a sampler, you can configure Stan to generate output to a directory on your computer. MCMC Monitor reads this output and displays it in the web app, with real-time updates. You can visualize the variables in the model, track the progress of the run, and examine the results.
+MCMC Monitor enables tracking and visualization of MCMC processes executed with [Stan](https://mc-stan.org/) in local or remote web browsers. When you run a sampler, you can configure Stan to generate output to a directory on your computer. MCMC Monitor reads this output and displays it in the web app, with real-time updates. As you track the progress of the run, MCMC provides diagnostic plots and statistics.
 
 How it works:
 
@@ -8,11 +8,18 @@ How it works:
 2. [Run a Stan program](#running-a-stan-program), configuring it to write output to a subdirectory of the output directory.
 3. [Open the web app](http://flatironinstitute.github.io/mcmc-monitor) to monitor and visualize the Stan run.
 
-You can optional configure mcmc-monitor to enable monitoring from a remote computer (see below).
+You can optional configure MCMC Monitor to enable monitoring from a remote computer (see below).
+
+* [Running the monitoring service](#running-the-monitor-service)
+* [Running a Stan program](#running-a-stan-program)
+* [Opening the web app](#opening-the-web-app)
+* [Enabling remote access](#enabling-remote-access)
+* [Installing cmdstan and cmdstanpy](#installing-cmdstan-and-cmdstanpy)
+* [Including and excluding parameters](#including-and-excluding-parameters)
 
 ## Running the monitor service
 
-First, make sure you have a recent version of [NodeJS](https://nodejs.org/en/download/) installed. This software has been tested with version 16.
+First, make sure you have a recent version of [NodeJS](https://nodejs.org/en/download/) installed. Our tests use version 16.
 
 > Note: there is no need to clone this repo. You can use the npx command below.
 
@@ -52,6 +59,8 @@ python test_finite_mixture.py
 # but you can view the output using mcmc-monitor
 ```
 
+For the above examples, you should monitor the examples/example-output directory.
+
 ## Opening the web app
 
 The web app is hosted [here](http://flatironinstitute.github.io/mcmc-monitor).
@@ -60,12 +69,12 @@ By default, the web app will attempt to connect to your monitoring service on po
 
 ## Enabling remote access
 
-To allow remote computers to access your monitor, do the following
+To allow remote computers to access your monitoring service, do the following
 
 * Use the --enable-remote-access flag when starting the service.
 * Follow the link printed in the console output.
 
-**How does this work?** We provide a proxy server that allows remote machines to access your monitor service. In order to avoid excessive bandwidth usage on our server, the system establishes a WebRTC connection so that traffic flows directly between computers, bypassing our proxy. However, since is not always possible to establish a WebRTC connection (due to firewall configurations), you may need to disable WebRTC by changing `webrtc=1` to `webrtc=0` in the query parameters of the URL. Note that in the case of `webrtc=0`, our proxy service may limit the amount of data that is served. Please try to keep `webrtc=1` whenever that is working. You can also [host your own proxy server](https://github.com/magland/connector-http-proxy).
+**How does this work?** We provide a proxy server that allows remote machines to access your monitor service. In order to avoid excessive bandwidth usage on our server, the system establishes a WebRTC connection so that traffic flows directly between computers, bypassing our proxy. However, since is not always possible to establish a WebRTC connection (due to firewall configurations), you may need to disable WebRTC by changing `webrtc=1` to `webrtc=0` in the query parameters of the URL. Note that in the case of `webrtc=0`, our proxy server may limit the amount of data that is served. Please try to keep `webrtc=1` whenever that is working. You can also [host your own proxy server](https://github.com/magland/connector-http-proxy).
 
 ## Installing cmdstan and cmdstanpy
 
@@ -79,6 +88,17 @@ conda install -c conda-forge cmdstan cmdstanpy
 
 For more information see the [cmdstanpy documentation](https://mc-stan.org/cmdstanpy/).
 
+## Including and excluding parameters
+
+By default, MCMC Monitor will not necessarily monitor all model parameters. It will always monitor system diagnostic variables (those ending in `__` such as `lp__`), scalar parameters, and vectors, matrices and tensors with up to 100 elements. By default, MCMC will not monitor variables with larger than 100 elements. You can override this by creating a `mcmc-run.yaml` file in the output directory for the run and then including the following content, for example:
+
+```
+# mcmc-run.yaml
+includeVariables: [y.1, y.2, y.3]
+```
+
+This will force monitoring of the variables included.
+
 ## What is MCMC sampling?
 
 [Markov Chain Monte Carlo](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) (MCMC) sampling is a method of sampling from a probability distribution, such as a posterior distribution, in order to approximate the distribution. This is accomplished by running a Markov Chain with the desired distribution as its equilibrium distribution. With each step of the Markov Chain, a sample is taken from the probability distribution. After a sufficient number of steps, the samples will approximate the desired distribution.
@@ -90,3 +110,16 @@ For more information see the [cmdstanpy documentation](https://mc-stan.org/cmdst
 ## Why monitor a running Stan program?
 
 Monitoring a running Stan program provides insight into the progress of the run and the results of the sampling. By tracking the progress of the MCMC sampling, it is possible to detect and diagnose problems with the program and observe whether the iterations are converging to the equilibrium distribution. Additionally, monitoring the results of the sampling allows the user to gain a better understanding of the posterior distributions, even before the program completes, which can inform decisions and predictions.
+
+## License
+
+Apache-2.0
+
+## Authors
+
+Jeremy Magland, Center for Computational Mathematics, Flatiron Institute
+
+Thanks also to
+* Jeff Soules
+* Brian Ward
+* Bob Carpenter
