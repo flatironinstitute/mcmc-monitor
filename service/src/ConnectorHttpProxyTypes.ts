@@ -32,14 +32,16 @@ export const isResponseToClient = (x: any): x is ResponseToClient => {
 
 export type InitializeMessageFromService = {
     type: 'initialize'
-    serviceName: string
+    serviceId: string
+    servicePrivateId: string
     proxySecret: string
 }
 
 export const isInitializeMessageFromService = (x: any): x is InitializeMessageFromService => {
     return validateObject(x, {
         type: isEqualTo('initialize'),
-        serviceName: isString,
+        serviceId: isString,
+        servicePrivateId: isString,
         proxySecret: isString
     })
 }

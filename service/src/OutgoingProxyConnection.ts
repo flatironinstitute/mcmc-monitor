@@ -11,7 +11,7 @@ const proxySecret = process.env['MCMC_MONITOR_PROXY_SECRET'] || 'mcmc-monitor-no
 class OutgoingProxyConnection {
     #acknowledged: boolean
     #webSocket: WebSocket
-    constructor(private serviceName: string, private outputManager: OutputManager, private signalCommunicator: SignalCommunicator, private o: {verbose: boolean, webrtc?: boolean}) {
+    constructor(private serviceId: string, private servicePrivateId: string, private outputManager: OutputManager, private signalCommunicator: SignalCommunicator, private o: {verbose: boolean, webrtc?: boolean}) {
         this.initializeWebSocket()
         const keepAlive = () => {
             if (this.#webSocket) {
@@ -51,7 +51,8 @@ class OutgoingProxyConnection {
             console.info('Connected')
             const msg: InitializeMessageFromService = {
                 type: 'initialize',
-                serviceName: this.serviceName,
+                serviceId: this.serviceId,
+                servicePrivateId: this.servicePrivateId,
                 proxySecret: proxySecret
             }
             ws.send(JSON.stringify(msg))
@@ -127,7 +128,7 @@ class OutgoingProxyConnection {
         this.#webSocket.send(JSON.stringify(responseToClient))
     }
     public get url() {
-        return `${proxyUrl}/s/${this.serviceName}`
+        return `${proxyUrl}/s/${this.serviceId}`
     }
     close() {
         if (this.#webSocket) {

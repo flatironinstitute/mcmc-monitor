@@ -6,10 +6,11 @@ import OutputManager from './OutputManager';
 import SimplePeer from 'simple-peer';
 import wrtc from 'wrtc'
 import { isMCMCMonitorPeerRequest, MCMCMonitorPeerResponse } from './MCMCMonitorPeerRequest';
-import SignalCommunicator from './SignalCommunicator';
+import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
 import OutgoingProxyConnection from './OutgoingProxyConnection';
 import fs from 'fs'
 import YAML from 'js-yaml'
+import crypto from 'crypto'
 
 class Server {
     #expressApp: Express
@@ -93,9 +94,8 @@ class Server {
         if (a.enableRemoteAccess) {
             ;(async () => {
                 console.info('Connecting to proxy')
-                // const serviceName = randomAlphaString(10)
-                const serviceName = await getServiceNameFromDir(this.a.dir)
-                const outgoingProxyConnection = new OutgoingProxyConnection(serviceName, this.#outputManager, signalCommunicator, {verbose: this.a.verbose, webrtc: true})
+                const {publicId, privateId} = await getServiceIdFromDir(this.a.dir)
+                const outgoingProxyConnection = new OutgoingProxyConnection(publicId, privateId, this.#outputManager, signalCommunicator, {verbose: this.a.verbose, webrtc: true})
                 this.#outgoingProxyConnection = outgoingProxyConnection
                 const proxyUrl = outgoingProxyConnection.url
                 const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=1`
@@ -124,22 +124,38 @@ class Server {
         this.#expressServer.listen(this.a.port, () => {
             return console.info(`Server is running on port ${this.a.port}`)
         })
+
+        // clean up output manager periodically
+        ;(async () => {
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+                await this.#outputManager.clearOldData()
+                await sleepMsec(30 * 1000)
+            }
+        })()
     }
 }
 
-async function getServiceNameFromDir(dir: string): Promise<string> {
+async function getServiceIdFromDir(dir: string): Promise<{publicId: string, privateId: string}> {
     const yamlPath = `${dir}/mcmc-monitor.yaml`
     let config: {[key: string]: any} = {}
     if (fs.existsSync(yamlPath)) {
         const yaml = await fs.promises.readFile(yamlPath, 'utf8')
         config = YAML.load(yaml)
     }
-    if (!config.serviceName) {
-        config.serviceName = `s-${randomAlphaStringLower(12)}`
+    if ((!config.publicId) || (!config.privateId)) {
+        config.privateId = `${randomAlphaStringLower(40)}`
+        config.publicId = sha1Hash(config.privateId).slice(0, 20)
         const newYaml = YAML.dump(config)
         await fs.promises.writeFile(yamlPath, newYaml)
     }
-    return config.serviceName
+    return {publicId: config.publicId, privateId: config.privateId}
+}
+
+function sha1Hash(x: string) {
+    const shasum = crypto.createHash('sha1')
+    shasum.update(x)
+    return shasum.digest('hex')
 }
 
 export const randomAlphaStringLower = (num_chars: number) => {

@@ -22,7 +22,6 @@ import { inverseTransform, transform as transformFft } from "./fft"
 //     return acorr
 
 export function autocorr_fft(chain: number[], n: number): number[] {
-    console.log('--- performing fft', n)
     const size = Math.round(Math.pow(2, Math.ceil(Math.log2(2 * chain.length - 1))))
     const variance = computeVariance(chain)
     if (variance === undefined) return []
@@ -83,7 +82,6 @@ export function first_neg_pair_start(chain: number[]): number {
 }
 
 export function ess_ipse(chain: number[]): number {
-    console.log('--- ess_ipse')
     if (chain.length < 4) {
         console.warn('ess requires chain.length >=4')
         return 0

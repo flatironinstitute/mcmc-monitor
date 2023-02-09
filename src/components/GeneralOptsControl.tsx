@@ -56,11 +56,11 @@ const GeneralOptsControl: FunctionComponent<Props> = () => {
 			}
 			<div>&nbsp;</div>
 			{
-				generalOpts.dataRefreshMode === 'manual' && (
-					<span style={{fontSize: 16}}>
-						<button onClick={() => {updateExistingSequences(runId)}}>update data</button>
-					</span>
-				)
+				// generalOpts.dataRefreshMode === 'manual' && (
+				<span style={{fontSize: 16}}>
+					<button onClick={() => {updateExistingSequences(runId)}}>refresh data</button>
+				</span>
+				// )
 			}
 		</div>
 	)
