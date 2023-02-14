@@ -18,7 +18,7 @@ type apiRequest = {
 
 export const handleApiRequest = async (props: apiRequest): Promise<MCMCMonitorResponse> => {
     const { request, outputManager, signalCommunicator, options } = props
-    const webrtcFlag = options.webrtc ? "Webrtc " : ""
+    const webrtcFlag = options.webrtc ? "Webrtc" : ""
 
     if (isProbeRequest(request)) {
         return handleProbeRequest(options.proxy)

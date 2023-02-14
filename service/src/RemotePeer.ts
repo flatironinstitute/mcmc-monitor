@@ -31,10 +31,7 @@ const getPeer = (connection: SignalCommunicatorConnection, outputMgr: OutputMana
     peer.on('connect', () => {
         console.info(`webrtc peer ${id} connected`)
     })
-    peer.on('close', () => {
-        console.info(`webrtc peer ${id} disconnected`)
-        connection.close()
-    })
+    peer.on('close', () => onClose(props))
     connection.onSignal(signal => onConnectionSignal(signal, props))
 
     return peer
@@ -62,12 +59,28 @@ const onData = (d: string, props: callbackProps) => {
             requestId: peerRequest.requestId
         }
         try {
-            peer.send(JSON.stringify(resp))
+            if (cnxn.wasClosed()) {
+                console.warn(`\tSignal communicator connection was closed before the response could be sent.`)
+            } else {
+                peer.send(JSON.stringify(resp))
+            }
         } catch(err) {
             console.error(err)
             console.warn(`\tProblem sending API response to webrtc peer ${id}.`)
         }
     })
+}
+
+
+const onClose = (props: callbackProps) => {
+    const { peer, id, cnxn } = props
+
+    console.info(`webrtc peer ${id} disconnected`)
+    peer.removeAllListeners('data')
+    peer.removeAllListeners('signal')
+    peer.removeAllListeners('connect')
+    peer.removeAllListeners('close')
+    cnxn.close()
 }
 
 
