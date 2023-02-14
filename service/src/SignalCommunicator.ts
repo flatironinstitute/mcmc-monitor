@@ -21,12 +21,12 @@ class SignalCommunicator {
     }
 }
 
-class SignalCommunicatorConnection {
+export class SignalCommunicatorConnection {
     #onSignalCallbacks: ((s: string) => void)[] = []
     #onCloseCallbacks: (() => void)[] = []
     #pendingSignalsToSend: string[] = []
-    constructor() {
-    }
+    #closed: boolean = false
+    constructor() { }
     async handleRequest(request: WebrtcSignalingRequest): Promise<WebrtcSignalingResponse> {
         if (request.signal) {
             this.#onSignalCallbacks.forEach(cb => {cb(request.signal)})
@@ -52,9 +52,13 @@ class SignalCommunicatorConnection {
     }
     close() {
         this.#onCloseCallbacks.forEach(cb => {cb()})
+        this.#closed = true
     }
     onClose(cb: () => void) {
         this.#onCloseCallbacks.push(cb)
+    }
+    wasClosed() {
+        return this.#closed
     }
     onSignal(cb: (s: string) => void) {
         this.#onSignalCallbacks.push(cb)

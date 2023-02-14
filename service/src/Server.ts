@@ -1,16 +1,15 @@
+import crypto from 'crypto';
 import express, { Express, NextFunction, Request, Response } from 'express';
+import fs from 'fs';
 import * as http from 'http';
-import { handleApiRequest } from './handleApiRequest';
+import YAML from 'js-yaml';
 import { isMCMCMonitorRequest, protocolVersion } from './MCMCMonitorRequest';
-import OutputManager from './OutputManager';
-import SimplePeer from 'simple-peer';
-import wrtc from 'wrtc'
-import { isMCMCMonitorPeerRequest, MCMCMonitorPeerResponse } from './MCMCMonitorPeerRequest';
-import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
 import OutgoingProxyConnection from './OutgoingProxyConnection';
-import fs from 'fs'
-import YAML from 'js-yaml'
-import crypto from 'crypto'
+import OutputManager from './OutputManager';
+import getPeer from './RemotePeer';
+import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
+import { handleApiRequest } from './handleApiRequest';
+const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173', 'http://localhost:5173']
 
 class Server {
     #expressApp: Express
@@ -22,7 +21,6 @@ class Server {
         this.#expressApp = express()
         this.#expressApp.use(express.json())
         this.#expressServer = http.createServer(this.#expressApp)
-        const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173', 'http://localhost:5173']
         this.#expressApp.use((req: Request, resp: Response, next: NextFunction) => {
             const origin = req.get('origin')
             const allowedOrigin = allowedOrigins.includes(origin) ? origin : undefined
@@ -42,50 +40,13 @@ class Server {
                 return
             }
             ;(async () => {
-                const response = await handleApiRequest(request, this.#outputManager, signalCommunicator, {verbose: this.a.verbose, proxy: false})
+                const response = await handleApiRequest({request, outputManager: this.#outputManager, signalCommunicator, options: {verbose: this.a.verbose, proxy: false}})
                 resp.status(200).send(response)
             })()
         })
         const signalCommunicator = new SignalCommunicator()
         if (a.enableRemoteAccess) {
-            signalCommunicator.onConnection(connection => {
-                const peer = new SimplePeer({initiator: false, wrtc})
-                peer.on('data', d => {
-                    const peerRequest = JSON.parse(d)
-                    if (!isMCMCMonitorPeerRequest(peerRequest)) {
-                        console.warn('Invalid webrtc peer request. Disconnecting.')
-                        peer.destroy()
-                        connection.close()
-                        return
-                    }
-                    handleApiRequest(peerRequest.request, this.#outputManager, signalCommunicator, {verbose: true, webrtc: true}).then(response => {
-                        const resp: MCMCMonitorPeerResponse = {
-                            type: 'mcmcMonitorPeerResponse',
-                            response,
-                            requestId: peerRequest.requestId
-                        }
-                        peer.send(JSON.stringify(resp))
-                    })
-                })
-                peer.on('signal', s => {
-                    connection.sendSignal(JSON.stringify(s))
-                })
-                peer.on('error', e => {
-                    console.error('Error in webrtc peer', e.message)
-                    peer.destroy()
-                    connection.close()
-                })
-                peer.on('connect', () => {
-                    console.info('webrtc peer connected')
-                })
-                peer.on('close', () => {
-                    console.info('webrtc peer disconnected')
-                    connection.close()
-                })
-                connection.onSignal(signal => {
-                    peer.signal(JSON.parse(signal))
-                })
-            })
+            signalCommunicator.onConnection(connection => { return getPeer(connection, this.#outputManager, signalCommunicator)})
         }
         const urlLocal = `https://flatironinstitute.github.io/mcmc-monitor?s=http://localhost:${this.a.port}`
         console.info('')
@@ -158,7 +119,7 @@ function sha1Hash(x: string) {
     return shasum.digest('hex')
 }
 
-export const randomAlphaStringLower = (num_chars: number) => {
+const randomAlphaStringLower = (num_chars: number) => {
     if (!num_chars) {
         /* istanbul ignore next */
         throw Error('randomAlphaString: num_chars needs to be a positive integer.')
