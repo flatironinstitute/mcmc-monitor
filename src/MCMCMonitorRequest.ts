@@ -1,3 +1,4 @@
+import { MCMCChain, isMCMCChain } from "./MCMCMonitorDataManager/MCMCMonitorTypes"
 import validateObject, { isArrayOf, isBoolean, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 export const protocolVersion = '0.1.3'
@@ -66,27 +67,14 @@ export const isGetChainsForRunRequest = (x: any): x is GetChainsForRunRequest =>
 
 export type GetChainsForRunResponse = {
     type: 'getChainsForRunResponse'
-    chains: {
-        runId: string
-        chainId: string
-        variableNames: string[]
-        rawHeader?: string
-        rawFooter?: string
-        variablePrefixesExcluded?: string[]
-    }[]
+    chains: MCMCChain[]
 }
 
+// TODO: Centralize typeguards across application
 export const isGetChainsForRunResponse = (x: any): x is GetChainsForRunResponse => (
     validateObject(x, {
         type: isEqualTo('getChainsForRunResponse'),
-        chains: isArrayOf(y => (validateObject(y, {
-            runId: isString,
-            chainId: isString,
-            variableNames: isArrayOf(isString),
-            rawHeader: optional(isString),
-            rawFooter: optional(isString),
-            variablePrefixesExcluded: optional(isArrayOf(isString))
-        })))
+        chains: isArrayOf(y => isMCMCChain(y))
     })
 )
 

@@ -54,10 +54,5 @@ export default async function updateSequences(data: MCMCMonitorData, dispatch: (
                 variableName: s.variableName
             })
         }
-        const elapsed = Date.now() - timer
-        if (elapsed > 200) {
-            // wait for next iteration
-            return
-        }
     }
 }

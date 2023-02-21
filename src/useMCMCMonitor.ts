@@ -1,8 +1,10 @@
 import { useCallback, useContext } from 'react'
 import { GeneralOpts, MCMCMonitorContext } from './MCMCMonitorDataManager/MCMCMonitorData'
 import { MCMCChain, MCMCRun } from './MCMCMonitorDataManager/MCMCMonitorTypes'
+import updateChains from './MCMCMonitorDataManager/updateChains'
 import { GetChainsForRunRequest, GetRunsRequest, isGetChainsForRunResponse, isGetRunsResponse } from './MCMCMonitorRequest'
 import postApiRequest from './postApiRequest'
+
 
 export const useMCMCMonitor = () => {
     const { data, dispatch, checkConnectionStatus } = useContext(MCMCMonitorContext)
@@ -49,14 +51,15 @@ export const useMCMCMonitor = () => {
             }
             const resp = await postApiRequest(req)
             if (!isGetChainsForRunResponse(resp)) {
-                console.warn(resp)
+                console.warn(JSON.stringify(resp))
                 throw Error('Unexpected getChainsForRun response')
             }
             setChainsForRun(runId, resp.chains)
         })()
     }, [setChainsForRun])
 
-    const updateExistingSequences = useCallback((runId: string) => {
+    const updateKnownData = useCallback((runId: string) => {
+        updateChains(runId, dispatch)
         dispatch({
             type: 'updateExistingSequences',
             runId
@@ -83,9 +86,10 @@ export const useMCMCMonitor = () => {
         generalOpts: data.generalOpts,
         sequenceStats: data.sequenceStats,
         variableStats: data.variableStats,
+        effectiveInitialDrawsToExclude: data.effectiveInitialDrawsToExclude,
         updateRuns,
         updateChainsForRun,
-        updateExistingSequences,
+        updateKnownData,
         setSelectedVariableNames,
         setSelectedChainIds,
         setSelectedRunId,

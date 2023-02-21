@@ -1,9 +1,9 @@
 import { FunctionComponent } from "react";
+import Logo from "../Logo";
 import ConnectionStatusWidget from "../components/ConnectionStatusWidget";
 import Hyperlink from "../components/Hyperlink";
 import RunsTable from "../components/RunsTable";
 import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl } from "../config";
-import Logo from "../Logo";
 
 type Props = any
 

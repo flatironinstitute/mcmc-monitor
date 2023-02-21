@@ -1,5 +1,5 @@
-import { ess } from "./stats/ess";
 import { MCMCMonitorAction, MCMCMonitorData, SequenceStats } from "./MCMCMonitorData";
+import { ess } from "./stats/ess";
 
 export default async function updateSequenceStats(data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void) {
     const runId = data.selectedRunId
@@ -12,7 +12,7 @@ export default async function updateSequenceStats(data: MCMCMonitorData, dispatc
             if (s.mean === undefined) {
                 const seq = data.sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName))[0]
                 if (seq) {
-                    const seqData = seq.data.slice(data.generalOpts.excludeInitialDraws)
+                    const seqData = seq.data.slice(data.effectiveInitialDrawsToExclude)
                     const newStats = computeStatsForSequence(seqData)
                     dispatch({
                         type: 'setSequenceStats',

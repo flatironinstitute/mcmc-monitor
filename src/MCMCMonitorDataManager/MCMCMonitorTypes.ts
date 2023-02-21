@@ -1,3 +1,5 @@
+import validateObject, { isArrayOf, isNumber, isString, optional } from "../validateObject"
+
 export type MCMCRun = {
     runId: string
 }
@@ -9,6 +11,8 @@ export type MCMCChain = {
     rawHeader?: string
     rawFooter?: string
     variablePrefixesExcluded?: string[]
+    excludedInitialIterationCount?: number
+    lastChangeTimestamp: number
 }
 
 export type MCMCSequence = {
@@ -18,3 +22,16 @@ export type MCMCSequence = {
     data: number[]
     updateRequested?: boolean
 }
+
+export const isMCMCChain = (x: any): x is MCMCChain => (
+    validateObject(x, {
+        runId: isString,
+        chainId: isString,
+        variableNames: isArrayOf(isString),
+        rawHeader: optional(isString),
+        rawFooter: optional(isString),
+        variablePrefixesExcluded: optional(isArrayOf(isString)),
+        excludedInitialIterationCount: optional(isNumber),
+        lastChangeTimestamp: isNumber
+    })
+)

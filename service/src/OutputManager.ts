@@ -1,18 +1,6 @@
 import fs from 'fs'
+import { MCMCChain, MCMCRun } from '../../src/MCMCMonitorDataManager/MCMCMonitorTypes'
 import ChainFile from './ChainFile'
-
-type MCMCRun = {
-    runId: string
-}
-
-type MCMCChain = {
-    runId: string
-    chainId: string
-    variableNames: string[]
-    rawHeader?: string
-    rawFooter?: string
-    variablePrefixesExcluded?: string[]
-}
 
 class OutputManager {
     #chainFiles: {[key: string]: ChainFile} = {} // by runId/chainId
@@ -65,7 +53,9 @@ class OutputManager {
                     variableNames: cf.variableNames,
                     rawHeader: cf.rawHeader,
                     rawFooter: cf.rawFooter,
-                    variablePrefixesExcluded: cf.variablePrefixesExcluded
+                    variablePrefixesExcluded: cf.variablePrefixesExcluded,
+                    excludedInitialIterationCount: cf.excludedInitialIterationCount,
+                    lastChangeTimestamp: cf.timestampLastChange
                 })
             }
         }

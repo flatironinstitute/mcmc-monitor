@@ -1,21 +1,22 @@
-import { FormControl, Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { FormControl, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { FunctionComponent } from "react";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 
 type Props = any
 
 const GeneralOptsControl: FunctionComponent<Props> = () => {
-	const { generalOpts, setGeneralOpts, updateExistingSequences, selectedRunId: runId } = useMCMCMonitor()
+	const { generalOpts, setGeneralOpts, updateKnownData, selectedRunId: runId } = useMCMCMonitor()
 	if (!runId) return <div>No runId</div>
 	return (
 		<div>
 			Exclude draws
 			<FormControl fullWidth size="small">
 				<Select
-					value={generalOpts.excludeInitialDraws}
-					onChange={(evt: SelectChangeEvent<number>) => {setGeneralOpts({...generalOpts, excludeInitialDraws: evt.target.value as number})}}
+					value={generalOpts.requestedInitialDrawsToExclude}
+					onChange={(evt: SelectChangeEvent<number>) => {setGeneralOpts({...generalOpts, requestedInitialDrawsToExclude: evt.target.value as number})}}
 				>
 					<MenuItem key={0} value={0}>None</MenuItem>
+                    <MenuItem key={-1} value={-1}>Read from file</MenuItem>
 					{
 						[10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000].map(n => (
 							<MenuItem key={n} value={n}>First {n}</MenuItem>
@@ -58,7 +59,7 @@ const GeneralOptsControl: FunctionComponent<Props> = () => {
 			{
 				// generalOpts.dataRefreshMode === 'manual' && (
 				<span style={{fontSize: 16}}>
-					<button onClick={() => {updateExistingSequences(runId)}}>refresh data</button>
+					<button onClick={() => {updateKnownData(runId)}}>refresh data</button>
 				</span>
 				// )
 			}

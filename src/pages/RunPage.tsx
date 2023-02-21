@@ -1,24 +1,24 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
+import { MCMCChain, MCMCRun } from "../MCMCMonitorDataManager/MCMCMonitorTypes";
 import { chainColorForIndex } from "../chainColorList";
+import ConnectionTab from "../components/ConnectionTab";
 import Diagnostics from "../components/DiagnosticsTab";
+import ExportTab from "../components/ExportTab";
 import RunControlPanel from "../components/RunControlPanel";
 import RunInfoTab from "../components/RunInfoTab";
 import ScatterplotsTab from "../components/ScatterplotsTab";
 import Splitter from "../components/Splitter";
-import TablesTab from "../components/TablesTab/TablesTab";
 import TabWidget from "../components/TabWidget/TabWidget";
+import TablesTab from "../components/TablesTab/TablesTab";
 import { useMCMCMonitor } from "../useMCMCMonitor";
-import { MCMCChain, MCMCRun } from "../MCMCMonitorDataManager/MCMCMonitorTypes";
 import useWindowDimensions from "../useWindowDimensions";
-import ConnectionTab from "../components/ConnectionTab";
-import ExportTab from "../components/ExportTab";
 
 type Props = {
 	runId: string
 }
 
 const RunPage: FunctionComponent<Props> = ({runId}) => {
-	const {runs, chains, sequences, updateChainsForRun, setSelectedChainIds, generalOpts, updateExistingSequences, setSelectedRunId} = useMCMCMonitor()
+	const {runs, chains, sequences, updateChainsForRun, setSelectedChainIds, generalOpts, updateKnownData, setSelectedRunId} = useMCMCMonitor()
 
 	useEffect(() => {
 		setSelectedRunId(runId)
@@ -30,14 +30,14 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 			if (canceled) return
 			setTimeout(() => {
 				if (generalOpts.dataRefreshMode === 'auto') {
-					updateExistingSequences(runId)
+					updateKnownData(runId)
 				}
 				update()
 			}, generalOpts.dataRefreshIntervalSec * 1000)
 		}
 		update()
 		return () => {canceled = true}
-	}, [runId, generalOpts.dataRefreshMode, generalOpts.dataRefreshIntervalSec, updateExistingSequences])
+	}, [runId, generalOpts.dataRefreshMode, generalOpts.dataRefreshIntervalSec, updateKnownData])
 
 	useEffect(() => {
 		updateChainsForRun(runId)
@@ -53,7 +53,10 @@ const RunPage: FunctionComponent<Props> = ({runId}) => {
 
 	const run: MCMCRun | undefined = useMemo(() => (runs.filter(r => (r.runId === runId))[0]), [runs, runId])
 
-	const chainsForRun = useMemo(() => (chains.filter(c => (c.runId === runId))), [chains, runId])
+	const chainsForRun = useMemo(() => {
+        return (chains.filter(c => (c.runId === runId))
+                      .sort((a, b) => a.chainId.localeCompare(b.chainId)))
+    }, [chains, runId])
 
 	const chainColors = useMemo(() => {
 		const ret: {[chainId: string]: string} = {}

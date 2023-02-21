@@ -16,11 +16,11 @@ type Props = {
 }
 
 export const useSequenceDrawRange = (numDrawsForRun: number) => {
-	const {generalOpts} = useMCMCMonitor()
+	const {effectiveInitialDrawsToExclude} = useMCMCMonitor()
 
 	const sequenceDrawRange: [number, number] | undefined = useMemo(() => {
-		return [Math.min(generalOpts.excludeInitialDraws, numDrawsForRun), numDrawsForRun]
-	}, [numDrawsForRun, generalOpts.excludeInitialDraws])
+		return [Math.min(effectiveInitialDrawsToExclude, numDrawsForRun), numDrawsForRun]
+	}, [numDrawsForRun, effectiveInitialDrawsToExclude])
 
 	return sequenceDrawRange
 }
