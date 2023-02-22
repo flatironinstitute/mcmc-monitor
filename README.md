@@ -117,9 +117,8 @@ Apache-2.0
 
 ## Authors
 
-Jeremy Magland, Center for Computational Mathematics, Flatiron Institute
+Jeremy Magland and Jeff Soules, Center for Computational Mathematics, Flatiron Institute
 
 Thanks also to
-* Jeff Soules
 * Brian Ward
 * Bob Carpenter

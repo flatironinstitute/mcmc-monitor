@@ -25,7 +25,7 @@ export class SignalCommunicatorConnection {
     #onSignalCallbacks: ((s: string) => void)[] = []
     #onCloseCallbacks: (() => void)[] = []
     #pendingSignalsToSend: string[] = []
-    #closed: boolean = false
+    #closed = false
     constructor() { }
     async handleRequest(request: WebrtcSignalingRequest): Promise<WebrtcSignalingResponse> {
         if (request.signal) {

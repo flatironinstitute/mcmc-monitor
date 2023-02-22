@@ -18,6 +18,7 @@ class WebrtcConnectionToService {
             }
             const response = await postApiRequest(request)
             if (response.type !== 'webrtcSignalingResponse') {
+                console.warn(response)
                 throw Error('Unexpected webrtc signaling response')
             }
             for (const sig0 of response.signals) {
