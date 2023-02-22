@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src", "service/src/types/MCMCMonitorTypes.ts", "service/src/types/MCMCMonitorRequest.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

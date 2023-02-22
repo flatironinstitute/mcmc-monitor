@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { MCMCChain, MCMCRun } from "../MCMCMonitorDataManager/MCMCMonitorTypes";
+import { MCMCChain, MCMCRun } from "../../service/src/types/MCMCMonitorTypes";
 import { chainColorForIndex } from "../chainColorList";
 import ConnectionTab from "../components/ConnectionTab";
 import Diagnostics from "../components/DiagnosticsTab";

@@ -1,4 +1,4 @@
-import { GetSequencesRequest, isGetSequencesResponse } from "../MCMCMonitorRequest";
+import { GetSequencesRequest, isGetSequencesResponse } from "../../service/src/types/MCMCMonitorRequest";
 import postApiRequest from "../postApiRequest";
 import { MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorData";
 

@@ -1,4 +1,4 @@
-import { isMCMCMonitorRequest, isMCMCMonitorResponse, MCMCMonitorRequest, MCMCMonitorResponse } from "./MCMCMonitorRequest"
+import { MCMCMonitorRequest, MCMCMonitorResponse, isMCMCMonitorRequest, isMCMCMonitorResponse } from "./MCMCMonitorRequest"
 import validateObject, { isEqualTo, isString } from "./validateObject"
 
 export type MCMCMonitorPeerRequest = {

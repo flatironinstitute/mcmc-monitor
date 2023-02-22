@@ -12,9 +12,10 @@ type Props = {
 }
 
 const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}) => {
-	const {chains, setSelectedVariableNames, selectedRunId: runId} = useMCMCMonitor()
+	const {chains, setSelectedVariableNames, selectedRunId: runId, initialDrawExclusionOptions} = useMCMCMonitor()
 	const {setRoute} = useRoute()
 	const chainsForRun = useMemo(() => (chains.filter(c => (c.runId === runId))), [chains, runId])
+    const { warmupOptions, detectedInitialDrawExclusion } = initialDrawExclusionOptions
 
 	const allVariableNames = useMemo(() => {
 		const s = new Set<string>()
@@ -62,7 +63,7 @@ const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}
 				<VariablesSelector variableNames={allVariableNames} variablePrefixesExcluded={allVariablePrefixesExcluded} />
 			</div>
 			<h3>Options</h3>
-			<GeneralOptsControl />
+			<GeneralOptsControl warmupOptions={warmupOptions} detectedInitialDrawExclusion={detectedInitialDrawExclusion} />
 		</div>
 	)
 }

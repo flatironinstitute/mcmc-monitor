@@ -2,9 +2,13 @@ import { FormControl, MenuItem, Select, SelectChangeEvent } from "@mui/material"
 import { FunctionComponent } from "react";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 
-type Props = any
+type Props = {
+    warmupOptions: number[],
+    detectedInitialDrawExclusion?: number
+}
 
-const GeneralOptsControl: FunctionComponent<Props> = () => {
+const GeneralOptsControl: FunctionComponent<Props> = (props: Props) => {
+    const { warmupOptions, detectedInitialDrawExclusion } = props
 	const { generalOpts, setGeneralOpts, updateKnownData, selectedRunId: runId } = useMCMCMonitor()
 	if (!runId) return <div>No runId</div>
 	return (
@@ -15,13 +19,9 @@ const GeneralOptsControl: FunctionComponent<Props> = () => {
 					value={generalOpts.requestedInitialDrawsToExclude}
 					onChange={(evt: SelectChangeEvent<number>) => {setGeneralOpts({...generalOpts, requestedInitialDrawsToExclude: evt.target.value as number})}}
 				>
+                    {getReadFromFileOptionText(detectedInitialDrawExclusion)}
 					<MenuItem key={0} value={0}>None</MenuItem>
-                    <MenuItem key={-1} value={-1}>Read from file</MenuItem>
-					{
-						[10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000].map(n => (
-							<MenuItem key={n} value={n}>First {n}</MenuItem>
-						))
-					}
+					{getWarmupCountList(warmupOptions)}
 				</Select>
 			</FormControl>
 			<div>&nbsp;</div>
@@ -65,6 +65,20 @@ const GeneralOptsControl: FunctionComponent<Props> = () => {
 			}
 		</div>
 	)
+}
+
+
+const getReadFromFileOptionText = (detectedInitialDrawExclusion: number | undefined) => {
+    const value = detectedInitialDrawExclusion === undefined ? "" : ` (${detectedInitialDrawExclusion})`
+    const text = `Read from file${value}`
+    return <MenuItem key={-1} value={-1}>{text}</MenuItem>
+}
+
+
+const getWarmupCountList = (warmupOptions: number[]) => {
+    return warmupOptions.map(n => (
+        <MenuItem key={n} value={n}>First {n}</MenuItem>
+    ))
 }
 
 export default GeneralOptsControl

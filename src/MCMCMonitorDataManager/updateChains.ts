@@ -1,4 +1,4 @@
-import { GetChainsForRunRequest, isGetChainsForRunResponse } from "../MCMCMonitorRequest"
+import { GetChainsForRunRequest, isGetChainsForRunResponse } from "../../service/src/types/MCMCMonitorRequest"
 import postApiRequest from "../postApiRequest"
 import { MCMCMonitorAction } from "./MCMCMonitorData"
 

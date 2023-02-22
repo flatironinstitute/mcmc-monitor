@@ -1,5 +1,5 @@
 import React from 'react'
-import { MCMCChain, MCMCRun, MCMCSequence } from './MCMCMonitorTypes'
+import { MCMCChain, MCMCRun, MCMCSequence } from '../../service/src/types/MCMCMonitorTypes'
 
 export type GeneralOpts = {
     dataRefreshMode: 'auto' | 'manual'
@@ -51,7 +51,7 @@ export const initialMCMCMonitorData: MCMCMonitorData = {
     selectedVariableNames: [],
     selectedChainIds: [],
     effectiveInitialDrawsToExclude: 20,
-    generalOpts: {dataRefreshMode: 'manual', dataRefreshIntervalSec: 5, requestedInitialDrawsToExclude: 20}
+    generalOpts: {dataRefreshMode: 'manual', dataRefreshIntervalSec: 5, requestedInitialDrawsToExclude: -1}
 }
 
 export const MCMCMonitorContext = React.createContext<{ data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void, checkConnectionStatus: () => void }>({
@@ -309,6 +309,12 @@ const chainsWereUpdated = (newChains: MCMCChain[], oldChains: MCMCChain[]): bool
 }
 
 
+export const detectedWarmupIterationCount = (data: MCMCMonitorData): number | undefined => {
+    const observedCount = data.chains.filter(c => c.excludedInitialIterationCount !== undefined)[0]?.excludedInitialIterationCount
+    return observedCount
+}
+
+
 const computeEffectiveWarmupIterations = (data: MCMCMonitorData, requested: number): number => {
     // Given a data set, compute how many warm-up iterations to actually skip.
     // This needs to be done because the user can request that the number of warm-up iterations
@@ -323,7 +329,7 @@ const computeEffectiveWarmupIterations = (data: MCMCMonitorData, requested: numb
     // value has not changed) because we start out not knowing the number.
     // On the other hand, if any value other than -1 is requested, we just use that number directly.
     if (requested === -1) {
-        const observedCount = data.chains.filter(c => c.excludedInitialIterationCount !== undefined)[0]?.excludedInitialIterationCount
+        const observedCount = detectedWarmupIterationCount(data)
         return observedCount ?? 0
     } else {
         return requested

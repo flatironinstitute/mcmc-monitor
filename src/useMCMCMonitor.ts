@@ -1,8 +1,8 @@
-import { useCallback, useContext } from 'react'
-import { GeneralOpts, MCMCMonitorContext } from './MCMCMonitorDataManager/MCMCMonitorData'
-import { MCMCChain, MCMCRun } from './MCMCMonitorDataManager/MCMCMonitorTypes'
+import { useCallback, useContext, useMemo } from 'react'
+import { GetChainsForRunRequest, GetRunsRequest, isGetChainsForRunResponse, isGetRunsResponse } from '../service/src/types/MCMCMonitorRequest'
+import { MCMCChain, MCMCRun } from '../service/src/types/MCMCMonitorTypes'
+import { GeneralOpts, MCMCMonitorContext, detectedWarmupIterationCount } from './MCMCMonitorDataManager/MCMCMonitorData'
 import updateChains from './MCMCMonitorDataManager/updateChains'
-import { GetChainsForRunRequest, GetRunsRequest, isGetChainsForRunResponse, isGetRunsResponse } from './MCMCMonitorRequest'
 import postApiRequest from './postApiRequest'
 
 
@@ -73,6 +73,15 @@ export const useMCMCMonitor = () => {
         })
     }, [dispatch])
 
+
+    const defaultInitialDrawExclusionOptions = [ 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 ]
+    const initialDrawExclusionOptions = useMemo(() => {
+        const detectedCount = detectedWarmupIterationCount(data)
+        return {
+            warmupOptions: defaultInitialDrawExclusionOptions,
+            detectedInitialDrawExclusion: detectedCount }
+    }, [data.chains])
+
     return {
         runs: data.runs,
         chains: data.chains,
@@ -87,6 +96,7 @@ export const useMCMCMonitor = () => {
         sequenceStats: data.sequenceStats,
         variableStats: data.variableStats,
         effectiveInitialDrawsToExclude: data.effectiveInitialDrawsToExclude,
+        initialDrawExclusionOptions,
         updateRuns,
         updateChainsForRun,
         updateKnownData,
