@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: "https://flatironinstitute.github.io/mcmc-monitor",
+  base: "https://flatironinstitute.github.io/mcmc-monitor/dev",
   resolve: {
     alias: {
       "simple-peer": "simple-peer/simplepeer.min.js"
