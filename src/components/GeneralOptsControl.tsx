@@ -70,7 +70,7 @@ const GeneralOptsControl: FunctionComponent<Props> = (props: Props) => {
 
 const getReadFromFileOptionText = (detectedInitialDrawExclusion: number | undefined) => {
     const value = detectedInitialDrawExclusion === undefined ? "" : ` (${detectedInitialDrawExclusion})`
-    const text = `Read from file${value}`
+    const text = `Auto detect${value}`
     return <MenuItem key={-1} value={-1}>{text}</MenuItem>
 }
 
