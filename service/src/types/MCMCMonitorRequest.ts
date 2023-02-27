@@ -1,7 +1,7 @@
 import { MCMCChain, MCMCRun, isMCMCChain, isMCMCRun } from "./MCMCMonitorTypes"
 import validateObject, { isArrayOf, isBoolean, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
-export const protocolVersion = '0.1.3'
+export const protocolVersion = '0.1.4'
 
 export type ProbeRequest = {
     type: 'probeRequest'
