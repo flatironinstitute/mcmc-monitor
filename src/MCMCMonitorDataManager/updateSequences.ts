@@ -1,4 +1,4 @@
-import { GetSequencesRequest, isGetSequencesResponse } from "../MCMCMonitorRequest";
+import { GetSequencesRequest, isGetSequencesResponse } from "../../service/src/types/MCMCMonitorRequest";
 import postApiRequest from "../postApiRequest";
 import { MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorData";
 
@@ -53,11 +53,6 @@ export default async function updateSequences(data: MCMCMonitorData, dispatch: (
                 chainId: s.chainId,
                 variableName: s.variableName
             })
-        }
-        const elapsed = Date.now() - timer
-        if (elapsed > 200) {
-            // wait for next iteration
-            return
         }
     }
 }

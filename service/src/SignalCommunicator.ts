@@ -1,4 +1,4 @@
-import { WebrtcSignalingRequest, WebrtcSignalingResponse } from "./MCMCMonitorRequest";
+import { WebrtcSignalingRequest, WebrtcSignalingResponse } from "./types/MCMCMonitorRequest";
 
 class SignalCommunicator {
     #onConnectionCallbacks: ((connection: SignalCommunicatorConnection) => void)[] = []

@@ -3,12 +3,12 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import fs from 'fs';
 import * as http from 'http';
 import YAML from 'js-yaml';
-import { isMCMCMonitorRequest, protocolVersion } from './MCMCMonitorRequest';
 import OutgoingProxyConnection from './OutgoingProxyConnection';
 import OutputManager from './OutputManager';
 import getPeer from './RemotePeer';
 import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
+import { isMCMCMonitorRequest, protocolVersion } from './types/MCMCMonitorRequest';
 const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173', 'http://localhost:5173']
 
 class Server {

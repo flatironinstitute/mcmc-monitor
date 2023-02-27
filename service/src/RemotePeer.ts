@@ -1,9 +1,9 @@
 import SimplePeer from 'simple-peer';
 import wrtc from 'wrtc';
-import { MCMCMonitorPeerResponse, isMCMCMonitorPeerRequest } from './MCMCMonitorPeerRequest';
 import OutputManager from './OutputManager';
 import SignalCommunicator, { SignalCommunicatorConnection } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
+import { MCMCMonitorPeerResponse, isMCMCMonitorPeerRequest } from './types/MCMCMonitorPeerRequest';
 
 
 type callbackProps = {

@@ -1,6 +1,6 @@
-import { GetChainsForRunRequest, GetChainsForRunResponse, GetRunsResponse, GetSequencesRequest, GetSequencesResponse, MCMCMonitorRequest, MCMCMonitorResponse, ProbeResponse, WebrtcSignalingRequest, WebrtcSignalingResponse, isGetChainsForRunRequest, isGetRunsRequest, isGetSequencesRequest, isProbeRequest, isWebrtcSignalingRequest, protocolVersion } from "./MCMCMonitorRequest";
 import OutputManager from "./OutputManager";
 import SignalCommunicator from "./SignalCommunicator";
+import { GetChainsForRunRequest, GetChainsForRunResponse, GetRunsResponse, GetSequencesRequest, GetSequencesResponse, MCMCMonitorRequest, MCMCMonitorResponse, ProbeResponse, WebrtcSignalingRequest, WebrtcSignalingResponse, isGetChainsForRunRequest, isGetRunsRequest, isGetSequencesRequest, isProbeRequest, isWebrtcSignalingRequest, protocolVersion } from "./types/MCMCMonitorRequest";
 
 type apiRequestOptions = {
     verbose: boolean,

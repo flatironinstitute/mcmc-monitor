@@ -1,10 +1,10 @@
 import React from 'react'
-import { MCMCChain, MCMCRun, MCMCSequence } from './MCMCMonitorTypes'
+import { MCMCChain, MCMCRun, MCMCSequence } from '../../service/src/types/MCMCMonitorTypes'
 
 export type GeneralOpts = {
     dataRefreshMode: 'auto' | 'manual'
     dataRefreshIntervalSec: number
-    excludeInitialDraws: number
+    requestedInitialDrawsToExclude: number
 }
 
 export type SequenceStats = {
@@ -35,6 +35,7 @@ export type MCMCMonitorData = {
     selectedRunId?: string
     selectedVariableNames: string[]
     selectedChainIds: string[]
+    effectiveInitialDrawsToExclude: number
     generalOpts: GeneralOpts
 }
 
@@ -49,7 +50,8 @@ export const initialMCMCMonitorData: MCMCMonitorData = {
     variableStats: {},
     selectedVariableNames: [],
     selectedChainIds: [],
-    generalOpts: {dataRefreshMode: 'manual', dataRefreshIntervalSec: 5, excludeInitialDraws: 20}
+    effectiveInitialDrawsToExclude: 20,
+    generalOpts: {dataRefreshMode: 'manual', dataRefreshIntervalSec: 5, requestedInitialDrawsToExclude: -1}
 }
 
 export const MCMCMonitorContext = React.createContext<{ data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void, checkConnectionStatus: () => void }>({
@@ -63,6 +65,10 @@ export type MCMCMonitorAction = {
     runs: MCMCRun[]
 } | {
     type: 'setChainsForRun'
+    runId: string
+    chains: MCMCChain[]
+} | {
+    type: 'updateChainsForRun'
     runId: string
     chains: MCMCChain[]
 } | {
@@ -129,10 +135,12 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         }
     }
     else if (a.type === 'setChainsForRun') {
-        return {
-            ...s,
-            chains: [...s.chains.filter(c => (c.runId !== a.runId)), ...a.chains]
-        }
+        return doChainUpdate(s, a.runId, a.chains)
+    }
+    else if (a.type === 'updateChainsForRun') {
+        const hadUpdates = chainsWereUpdated(a.chains, s.chains)
+        if (!hadUpdates) return s // preserve reference equality if nothing changed
+        return doChainUpdate(s, a.runId, a.chains)
     }
     else if (a.type === 'setSelectedVariableNames') {
         return {
@@ -241,11 +249,13 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         }
     }
     else if (a.type === 'setGeneralOpts') {
-        const recalc = a.opts.excludeInitialDraws !== s.generalOpts.excludeInitialDraws
+        const effectiveWarmupIterations = computeEffectiveWarmupIterations(s, a.opts.requestedInitialDrawsToExclude)
+        const recalc = effectiveWarmupIterations !== s.effectiveInitialDrawsToExclude
         return {
             ...s,
             sequenceStats: recalc ? {} : s.sequenceStats, // invalidate the sequence stats
             variableStats: recalc ? {} : s.variableStats, // invalidate the variable stats
+            effectiveInitialDrawsToExclude: effectiveWarmupIterations,
             generalOpts: a.opts
         }
     }
@@ -276,4 +286,52 @@ function appendData(x: number[], position: number, y: number[]) {
     if (position > x.length) return x
     if (position + y.length <= x.length) return x
     return [...x, ...y.slice(x.length - position)]
+}
+
+
+const doChainUpdate = (s: MCMCMonitorData, runId: string, newChains: MCMCChain[]): MCMCMonitorData => {
+    const chains = [...s.chains.filter(c => (c.runId !== runId)), ...newChains]
+    const newState = { ...s, chains }
+    const effectiveWarmupIterations = computeEffectiveWarmupIterations(newState, newState.generalOpts.requestedInitialDrawsToExclude)
+    if (effectiveWarmupIterations !== newState.effectiveInitialDrawsToExclude) {
+        newState.effectiveInitialDrawsToExclude = effectiveWarmupIterations
+    }
+    return newState
+}
+
+
+const chainsWereUpdated = (newChains: MCMCChain[], oldChains: MCMCChain[]): boolean => {
+    const known: Map<string, number> = new Map()
+    oldChains.forEach(c => known.set(c.chainId, c.lastChangeTimestamp))
+    // There is an update if there are any new chains for which either a) the chain ID was
+    // not yet encountered ( hence "|| -1" ) or b) the new chain update stamp is greater than the old one
+    return (newChains.some(newChain => newChain.lastChangeTimestamp > (known.get(newChain.chainId) || -1)))
+}
+
+
+export const detectedWarmupIterationCount = (data: MCMCMonitorData): number | undefined => {
+    const observedCount = data.chains.filter(c => c.excludedInitialIterationCount !== undefined)[0]?.excludedInitialIterationCount
+    return observedCount
+}
+
+
+const computeEffectiveWarmupIterations = (data: MCMCMonitorData, requested: number): number => {
+    // Given a data set, compute how many warm-up iterations to actually skip.
+    // This needs to be done because the user can request that the number of warm-up iterations
+    // be read from the file, in which case it will not match the number in the dropdown menu.
+    // A request for a data-determined number of warm-up iterations is identified by the signal
+    // value of -1 for the requested iteration count. If this is passed, we need to look at the
+    // data and set the real warm-up count to either 0 (if the actual number is not yet known)
+    // or to the observed value (by inspecting the chains).
+    // At present, we assume that the value will be the same for any chain, so we can look at
+    // any arbitrary chain.
+    // Note that as data comes in, we will need to re-evaluate this (even though the requested
+    // value has not changed) because we start out not knowing the number.
+    // On the other hand, if any value other than -1 is requested, we just use that number directly.
+    if (requested === -1) {
+        const observedCount = detectedWarmupIterationCount(data)
+        return observedCount ?? 0
+    } else {
+        return requested
+    }
 }
