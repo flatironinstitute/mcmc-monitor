@@ -8,7 +8,7 @@ export default async function updateVariableStats(data: MCMCMonitorData, dispatc
     for (const variableName of data.selectedVariableNames) {
         const k = `${runId}/${variableName}`
         const s = data.variableStats[k] || {}
-        if (s.mean === undefined) {
+        if (!s.isUpToDate) {
             const chainStats: SequenceStats[] = data.selectedChainIds.map(chainId => {
                 const k2 = `${runId}/${chainId}/${variableName}`
                 return data.sequenceStats[k2] || {}
@@ -24,7 +24,8 @@ export default async function updateVariableStats(data: MCMCMonitorData, dispatc
                     stdev,
                     ess,
                     count,
-                    rhat
+                    rhat,
+                    isUpToDate: true
                 }
                 dispatch({
                     type: 'setVariableStats',
