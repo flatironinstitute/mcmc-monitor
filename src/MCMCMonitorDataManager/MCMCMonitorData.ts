@@ -145,13 +145,13 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
     else if (a.type === 'setSelectedVariableNames') {
         return {
             ...s,
-            selectedVariableNames: a.variableNames.sort()
+            selectedVariableNames: [...a.variableNames].sort()
         }
     }
     else if (a.type === 'setSelectedChainIds') {
         return {
             ...s,
-            selectedChainIds: a.chainIds.sort()
+            selectedChainIds: [...a.chainIds].sort()
         }
     }
     else if (a.type === 'setSelectedRunId') {
