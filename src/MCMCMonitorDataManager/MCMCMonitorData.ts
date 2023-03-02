@@ -184,12 +184,12 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         }
     }
     else if (a.type === 'appendSequenceData') {
-        const sequenceStatsIndex = `${a.runId}/${a.chainId}/${a.variableName}`
-        const variableStatsIndex = `${a.runId}/${a.variableName}`
+        const sequenceStatsKey = `${a.runId}/${a.chainId}/${a.variableName}`
+        const variableStatsKey = `${a.runId}/${a.variableName}`
         return {
             ...s,
-            sequenceStats: invalidateStats(s.sequenceStats, sequenceStatsIndex),
-            variableStats: invalidateStats(s.variableStats, variableStatsIndex),
+            sequenceStats: invalidateStats(s.sequenceStats, sequenceStatsKey),
+            variableStats: invalidateStats(s.variableStats, variableStatsKey),
             sequences: s.sequences.map(x => (
                 (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
                     x : {...x, data: appendData(x.data, a.position, a.data)}
@@ -206,8 +206,6 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         }
     }
     else if (a.type === 'updateSequence') {
-        // const k = `${a.runId}/${a.chainId}/${a.variableName}`
-        // const k2 = `${a.runId}/${a.variableName}`
         if (!s.sequences.find(x => (x.runId === a.runId && x.chainId === a.chainId && x.variableName === a.variableName))) {
             return {
                 ...s,
@@ -223,14 +221,6 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         else {
             return {
                 ...s,
-                // sequenceStats: {
-                //     ...s.sequenceStats,
-                //     [k]: {} // invalidate
-                // },
-                // variableStats: {
-                //     ...s.variableStats,
-                //     [k2]: {} // invalidate
-                // },
                 sequences: s.sequences.map(x => (
                     (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
                         x : {...x, updateRequested: true}
