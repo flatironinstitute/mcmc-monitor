@@ -1,6 +1,8 @@
 import { MCMCMonitorAction, MCMCMonitorData, SequenceStats } from "./MCMCMonitorData";
 import { ess } from "./stats/ess";
 
+const CALCULATION_BUDGET_MS = 200
+
 export default async function updateSequenceStats(data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void) {
     const runId = data.selectedRunId
     if (!runId) return
@@ -9,7 +11,7 @@ export default async function updateSequenceStats(data: MCMCMonitorData, dispatc
         for (const variableName of data.selectedVariableNames) {
             const k = `${runId}/${chainId}/${variableName}`
             const s = data.sequenceStats[k] || {}
-            if (s.mean === undefined) {
+            if (!s.isUpToDate) {
                 const seq = data.sequences.filter(s => (s.runId === runId && s.chainId === chainId && s.variableName === variableName))[0]
                 if (seq) {
                     const seqData = seq.data.slice(data.effectiveInitialDrawsToExclude)
@@ -24,8 +26,9 @@ export default async function updateSequenceStats(data: MCMCMonitorData, dispatc
                 }
             }
             const elapsed = Date.now() - timer
-            if (elapsed > 200) {
-                // wait for next iteration
+            // We'd rather return some result than hang forever, so if we aren't done
+            // computing all the stats before the budget runs out, return early
+            if (elapsed > CALCULATION_BUDGET_MS) {
                 return
             }
         }
@@ -41,7 +44,8 @@ function computeStatsForSequence(seqData: number[]): SequenceStats {
         stdev,
         ess: ess0,
         acor,
-        count: seqData.length
+        count: seqData.length,
+        isUpToDate: seqData.length > 0
     }
 }
 

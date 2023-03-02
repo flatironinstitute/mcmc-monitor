@@ -13,6 +13,7 @@ export type SequenceStats = {
     count?: number
     ess?: number
     acor?: number[]
+    isUpToDate?: boolean
 }
 
 export type VariableStats = {
@@ -21,7 +22,11 @@ export type VariableStats = {
     ess?: number
     count?: number
     rhat?: number
+    isUpToDate?: boolean
 }
+
+type SequenceStatsDict = { [key: string]: SequenceStats }
+type VariableStatsDict = { [key: string]: VariableStats }
 
 export type MCMCMonitorData = {
     connectedToService: boolean | undefined
@@ -30,8 +35,8 @@ export type MCMCMonitorData = {
     runs: MCMCRun[]
     chains: MCMCChain[]
     sequences: MCMCSequence[]
-    sequenceStats: {[key: string]: SequenceStats}
-    variableStats: {[key: string]: VariableStats}
+    sequenceStats: SequenceStatsDict
+    variableStats: VariableStatsDict
     selectedRunId?: string
     selectedVariableNames: string[]
     selectedChainIds: string[]
@@ -179,18 +184,12 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         }
     }
     else if (a.type === 'appendSequenceData') {
-        const k = `${a.runId}/${a.chainId}/${a.variableName}`
-        const k2 = `${a.runId}/${a.variableName}`
+        const sequenceStatsKey = `${a.runId}/${a.chainId}/${a.variableName}`
+        const variableStatsKey = `${a.runId}/${a.variableName}`
         return {
             ...s,
-            sequenceStats: {
-                ...s.sequenceStats,
-                [k]: {} // invalidate the sequence stats
-            },
-            variableStats: {
-                ...s.variableStats,
-                [k2]: {} //invalidate the variable stats
-            },
+            sequenceStats: invalidateStats(s.sequenceStats, sequenceStatsKey),
+            variableStats: invalidateStats(s.variableStats, variableStatsKey),
             sequences: s.sequences.map(x => (
                 (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
                     x : {...x, data: appendData(x.data, a.position, a.data)}
@@ -207,8 +206,6 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         }
     }
     else if (a.type === 'updateSequence') {
-        // const k = `${a.runId}/${a.chainId}/${a.variableName}`
-        // const k2 = `${a.runId}/${a.variableName}`
         if (!s.sequences.find(x => (x.runId === a.runId && x.chainId === a.chainId && x.variableName === a.variableName))) {
             return {
                 ...s,
@@ -224,14 +221,6 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         else {
             return {
                 ...s,
-                // sequenceStats: {
-                //     ...s.sequenceStats,
-                //     [k]: {} // invalidate
-                // },
-                // variableStats: {
-                //     ...s.variableStats,
-                //     [k2]: {} // invalidate
-                // },
                 sequences: s.sequences.map(x => (
                     (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
                         x : {...x, updateRequested: true}
@@ -253,8 +242,8 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         const recalc = effectiveWarmupIterations !== s.effectiveInitialDrawsToExclude
         return {
             ...s,
-            sequenceStats: recalc ? {} : s.sequenceStats, // invalidate the sequence stats
-            variableStats: recalc ? {} : s.variableStats, // invalidate the variable stats
+            sequenceStats: recalc ? invalidateStats(s.sequenceStats) : s.sequenceStats,
+            variableStats: recalc ? invalidateStats(s.variableStats) : s.variableStats,
             effectiveInitialDrawsToExclude: effectiveWarmupIterations,
             generalOpts: a.opts
         }
@@ -334,4 +323,18 @@ const computeEffectiveWarmupIterations = (data: MCMCMonitorData, requested: numb
     } else {
         return requested
     }
+}
+
+
+const invalidateStats = <T extends SequenceStatsDict | VariableStatsDict>(statsDict: T, key?: string): T => {
+    if (key === undefined) {
+        Object.keys(statsDict).forEach(s => statsDict[s].isUpToDate = false)
+    }
+    else if (key in Object.keys(statsDict)) {
+        statsDict[key].isUpToDate = false
+    } else {
+        console.warn(`Attempt to invalidate stats with key ${key}, which is not in the dictionary.`)
+    }
+
+    return statsDict
 }
