@@ -1,6 +1,6 @@
 import SimplePeer from "simple-peer";
-import { MCMCMonitorPeerRequest, isMCMCMonitorPeerResponse } from "../service/src/types/MCMCMonitorPeerRequest";
-import { MCMCMonitorRequest, MCMCMonitorResponse, WebrtcSignalingRequest } from "../service/src/types/MCMCMonitorRequest";
+import { MCMCMonitorPeerRequest, isMCMCMonitorPeerResponse } from "../../service/src/types/MCMCMonitorPeerRequest";
+import { MCMCMonitorRequest, MCMCMonitorResponse, WebrtcSignalingRequest } from "../../service/src/types/MCMCMonitorRequest";
 import postApiRequest from "./postApiRequest";
 
 class WebrtcConnectionToService {

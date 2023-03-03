@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
 import { FunctionComponent, useMemo } from "react";
-import { useMCMCMonitor } from "../useMCMCMonitor";
+import { useMCMCMonitor } from "../util/useMCMCMonitor";
 
 type Props = {
 	runId: string

@@ -3,7 +3,7 @@ import { ProbeRequest, isProbeResponse, protocolVersion } from "../service/src/t
 import { MCMCMonitorContext, initialMCMCMonitorData, mcmcMonitorReducer } from "./MCMCMonitorDataManager/MCMCMonitorData"
 import MCMCDataManager from "./MCMCMonitorDataManager/MCMCMonitorDataManager"
 import { useWebrtc, webrtcConnectionToService } from "./config"
-import postApiRequest from "./postApiRequest"
+import postApiRequest from "./networking/postApiRequest"
 
 type SetupMcmcMonitorProps = {
     dataManager: MCMCDataManager | undefined

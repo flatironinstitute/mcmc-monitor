@@ -1,13 +1,13 @@
 import { Fragment, FunctionComponent, PropsWithChildren, useEffect } from "react";
-import { protocolVersion } from "../service/src/types/MCMCMonitorRequest";
+import { protocolVersion } from "../../service/src/types/MCMCMonitorRequest";
+import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
+import Hyperlink from "../components/Hyperlink";
+import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl, useWebrtc } from "../config";
+import Home from "../pages/Home";
+import RunPage from "../pages/RunPage";
+import { useMCMCMonitor } from "../util/useMCMCMonitor";
+import useRoute from "../util/useRoute";
 import Logo from "./Logo";
-import MCMCDataManager from "./MCMCMonitorDataManager/MCMCMonitorDataManager";
-import Hyperlink from "./components/Hyperlink";
-import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl, useWebrtc } from "./config";
-import Home from "./pages/Home";
-import RunPage from "./pages/RunPage";
-import { useMCMCMonitor } from "./useMCMCMonitor";
-import useRoute from "./useRoute";
 
 
 type Props = {

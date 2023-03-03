@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FunctionComponent, useMemo } from "react";
-import { useMCMCMonitor } from "../../useMCMCMonitor";
+import { useMCMCMonitor } from "../../util/useMCMCMonitor";
 
 type Props = {
 	variableName: string

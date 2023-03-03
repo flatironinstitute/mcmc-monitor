@@ -1,6 +1,6 @@
 import { FunctionComponent, useEffect, useMemo, useState } from "react";
-import { useMCMCMonitor } from "../useMCMCMonitor";
-import useRoute from "../useRoute";
+import { useMCMCMonitor } from "../util/useMCMCMonitor";
+import useRoute from "../util/useRoute";
 import ChainsSelector from "./ChainsSelector";
 import GeneralOptsControl from "./GeneralOptsControl";
 import Hyperlink from "./Hyperlink";

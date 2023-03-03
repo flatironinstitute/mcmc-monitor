@@ -1,8 +1,7 @@
-import { FunctionComponent, useEffect, useMemo } from "react";
-import { useMCMCMonitor } from "../useMCMCMonitor";
+import { FunctionComponent, useMemo } from "react";
+import { useMCMCMonitor } from "../util/useMCMCMonitor";
 import { applyDrawRange } from "./SequenceHistogram";
-import SequenceScatterplotWidget from "./SequenceScatterplotWidget";
-import { ScatterplotSequence } from "./SequenceScatterplotWidget";
+import SequenceScatterplotWidget, { ScatterplotSequence } from "./SequenceScatterplotWidget";
 
 type Props = {
 	runId: string

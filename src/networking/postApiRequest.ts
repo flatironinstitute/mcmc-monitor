@@ -1,5 +1,5 @@
-import { MCMCMonitorRequest, MCMCMonitorResponse, isMCMCMonitorResponse } from "../service/src/types/MCMCMonitorRequest"
-import { serviceBaseUrl, useWebrtc, webrtcConnectionToService } from "./config"
+import { MCMCMonitorRequest, MCMCMonitorResponse, isMCMCMonitorResponse } from "../../service/src/types/MCMCMonitorRequest"
+import { serviceBaseUrl, useWebrtc, webrtcConnectionToService } from "../config"
 
 const postApiRequest = async (request: MCMCMonitorRequest): Promise<MCMCMonitorResponse> => {
     if ((useWebrtc) && (request.type !== 'probeRequest') && (request.type !== 'webrtcSignalingRequest')) {

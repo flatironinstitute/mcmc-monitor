@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { HashRouter } from 'react-router-dom'
+import SetupMCMCMonitor from '../SetupMCMCMonitor'
 import './App.css'
 import MCMCDataManager from './MCMCMonitorDataManager/MCMCMonitorDataManager'
 import MainWindow from './MainWindow'
-import SetupMCMCMonitor from './SetupMCMCMonitor'
 
 function App() {
     const [dataManager, setDataManager] = useState<MCMCDataManager | undefined>()

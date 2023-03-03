@@ -1,6 +1,6 @@
 import { FunctionComponent } from "react";
 import { serviceBaseUrl } from "../config";
-import { useMCMCMonitor } from "../useMCMCMonitor";
+import { useMCMCMonitor } from "../util/useMCMCMonitor";
 import Hyperlink from "./Hyperlink";
 
 type Props = any
