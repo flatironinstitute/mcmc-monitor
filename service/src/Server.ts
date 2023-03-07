@@ -1,3 +1,4 @@
+import check from 'check-node-version';
 import crypto from 'crypto';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import fs from 'fs';
@@ -9,7 +10,9 @@ import getPeer from './RemotePeer';
 import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
 import { isMCMCMonitorRequest, protocolVersion } from './types/MCMCMonitorRequest';
+
 const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173', 'http://localhost:5173']
+const MINIMUM_SUPPORTED_NODE = "16.0.0"
 
 class Server {
     #expressApp: Express
@@ -82,6 +85,7 @@ class Server {
         })
     }
     start() {
+        checkNodeVersion()
         this.#expressServer.listen(this.a.port, () => {
             return console.info(`Server is running on port ${this.a.port}`)
         })
@@ -117,6 +121,32 @@ function sha1Hash(x: string) {
     const shasum = crypto.createHash('sha1')
     shasum.update(x)
     return shasum.digest('hex')
+}
+
+// Note: If we ever have more hard dependencies, we might make this more sophisticated in passing in the package requirements list.
+const checkNodeVersion = () => {
+    check(
+        { node: `>= ${MINIMUM_SUPPORTED_NODE}`, },
+        (error, result) => {
+            if (error) {
+                throw (error)
+            }
+            if (!result.isSatisfied) {
+                if (!result.versions["node"].isSatisfied) {
+                    console.error(`\n\tThis system is running with node version ${result.versions["node"].version}, but the minimum required version is ${MINIMUM_SUPPORTED_NODE}. Exiting.`)
+                    process.exit(-1)
+                }
+                const errors: string[] = []
+                for (const pkg of Object.keys(result.versions)) {
+                    if (!result.versions[pkg].isSatisfied) {
+                        errors.push(`${pkg} (current version ${result.versions[pkg].version}, needed ${result.versions[pkg].wanted})`)
+                    }
+                }
+                console.error(`The following package requirements were not met:\n\t${errors.join("\n\t")}`)
+                process.exit(-1)
+            }
+        }
+    )
 }
 
 const randomAlphaStringLower = (num_chars: number) => {
