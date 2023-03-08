@@ -20,6 +20,7 @@ You can optional configure MCMC Monitor to enable monitoring from a remote compu
 ## Running the monitor service
 
 First, make sure you have a recent version of [NodeJS](https://nodejs.org/en/download/) installed. Our tests use version 16.
+(`node` version 16.0.0 is considered the minimum supported version for the project.)
 
 > Note: there is no need to clone this repo. You can use the npx command below.
 
@@ -42,6 +43,19 @@ npx mcmc-monitor@latest start --dir /path/to/parent/output/directory --verbose
 ```
 
 To enable remote access (i.e., access this monitor service from a different computer) follow the instructions in the section below.
+
+### Note on `npx` and installation
+
+Some users have experienced an issue in which the `npx mcmc-monitor@latest ...` command above is not successful. In
+these cases, `npx` asks for permission to install the new version, and appears to install, but does not actually install or launch
+`mcmc-monitor`. In this case, it may be necessary to install `mcmc-monitor` manually:
+
+```bash
+npm install mcmc-monitor@latest
+```
+After manually installing, invoking the program with `npx` as above should work. However, you will need to rerun the manual installation step
+when new versions are released.
+
 
 ## Running a Stan program
 
