@@ -84,7 +84,7 @@ const ProtocolCheck: FunctionComponent<ProtocolCheckProps> = (props: ProtocolChe
     }
     return <div>
         <hr />
-        <div><b>PROTOCOL MISMATCH:</b> Connected service is running protocol version {serviceProtocol} while we expect {expectedProtocol}.
+        <div><span style={{fontWeight: "bolder"}}>PROTOCOL MISMATCH:</span> Connected service is running protocol version {serviceProtocol} while we expect {expectedProtocol}.
         Please contact the service administrator and request that they upgrade.
         </div>
     </div>
