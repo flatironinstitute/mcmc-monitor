@@ -90,6 +90,7 @@ export const useMCMCMonitor = () => {
         selectedChainIds: data.selectedChainIds,
         selectedRunId: data.selectedRunId,
         connectedToService: data.connectedToService,
+        serviceProtocolVersion: data.serviceProtocolVersion,
         webrtcConnectionStatus: data.webrtcConnectionStatus,
         usingProxy: data.usingProxy,
         generalOpts: data.generalOpts,

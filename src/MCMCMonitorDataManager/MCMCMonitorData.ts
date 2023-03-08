@@ -30,6 +30,7 @@ type VariableStatsDict = { [key: string]: VariableStats }
 
 export type MCMCMonitorData = {
     connectedToService: boolean | undefined
+    serviceProtocolVersion: string | undefined
     webrtcConnectionStatus: 'unused' | 'pending' | 'connected' | 'error'
     usingProxy: boolean | undefined
     runs: MCMCRun[]
@@ -46,6 +47,7 @@ export type MCMCMonitorData = {
 
 export const initialMCMCMonitorData: MCMCMonitorData = {
     connectedToService: undefined,
+    serviceProtocolVersion: undefined,
     webrtcConnectionStatus: 'pending',
     usingProxy: undefined,
     runs: [],
@@ -100,6 +102,9 @@ export type MCMCMonitorAction = {
 } | {
     type: 'setConnectedToService'
     connected: boolean | undefined
+} | {
+    type: 'setServiceProtocolVersion'
+    version: string | undefined
 } | {
     type: 'setWebrtcConnectionStatus'
     status: 'unused' | 'pending' | 'connected' | 'error'
@@ -169,6 +174,12 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
         return {
             ...s,
             connectedToService: a.connected
+        }
+    }
+    else if (a.type === 'setServiceProtocolVersion') {
+        return {
+            ...s,
+            serviceProtocolVersion: a.version
         }
     }
     else if (a.type === 'setWebrtcConnectionStatus') {
