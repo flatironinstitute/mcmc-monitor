@@ -12,7 +12,7 @@ import { handleApiRequest } from './handleApiRequest';
 import { isMCMCMonitorRequest, protocolVersion } from './types/MCMCMonitorRequest';
 
 const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173', 'http://localhost:5173']
-const MINIMUM_SUPPORTED_NODE = "16.0.0"
+const PATH_TO_PACKAGE_JSON = '../package.json'
 
 class Server {
     #expressApp: Express
@@ -125,17 +125,21 @@ function sha1Hash(x: string) {
 
 // Note: If we ever have more hard dependencies, we might make this more sophisticated in passing in the package requirements list.
 const checkNodeVersion = () => {
+    const data = require(PATH_TO_PACKAGE_JSON)
+    const needs = data["engines"]
     check(
-        { node: `>= ${MINIMUM_SUPPORTED_NODE}`, },
+        needs,
         (error, result) => {
             if (error) {
                 throw (error)
             }
             if (!result.isSatisfied) {
                 if (!result.versions["node"].isSatisfied) {
-                    console.error(`\n\tThis system is running with node version ${result.versions["node"].version}, but the minimum required version is ${MINIMUM_SUPPORTED_NODE}. Exiting.`)
+                    console.error(`\n\tThis system is running with node version ${result.versions["node"].version}, but the minimum required version is ${result.versions["node"].wanted}. Exiting.`)
                     process.exit(-1)
                 }
+                // NOTE: The following is currently unreachable since we are only asking for a node version and we already handled that case.
+                // However, it'll handle anything else that comes up, so it's left in as a default in case we make changes.
                 const errors: string[] = []
                 for (const pkg of Object.keys(result.versions)) {
                     if (!result.versions[pkg].isSatisfied) {
