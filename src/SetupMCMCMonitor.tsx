@@ -87,6 +87,7 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
                         throw Error('Unexpected probe response')
                     }
                     setUsingProxy(resp.proxy ? true : false)
+                    dataDispatch({type: 'setServiceProtocolVersion', version: resp.protocolVersion})
                     if (resp.protocolVersion !== protocolVersion) {
                         throw Error(`Unexpected protocol version: ${resp.protocolVersion} <> ${protocolVersion}`)
                     }
