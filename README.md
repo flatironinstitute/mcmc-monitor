@@ -8,7 +8,7 @@ How it works:
 2. [Run a Stan program](#running-a-stan-program), configuring it to write output to a subdirectory of the output directory.
 3. [Open the web app](http://flatironinstitute.github.io/mcmc-monitor) to monitor and visualize the Stan run.
 
-You can optional configure MCMC Monitor to enable monitoring from a remote computer (see below).
+You can optionally configure MCMC Monitor to enable monitoring from a remote computer (see below).
 
 * [Running the monitoring service](#running-the-monitor-service)
 * [Running a Stan program](#running-a-stan-program)
@@ -88,7 +88,7 @@ To allow remote computers to access your monitoring service, do the following
 * Use the --enable-remote-access flag when starting the service.
 * Follow the link printed in the console output.
 
-**How does this work?** We provide a proxy server that allows remote machines to access your monitor service. In order to avoid excessive bandwidth usage on our server, the system establishes a WebRTC connection so that traffic flows directly between computers, bypassing our proxy. However, since is not always possible to establish a WebRTC connection (due to firewall configurations), you may need to disable WebRTC by changing `webrtc=1` to `webrtc=0` in the query parameters of the URL. Note that in the case of `webrtc=0`, our proxy server may limit the amount of data that is served. Please try to keep `webrtc=1` whenever that is working. You can also [host your own proxy server](https://github.com/magland/connector-http-proxy).
+**How does this work?** We provide a proxy server that allows remote machines to access your monitor service. In order to avoid excessive bandwidth usage on our server, the system establishes a WebRTC connection so that traffic flows directly between computers, bypassing our proxy. However, since it is not always possible to establish a WebRTC connection (due to firewall configurations), you may need to disable WebRTC by changing `webrtc=1` to `webrtc=0` in the query parameters of the URL. Note that in the case of `webrtc=0`, our proxy server may limit the amount of data that is served. Please try to keep `webrtc=1` whenever that is working. You can also [host your own proxy server](https://github.com/magland/connector-http-proxy).
 
 ## Installing cmdstan and cmdstanpy
 
