@@ -96,11 +96,13 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 										/>}
 									</Grid>
 									{
+										// histograms for individual chains
 										diagnosticsSelection.histogram && selectedChainIds.map(chainId => (
 											<Grid item key={chainId}>
 												<SequenceHistogram
 													runId={runId}
 													chainId={chainId}
+													title={chainId}
 													variableName={v}
 													drawRange={sequenceHistogramDrawRange}
 													width={Math.min(width, 300 * sizeScale)}
@@ -108,6 +110,22 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 												/>
 											</Grid>
 										))
+									}
+									{
+										// histogram for all chains
+										diagnosticsSelection.histogram && (
+											<Grid item key={"___all_chains"}>
+												<SequenceHistogram
+													runId={runId}
+													chainId={selectedChainIds}
+													title="All selected chains"
+													variableName={v}
+													drawRange={sequenceHistogramDrawRange}
+													width={Math.min(width, 300 * sizeScale)}
+													height={450 * sizeScale}
+												/>
+											</Grid>
+										)
 									}
 									{
 										diagnosticsSelection.acf && selectedChainIds.map(chainId => (

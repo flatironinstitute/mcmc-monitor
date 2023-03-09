@@ -152,6 +152,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 														key={ii}
 														runId={runId}
 														chainId={selectedChainIds}
+														title=""
 														variableName={v1}
 														drawRange={sequenceHistogramDrawRange}
 														width={0}

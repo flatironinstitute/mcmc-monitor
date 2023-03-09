@@ -7,11 +7,12 @@ type Props = {
 	chainId: string | string[]
 	variableName: string
 	drawRange: [number, number] | undefined
+	title: string
 	width: number
 	height: number
 }
 
-const SequenceHistogram: FunctionComponent<Props> = ({runId, chainId, variableName, drawRange, width, height}) => {
+const SequenceHistogram: FunctionComponent<Props> = ({runId, chainId, variableName, drawRange, title, width, height}) => {
 	const {sequences} = useMCMCMonitor()
 	const histData = useMemo(() => {
 		function getDataForChain(ch: string) {
@@ -31,7 +32,7 @@ const SequenceHistogram: FunctionComponent<Props> = ({runId, chainId, variableNa
 		}
 	}, [chainId, sequences, runId, variableName, drawRange])
 	return (
-		<SequenceHistogramWidget histData={histData} variableName={variableName} title={!Array.isArray(chainId) ? chainId : ''} width={width} height={height} />
+		<SequenceHistogramWidget histData={histData} variableName={variableName} title={title} width={width} height={height} />
 	)
 }
 
