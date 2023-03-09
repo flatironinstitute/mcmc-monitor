@@ -17,6 +17,11 @@ You can optionally configure MCMC Monitor to enable monitoring from a remote com
 * [Installing cmdstan and cmdstanpy](#installing-cmdstan-and-cmdstanpy)
 * [Including and excluding parameters](#including-and-excluding-parameters)
 
+### Feedback welcome!
+
+This tool is under active development. We welcome bug reports and feature requests--please feel free to submit
+a [Github issue](https://github.com/flatironinstitute/mcmc-monitor/issues) if you spot a way MCMC Monitor can be improved.
+
 ## Running the monitor service
 
 First, make sure you have a recent version of [NodeJS](https://nodejs.org/en/download/) installed. Our tests use version 16.
