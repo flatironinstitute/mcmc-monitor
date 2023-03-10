@@ -1,5 +1,4 @@
-import { FunctionComponent } from "react";
-import Logo from "../Logo";
+import { Fragment, FunctionComponent } from "react";
 import ConnectionStatusWidget from "../components/ConnectionStatusWidget";
 import Hyperlink from "../components/Hyperlink";
 import RunsTable from "../components/RunsTable";
@@ -9,9 +8,7 @@ type Props = any
 
 const Home: FunctionComponent<Props> = () => {
 	return (
-		<div style={{margin: 60}}>
-			<Logo />
-			<h3>WIP</h3>
+        <Fragment>
 			{
 				serviceBaseUrl !== exampleServiceBaseUrl && (
 					<div>
@@ -34,7 +31,7 @@ const Home: FunctionComponent<Props> = () => {
 			<RunsTable />
 			<hr />
 			<ConnectionStatusWidget />
-		</div>
+        </Fragment>
 	)
 }
 
