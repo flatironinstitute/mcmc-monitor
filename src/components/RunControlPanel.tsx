@@ -43,9 +43,9 @@ const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}
 
 	useEffect(() => {
 		// start with just lp__ selected
-		if (allVariableNames.includes('lp__')) {
-			setSelectedVariableNames(['lp__'])
-		}
+        if (allVariableNames.includes('lp__')) {
+            setSelectedVariableNames(['lp__'])
+        }
 	}, [runId, setSelectedVariableNames, allVariableNames])
 
 	return (
