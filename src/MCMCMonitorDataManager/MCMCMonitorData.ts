@@ -309,8 +309,8 @@ const chainsWereUpdated = (newChains: MCMCChain[], oldChains: MCMCChain[]): bool
 }
 
 
-export const detectedWarmupIterationCount = (data: MCMCMonitorData): number | undefined => {
-    const observedCount = data.chains.filter(c => c.excludedInitialIterationCount !== undefined)[0]?.excludedInitialIterationCount
+export const detectedWarmupIterationCount = (chains: MCMCChain[]): number | undefined => {
+    const observedCount = chains.filter(c => c.excludedInitialIterationCount !== undefined)[0]?.excludedInitialIterationCount
     return observedCount
 }
 
@@ -329,7 +329,7 @@ const computeEffectiveWarmupIterations = (data: MCMCMonitorData, requested: numb
     // value has not changed) because we start out not knowing the number.
     // On the other hand, if any value other than -1 is requested, we just use that number directly.
     if (requested === -1) {
-        const observedCount = detectedWarmupIterationCount(data)
+        const observedCount = detectedWarmupIterationCount(data.chains)
         return observedCount ?? 0
     } else {
         return requested

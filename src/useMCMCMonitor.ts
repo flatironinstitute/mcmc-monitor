@@ -5,6 +5,7 @@ import { GeneralOpts, MCMCMonitorContext, detectedWarmupIterationCount } from '.
 import updateChains from './MCMCMonitorDataManager/updateChains'
 import postApiRequest from './postApiRequest'
 
+const defaultInitialDrawExclusionOptions = [ 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 ]
 
 export const useMCMCMonitor = () => {
     const { data, dispatch, checkConnectionStatus } = useContext(MCMCMonitorContext)
@@ -74,9 +75,8 @@ export const useMCMCMonitor = () => {
     }, [dispatch])
 
 
-    const defaultInitialDrawExclusionOptions = [ 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 ]
     const initialDrawExclusionOptions = useMemo(() => {
-        const detectedCount = detectedWarmupIterationCount(data)
+        const detectedCount = detectedWarmupIterationCount(data.chains)
         return {
             warmupOptions: defaultInitialDrawExclusionOptions,
             detectedInitialDrawExclusion: detectedCount }
