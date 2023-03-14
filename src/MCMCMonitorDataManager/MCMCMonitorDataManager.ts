@@ -12,8 +12,8 @@ class MCMCDataManager {
         this.#data = data
     }
     async start() {
-        // eslint-disable-next-line no-constant-condition
         this.#stopped = false
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             if (this.#stopped) return
             await this._iterate()
