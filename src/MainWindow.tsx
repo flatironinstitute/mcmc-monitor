@@ -1,6 +1,7 @@
 import { Fragment, FunctionComponent, PropsWithChildren, useEffect } from "react";
 import { protocolVersion } from "../service/src/types/MCMCMonitorRequest";
 import Logo from "./Logo";
+import MCMCDataManager from "./MCMCMonitorDataManager/MCMCMonitorDataManager";
 import Hyperlink from "./components/Hyperlink";
 import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl, useWebrtc } from "./config";
 import Home from "./pages/Home";
@@ -9,12 +10,14 @@ import { useMCMCMonitor } from "./useMCMCMonitor";
 import useRoute from "./useRoute";
 
 
-type Props = any
+type Props = {
+    dataManager: MCMCDataManager | undefined
+}
 
-const MainWindow: FunctionComponent<Props> = () => {
+const MainWindow: FunctionComponent<Props> = (props: Props) => {
+    const { dataManager } = props
 	const { route } = useRoute()
 	const { updateRuns, serviceProtocolVersion } = useMCMCMonitor()
-
 	useEffect(() => {
 		updateRuns()
 	}, [updateRuns])
@@ -46,7 +49,7 @@ const MainWindow: FunctionComponent<Props> = () => {
             )
             break
         case "run":
-            return <RunPage runId={route.runId} />
+            return <RunPage runId={route.runId} dataManager={dataManager} />
             break
         default:
             return <span />

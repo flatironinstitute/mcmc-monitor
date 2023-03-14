@@ -1,5 +1,6 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
 import { MCMCChain, MCMCRun } from "../../service/src/types/MCMCMonitorTypes";
+import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
 import { chainColorForIndex } from "../chainColorList";
 import ConnectionTab from "../components/ConnectionTab";
 import Diagnostics from "../components/DiagnosticsTab";
@@ -15,10 +16,17 @@ import useWindowDimensions from "../useWindowDimensions";
 
 type Props = {
 	runId: string
+    dataManager: MCMCDataManager | undefined
 }
 
-const RunPage: FunctionComponent<Props> = ({runId}) => {
+const RunPage: FunctionComponent<Props> = ({runId, dataManager}) => {
 	const {runs, chains, sequences, updateChainsForRun, setSelectedChainIds, generalOpts, updateKnownData, setSelectedRunId} = useMCMCMonitor()
+
+    useEffect(() => {
+        if (dataManager === undefined) return
+        dataManager.start()
+        return () => { dataManager.stop() }
+    }, [dataManager])
 
 	useEffect(() => {
 		setSelectedRunId(runId)

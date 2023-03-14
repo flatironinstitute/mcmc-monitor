@@ -1,24 +1,25 @@
-import { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo, useReducer, useState } from "react"
+import { Dispatch, FunctionComponent, PropsWithChildren, SetStateAction, useCallback, useEffect, useMemo, useReducer, useState } from "react"
 import { ProbeRequest, isProbeResponse, protocolVersion } from "../service/src/types/MCMCMonitorRequest"
 import { MCMCMonitorContext, initialMCMCMonitorData, mcmcMonitorReducer } from "./MCMCMonitorDataManager/MCMCMonitorData"
 import MCMCDataManager from "./MCMCMonitorDataManager/MCMCMonitorDataManager"
 import { useWebrtc, webrtcConnectionToService } from "./config"
 import postApiRequest from "./postApiRequest"
 
-const SetupMCMCMonitor: FunctionComponent<PropsWithChildren> = ({children}) => {
+type SetupMcmcMonitorProps = {
+    dataManager: MCMCDataManager | undefined
+    setDataManager: Dispatch<SetStateAction<MCMCDataManager | undefined>>
+}
+
+const SetupMCMCMonitor: FunctionComponent<PropsWithChildren<SetupMcmcMonitorProps>> = (props: PropsWithChildren<SetupMcmcMonitorProps>) => {
+    const { children, dataManager, setDataManager } = props
     const [data, dataDispatch] = useReducer(mcmcMonitorReducer, initialMCMCMonitorData)
-    const [dataManager, setDataManager] = useState<MCMCDataManager | undefined>()
     const [usingProxy, setUsingProxy] = useState<boolean | undefined>(undefined)
 
     // instantiate the data manager
     useEffect(() => {
         // should only be instantiated once
         const dm = new MCMCDataManager(dataDispatch)
-        dm.start()
         setDataManager(dm)
-        return () => {
-            dm.stop()
-        }
     }, [dataDispatch])
 
 
