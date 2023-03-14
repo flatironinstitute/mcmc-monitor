@@ -344,7 +344,8 @@ const invalidateStats = <T extends SequenceStatsDict | VariableStatsDict>(statsD
     else if (key in Object.keys(statsDict)) {
         statsDict[key].isUpToDate = false
     } else {
-        console.warn(`Attempt to invalidate stats with key ${key}, which is not in the dictionary.`)
+        // No-op--this situation is actually entirely expected.
+        // console.warn(`Attempt to invalidate stats with key ${key}, which is not in the dictionary.`)
     }
 
     return statsDict
