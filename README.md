@@ -65,7 +65,9 @@ these cases, `npx` asks for permission to install the new version, and appears t
 npm install mcmc-monitor@latest
 ```
 After manually installing, invoking the program with `npx` as above should work. However, you will need to rerun the manual installation step
-when new versions are released.
+when new versions are released. Also note that installing a node package without the `-g` (global) flag will cause npm to create
+a `node_modules` folder in the current working directory, so you may wish to create a specific subdirectory first if you don't
+want this added to your home directory.
 
 
 ## Running a Stan program
