@@ -128,7 +128,7 @@ class ChainFile {
             // read the file starting from where we left off
             const txt = await readNewData(this.#filePosition, this.path)
             if (txt.length > 0) {
-                this.#filePosition += txt.length + 1
+                this.#filePosition += txt.length
                 this.parseData(txt)
                 this.#timestampLastChange = Date.now()
             }
@@ -261,7 +261,7 @@ const readNewData = async (lastReadByte: number, path: string): Promise<string> 
     }
     // drop any partially-read lines
     const lastNewlineLoc = txt.lastIndexOf('\n')
-    txt = lastNewlineLoc >= 0 ? txt.slice(0, lastNewlineLoc) : ''
+    txt = lastNewlineLoc >= 0 ? txt.slice(0, lastNewlineLoc + 1) : ''
     return txt
 }
 
