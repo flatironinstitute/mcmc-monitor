@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useMemo } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { useMCMCMonitor } from "../useMCMCMonitor";
 import useRoute from "../useRoute";
 import ChainsSelector from "./ChainsSelector";
@@ -16,6 +16,7 @@ const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}
 	const {setRoute} = useRoute()
 	const chainsForRun = useMemo(() => (chains.filter(c => (c.runId === runId))), [chains, runId])
     const { warmupOptions, detectedInitialDrawExclusion } = initialDrawExclusionOptions
+    const [ knownVariableNames, setKnownVariableNames ] = useState<string[]>([])
 
 	const allVariableNames = useMemo(() => {
 		const s = new Set<string>()
@@ -41,12 +42,21 @@ const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}
 		return [...s].sort()
 	}, [chainsForRun])
 
+    useEffect(() => {
+        const known = new Set(knownVariableNames)
+        if (knownVariableNames.length !== allVariableNames.length || allVariableNames.some(n => !known.has(n))) {
+            setKnownVariableNames(allVariableNames)
+        }
+    }, [knownVariableNames, allVariableNames])
+
 	useEffect(() => {
 		// start with just lp__ selected
-        if (allVariableNames.includes('lp__')) {
+        if (knownVariableNames.includes('lp__')) {
             setSelectedVariableNames(['lp__'])
+        } else {
+            setSelectedVariableNames([])
         }
-	}, [runId, setSelectedVariableNames, allVariableNames])
+	}, [runId, setSelectedVariableNames, knownVariableNames])
 
 	return (
 		<div style={{fontSize: 14}}>
@@ -60,7 +70,7 @@ const RunControlPanel: FunctionComponent<Props> = ({numDrawsForRun, chainColors}
 			</div>
 			<h3>Variables</h3>
 			<div style={{position: 'relative', maxHeight: 200, overflowY: 'auto'}}>
-				<VariablesSelector variableNames={allVariableNames} variablePrefixesExcluded={allVariablePrefixesExcluded} />
+				<VariablesSelector variableNames={knownVariableNames} variablePrefixesExcluded={allVariablePrefixesExcluded} />
 			</div>
 			<h3>Options</h3>
 			<GeneralOptsControl warmupOptions={warmupOptions} detectedInitialDrawExclusion={detectedInitialDrawExclusion} />
