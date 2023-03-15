@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 module.exports = {
     "env": {
         "browser": true,
@@ -22,6 +23,7 @@ module.exports = {
     ],
     "rules": {
         "@typescript-eslint/no-explicit-any": "off",
+        "no-constant-condition": ["error", { "checkLoops": false }],
         "react/react-in-jsx-scope": "off",
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-extra-semi": "off"

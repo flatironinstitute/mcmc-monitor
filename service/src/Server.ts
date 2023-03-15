@@ -92,7 +92,6 @@ class Server {
 
         // clean up output manager periodically
         ;(async () => {
-            // eslint-disable-next-line no-constant-condition
             while (true) {
                 await this.#outputManager.clearOldData()
                 await sleepMsec(30 * 1000)
@@ -125,6 +124,7 @@ function sha1Hash(x: string) {
 
 // Note: If we ever have more hard dependencies, we might make this more sophisticated in passing in the package requirements list.
 const checkNodeVersion = () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const data = require(PATH_TO_PACKAGE_JSON)
     const needs = data["engines"]
     check(

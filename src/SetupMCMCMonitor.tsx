@@ -20,7 +20,7 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren<SetupMcmcMonitorProp
         // should only be instantiated once
         const dm = new MCMCDataManager(dataDispatch)
         setDataManager(dm)
-    }, [dataDispatch])
+    }, [dataDispatch, setDataManager])
 
 
     // every time data changes, the dataManager needs to get the updated data

@@ -15,7 +15,7 @@ export const useMCMCMonitor = () => {
     }, [dispatch])
 
     const setChainsForRun = useCallback((runId: string, chains: MCMCChain[]) => {
-        dispatch({ type: 'setChainsForRun', runId, chains })
+        dispatch({ type: 'updateChainsForRun', runId, chains })
     }, [dispatch])
 
     const setSelectedVariableNames = useCallback((variableNames: string[]) => {
