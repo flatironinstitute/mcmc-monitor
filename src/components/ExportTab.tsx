@@ -34,7 +34,7 @@ const ExportTab: FunctionComponent<Props> = () => {
 	}, [selectedVariableNames, sequences, selectedChainIds, runId])
 	return (
 		<div>
-			<textarea style={{width: '90%', maxWidth: 1000, height: 500}} value={csvText} />
+			<textarea style={{width: '90%', maxWidth: 1000, height: 500}} value={csvText} readOnly={true} />
 		</div>
 	)
 }
