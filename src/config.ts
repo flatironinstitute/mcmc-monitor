@@ -1,4 +1,4 @@
-import WebrtcConnectionToService from "./WebrtcConnectionToService"
+import WebrtcConnectionToService from "./networking/WebrtcConnectionToService"
 
 const urlSearchParams = new URLSearchParams(window.location.search)
 const queryParams = Object.fromEntries(urlSearchParams.entries())

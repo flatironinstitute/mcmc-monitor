@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { FunctionComponent, useMemo } from "react";
-import { useMCMCMonitor } from "../useMCMCMonitor";
-import useRoute from "../useRoute";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
+import useRoute from "../util/useRoute";
 import Hyperlink from "./Hyperlink";
 
 type Props = any

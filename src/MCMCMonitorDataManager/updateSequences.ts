@@ -1,5 +1,5 @@
 import { GetSequencesRequest, isGetSequencesResponse } from "../../service/src/types/MCMCMonitorRequest";
-import postApiRequest from "../postApiRequest";
+import postApiRequest from "../networking/postApiRequest";
 import { MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorData";
 
 export default async function updateSequences(data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void) {

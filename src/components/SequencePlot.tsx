@@ -1,5 +1,5 @@
-import { FunctionComponent, useEffect, useMemo } from "react";
-import { useMCMCMonitor } from "../useMCMCMonitor";
+import { FunctionComponent, useMemo } from "react";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import SequencePlotWidget, { PlotSequence } from "./SequencePlotWidget";
 
 type Props = {

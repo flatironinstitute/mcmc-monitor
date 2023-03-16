@@ -1,6 +1,6 @@
 import { FormControl, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { FunctionComponent } from "react";
-import { useMCMCMonitor } from "../useMCMCMonitor";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 
 type Props = {
     warmupOptions: number[],

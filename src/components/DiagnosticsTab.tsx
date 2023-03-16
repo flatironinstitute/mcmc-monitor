@@ -1,7 +1,7 @@
 import { KeyboardArrowDown, KeyboardArrowRight } from "@mui/icons-material";
 import { Checkbox, FormControlLabel, Grid, IconButton } from "@mui/material";
 import { FunctionComponent, useMemo, useReducer, useState } from "react";
-import { useMCMCMonitor } from "../useMCMCMonitor";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import AutocorrelationPlot from "./AutocorrelationPlot";
 import { PlotSize, PlotSizeSelector } from "./ScatterplotsTab";
 import SequenceHistogram from "./SequenceHistogram";

@@ -1,7 +1,7 @@
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { FunctionComponent } from "react";
 import { MCMCChain } from "../../service/src/types/MCMCMonitorTypes";
-import { useMCMCMonitor } from "../useMCMCMonitor";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 
 type Props = {
 	chains: MCMCChain[]

@@ -1,6 +1,6 @@
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import Server from './Server'
+import Server from './networking/Server'
 
 const main = () => {
     yargs(hideBin(process.argv))

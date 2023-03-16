@@ -1,9 +1,9 @@
 import { Dispatch, FunctionComponent, PropsWithChildren, SetStateAction, useCallback, useEffect, useMemo, useReducer, useState } from "react"
-import { ProbeRequest, isProbeResponse, protocolVersion } from "../service/src/types/MCMCMonitorRequest"
-import { MCMCMonitorContext, initialMCMCMonitorData, mcmcMonitorReducer } from "./MCMCMonitorDataManager/MCMCMonitorData"
-import MCMCDataManager from "./MCMCMonitorDataManager/MCMCMonitorDataManager"
-import { useWebrtc, webrtcConnectionToService } from "./config"
-import postApiRequest from "./postApiRequest"
+import { ProbeRequest, isProbeResponse, protocolVersion } from "../../service/src/types/MCMCMonitorRequest"
+import { useWebrtc, webrtcConnectionToService } from "../config"
+import postApiRequest from "../networking/postApiRequest"
+import { MCMCMonitorContext, initialMCMCMonitorData, mcmcMonitorReducer } from "./MCMCMonitorData"
+import MCMCDataManager from "./MCMCMonitorDataManager"
 
 type SetupMcmcMonitorProps = {
     dataManager: MCMCDataManager | undefined

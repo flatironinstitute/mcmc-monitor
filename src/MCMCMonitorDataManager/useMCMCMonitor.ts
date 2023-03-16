@@ -1,9 +1,9 @@
 import { useCallback, useContext, useMemo } from 'react'
-import { GetChainsForRunRequest, GetRunsRequest, isGetChainsForRunResponse, isGetRunsResponse } from '../service/src/types/MCMCMonitorRequest'
-import { MCMCChain, MCMCRun } from '../service/src/types/MCMCMonitorTypes'
-import { GeneralOpts, MCMCMonitorContext, detectedWarmupIterationCount } from './MCMCMonitorDataManager/MCMCMonitorData'
-import updateChains from './MCMCMonitorDataManager/updateChains'
-import postApiRequest from './postApiRequest'
+import { GetChainsForRunRequest, GetRunsRequest, isGetChainsForRunResponse, isGetRunsResponse } from '../../service/src/types/MCMCMonitorRequest'
+import { MCMCChain, MCMCRun } from '../../service/src/types/MCMCMonitorTypes'
+import postApiRequest from '../networking/postApiRequest'
+import { GeneralOpts, MCMCMonitorContext, detectedWarmupIterationCount } from './MCMCMonitorData'
+import updateChains from './updateChains'
 
 const defaultInitialDrawExclusionOptions = [ 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 ]
 
