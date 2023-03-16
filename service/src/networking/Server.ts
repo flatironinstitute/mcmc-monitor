@@ -12,7 +12,7 @@ import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
 
 const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173', 'http://localhost:5173']
-const PATH_TO_PACKAGE_JSON = '../package.json'
+const PATH_TO_PACKAGE_JSON = '../../package.json'
 
 class Server {
     #expressApp: Express
