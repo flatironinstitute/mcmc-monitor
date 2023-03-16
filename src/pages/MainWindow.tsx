@@ -1,9 +1,9 @@
 import { Fragment, FunctionComponent, PropsWithChildren, useEffect } from "react";
 import { protocolVersion } from "../../service/src/types/MCMCMonitorRequest";
 import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import Hyperlink from "../components/Hyperlink";
 import { defaultServiceBaseUrl, exampleServiceBaseUrl, serviceBaseUrl, useWebrtc } from "../config";
-import { useMCMCMonitor } from "../util/useMCMCMonitor";
 import useRoute from "../util/useRoute";
 import Home from "./Home";
 import Logo from "./Logo";

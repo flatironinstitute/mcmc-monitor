@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useMemo, useState } from "react";
-import { useMCMCMonitor } from "../util/useMCMCMonitor";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import useRoute from "../util/useRoute";
 import ChainsSelector from "./ChainsSelector";
 import GeneralOptsControl from "./GeneralOptsControl";

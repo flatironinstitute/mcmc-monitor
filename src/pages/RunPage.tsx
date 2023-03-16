@@ -1,6 +1,7 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
 import { MCMCChain, MCMCRun } from "../../service/src/types/MCMCMonitorTypes";
 import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import ConnectionTab from "../components/ConnectionTab";
 import Diagnostics from "../components/DiagnosticsTab";
 import ExportTab from "../components/ExportTab";
@@ -11,7 +12,6 @@ import Splitter from "../components/Splitter";
 import TabWidget from "../components/TabWidget/TabWidget";
 import TablesTab from "../components/TablesTab/TablesTab";
 import { chainColorForIndex } from "../util/chainColorList";
-import { useMCMCMonitor } from "../util/useMCMCMonitor";
 import useWindowDimensions from "../util/useWindowDimensions";
 
 type Props = {

@@ -1,5 +1,5 @@
 import { FunctionComponent, useMemo } from "react";
-import { useMCMCMonitor } from "../util/useMCMCMonitor";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import { applyDrawRange } from "./SequenceHistogram";
 import SequenceScatterplot3DWidget, { Scatterplot3DSequence } from "./SequenceScatterplot3DWidget";
 

@@ -1,6 +1,6 @@
 import { FormControl, Grid, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { FunctionComponent, useMemo, useState } from "react";
-import { useMCMCMonitor } from "../util/useMCMCMonitor";
+import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import { useSequenceDrawRange } from "./DiagnosticsTab";
 import MatrixOfPlots from "./MatrixOfPlots";
 import SequenceHistogram from "./SequenceHistogram";

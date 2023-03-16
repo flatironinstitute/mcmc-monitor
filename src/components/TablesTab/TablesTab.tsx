@@ -1,6 +1,6 @@
 import { createTheme, ThemeProvider } from "@mui/material";
 import { FunctionComponent } from "react";
-import { useMCMCMonitor } from "../../util/useMCMCMonitor";
+import { useMCMCMonitor } from "../../MCMCMonitorDataManager/useMCMCMonitor";
 import MainTable from "./MainTable";
 import VariableTable from "./VariableTable";
 
