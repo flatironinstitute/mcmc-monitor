@@ -25,8 +25,8 @@ export type VariableStats = {
     isUpToDate?: boolean
 }
 
-type SequenceStatsDict = { [key: string]: SequenceStats }
-type VariableStatsDict = { [key: string]: VariableStats }
+export type SequenceStatsDict = { [key: string]: SequenceStats }
+export type VariableStatsDict = { [key: string]: VariableStats }
 
 export type MCMCMonitorData = {
     connectedToService: boolean | undefined
@@ -282,13 +282,49 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
     else return s
 }
 
-function appendData(x: number[], position: number, y: number[]) {
-    if (position > x.length) return x
-    if (position + y.length <= x.length) return x
-    return [...x, ...y.slice(x.length - position)]
+
+export const detectedWarmupIterationCount = (chains: MCMCChain[]): number | undefined => {
+    const observedCount = chains.filter(c => c.excludedInitialIterationCount !== undefined)[0]?.excludedInitialIterationCount
+    return observedCount
 }
 
 
+/**
+ * Function to append asynchronously-fetched data from a matrix to the internal data store.
+ * 
+ * We have an existing (cached) data series {@link existingData} and an incoming set of data entries
+ * {@link newData}. Both are intended to represent data entries for the same data series from
+ * some external file. {@link newData} represents the entries which might need to be appended to
+ * the cache, by reading the file starting from the row {@link position}.
+ * 
+ * Because the cache update can be requested repeatedly in an asyncrhonous environment, we have
+ * to deal with cases where data does not align properly. The {@link position} field is key to this,
+ * since it is largely passed through from the original request. In the case where {@link position}
+ * is greater than the existing data's cached length, we return the existing data unmodified (since
+ * we don't have a principled way to add to a data series with a hole in it). In the case where
+ * {@link position} plus the length of the data in {@link newData} is less than the overall length
+ * of {@link existingData}, we again return the existing data unmodified (since the incoming data
+ * update should only represent data that's already in cache). Finally, if the incoming data
+ * {@link newData} starts at or before the end of the existing data but continues beyond the
+ * end of the existing data series, we can append some or all of {@link newData} to
+ * {@link existingData}; we do so and return a new list.
+ * In no event do we overwrite anything in the existing cached data series {@link existingData}.
+ * 
+ * @param existingData A cached data series.
+ * @param position The row of the ultimate data source file which marks where the
+ * {@link newData} starts.
+ * @param newData A data series representing (hopefully newer) entries of {@link existingData}
+ * from the original source file.
+ * @returns A copy of the data series, possibly with some of the new entries appended.
+ */
+function appendData(existingData: number[], position: number, newData: number[]) {
+    if (position > existingData.length) return existingData
+    if (position + newData.length <= existingData.length) return existingData
+    return [...existingData, ...newData.slice(existingData.length - position)]
+}
+
+
+// Update should keep any existing chains for other run IDs, and replace anything with the specified run ID with the new chain values.
 const doChainUpdate = (s: MCMCMonitorData, runId: string, newChains: MCMCChain[]): MCMCMonitorData => {
     const chains = [...s.chains.filter(c => (c.runId !== runId)), ...newChains]
     const newState = { ...s, chains }
@@ -306,12 +342,6 @@ const chainsWereUpdated = (newChains: MCMCChain[], oldChains: MCMCChain[]): bool
     // There is an update if there are any new chains for which either a) the chain ID was
     // not yet encountered ( hence "|| -1" ) or b) the new chain update stamp is greater than the old one
     return (newChains.some(newChain => newChain.lastChangeTimestamp > (known.get(newChain.chainId) || -1)))
-}
-
-
-export const detectedWarmupIterationCount = (chains: MCMCChain[]): number | undefined => {
-    const observedCount = chains.filter(c => c.excludedInitialIterationCount !== undefined)[0]?.excludedInitialIterationCount
-    return observedCount
 }
 
 
@@ -341,7 +371,7 @@ const invalidateStats = <T extends SequenceStatsDict | VariableStatsDict>(statsD
     if (key === undefined) {
         Object.keys(statsDict).forEach(s => statsDict[s].isUpToDate = false)
     }
-    else if (key in Object.keys(statsDict)) {
+    else if (Object.keys(statsDict).includes(key)) {
         statsDict[key].isUpToDate = false
     } else {
         // No-op--this situation is actually entirely expected.
@@ -349,4 +379,9 @@ const invalidateStats = <T extends SequenceStatsDict | VariableStatsDict>(statsD
     }
 
     return statsDict
+}
+
+export {
+    appendData as appendData_TEST, chainsWereUpdated as chainsWereUpdated_TEST,
+    computeEffectiveWarmupIterations as computeEffectiveWarmupIterations_TEST, doChainUpdate as doChainUpdate_TEST, invalidateStats as invalidateStats_TEST
 }
