@@ -108,9 +108,6 @@ describe("Post API Request function", () => {
         mockConfig()
         const postApiRequest = await importFunctionUnderTest()
 
-        // For testing errors, jest requires a *callback* that invokes the fn
-        // expect(() => postApiRequest(myRequest)).toThrowError() // synchronous example
-        // for async fns, use
         await expect(() => postApiRequest(myRequest)).rejects.toThrowError(TypeError)
         expect(myMockedWarn).toHaveBeenCalledTimes(1)
         vi.spyOn(console, 'warn').mockRestore()
