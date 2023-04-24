@@ -13,6 +13,11 @@ dev-dist
 dist-ssr
 *.local
 
+# Coverages
+coverage/
+lcov.info
+lcov-report/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
