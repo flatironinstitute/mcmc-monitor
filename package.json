@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist --no-history",
-    "dev-deploy": "tsc && vite --config vite.dev-config.ts build && gh-pages -d dev-dist --no-history --dest dev",
-    "dev": "vite",
     "build": "tsc && vite build",
+    "predeploy": "npm run build && npm run coverage",
+    "deploy": "gh-pages -d dist --no-history",
+    "predev-deploy": "tsc && vite --config vite.dev-config.ts build && npm run coverage",
+    "dev-deploy": "gh-pages -d dev-dist --no-history --dest dev",
+    "dev": "vite",
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage"
