@@ -1,4 +1,5 @@
-import { initialMCMCMonitorData, MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorData";
+import { initialMCMCMonitorData } from "./MCMCMonitorData";
+import { MCMCMonitorAction, MCMCMonitorData } from "./MCMCMonitorDataTypes";
 import updateSequences from "./updateSequences";
 import updateSequenceStats from "./updateSequenceStats";
 import updateVariableStats from "./updateVariableStats";

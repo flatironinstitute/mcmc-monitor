@@ -1,49 +1,13 @@
 import React from 'react'
+<<<<<<< HEAD
 import { MCMCChain, MCMCRun, MCMCSequence } from '../../service/src/types'
+=======
+import { MCMCSequenceUpdate } from '../../service/src/types/MCMCMonitorRequest'
+import { MCMCChain, MCMCSequence, getSequenceIdentifier } from '../../service/src/types/MCMCMonitorTypes'
+import sortedListsAreEqual from '../util/sortedListsAreEqual'
+import { MCMCMonitorAction, MCMCMonitorData, SequenceStatsDict, VariableStatsDict } from './MCMCMonitorDataTypes'
+>>>>>>> 2a24564 (Swap reducer to case. Refactor logic to larger units of work.)
 
-export type GeneralOpts = {
-    dataRefreshMode: 'auto' | 'manual'
-    dataRefreshIntervalSec: number
-    requestedInitialDrawsToExclude: number
-}
-
-export type SequenceStats = {
-    mean?: number
-    stdev?: number
-    count?: number
-    ess?: number
-    acor?: number[]
-    isUpToDate?: boolean
-}
-
-export type VariableStats = {
-    mean?: number
-    stdev?: number
-    ess?: number
-    count?: number
-    rhat?: number
-    isUpToDate?: boolean
-}
-
-export type SequenceStatsDict = { [key: string]: SequenceStats }
-export type VariableStatsDict = { [key: string]: VariableStats }
-
-export type MCMCMonitorData = {
-    connectedToService: boolean | undefined
-    serviceProtocolVersion: string | undefined
-    webrtcConnectionStatus: 'unused' | 'pending' | 'connected' | 'error'
-    usingProxy: boolean | undefined
-    runs: MCMCRun[]
-    chains: MCMCChain[]
-    sequences: MCMCSequence[]
-    sequenceStats: SequenceStatsDict
-    variableStats: VariableStatsDict
-    selectedRunId?: string
-    selectedVariableNames: string[]
-    selectedChainIds: string[]
-    effectiveInitialDrawsToExclude: number
-    generalOpts: GeneralOpts
-}
 
 export const initialMCMCMonitorData: MCMCMonitorData = {
     connectedToService: undefined,
@@ -67,225 +31,201 @@ export const MCMCMonitorContext = React.createContext<{ data: MCMCMonitorData, d
     checkConnectionStatus: () => {}
 })
 
-export type MCMCMonitorAction = {
-    type: 'setRuns'
-    runs: MCMCRun[]
-} | {
-    type: 'setChainsForRun'
-    runId: string
-    chains: MCMCChain[]
-} | {
-    type: 'updateChainsForRun'
-    runId: string
-    chains: MCMCChain[]
-} | {
-    type: 'appendSequenceData'
-    runId: string
-    chainId: string
-    variableName: string
-    position: number
-    data: number[]
-} | {
-    type: 'markSequenceAsUpdated'
-    runId: string
-    chainId: string
-    variableName: string
-} | {
-    type: 'setSelectedVariableNames'
-    variableNames: string[]
-} | {
-    type: 'setSelectedRunId'
-    runId: string | undefined
-} | {
-    type: 'setSelectedChainIds'
-    chainIds: string[]
-} | {
-    type: 'setConnectedToService'
-    connected: boolean | undefined
-} | {
-    type: 'setServiceProtocolVersion'
-    version: string | undefined
-} | {
-    type: 'setWebrtcConnectionStatus'
-    status: 'unused' | 'pending' | 'connected' | 'error'
-} | {
-    type: 'setUsingProxy'
-    usingProxy: boolean | undefined
-} | {
-    type: 'updateSequence'
-    runId: string
-    chainId: string
-    variableName: string
-} | {
-    type: 'updateExistingSequences'
-    runId: string
-} | {
-    type: 'setGeneralOpts'
-    opts: GeneralOpts
-} | {
-    type: 'setSequenceStats'
-    runId: string
-    chainId: string
-    variableName: string
-    stats: SequenceStats
-} | {
-    type: 'setVariableStats'
-    runId: string
-    variableName: string
-    stats: VariableStats
-}
-
 export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MCMCMonitorData => {
-    if (a.type === 'setRuns') {
-        const runIds = a.runs.map(r => (r.runId))
-        return {
-            ...s,
-            runs: a.runs,
-            chains: s.chains.filter(c => (runIds.includes(c.runId)))
-        }
-    }
-    else if (a.type === 'setChainsForRun') {
-        return doChainUpdate(s, a.runId, a.chains)
-    }
-    else if (a.type === 'updateChainsForRun') {
-        const hadUpdates = chainsWereUpdated(a.chains, s.chains)
-        if (!hadUpdates) return s // preserve reference equality if nothing changed
-        return doChainUpdate(s, a.runId, a.chains)
-    }
-    else if (a.type === 'setSelectedVariableNames') {
-        return {
-            ...s,
-            selectedVariableNames: [...a.variableNames].sort()
-        }
-    }
-    else if (a.type === 'setSelectedChainIds') {
-        return {
-            ...s,
-            selectedChainIds: [...a.chainIds].sort()
-        }
-    }
-    else if (a.type === 'setSelectedRunId') {
-        return {
-            ...s,
-            selectedRunId: a.runId
-        }
-    }
-    else if (a.type === 'setConnectedToService') {
-        return {
-            ...s,
-            connectedToService: a.connected
-        }
-    }
-    else if (a.type === 'setServiceProtocolVersion') {
-        return {
-            ...s,
-            serviceProtocolVersion: a.version
-        }
-    }
-    else if (a.type === 'setWebrtcConnectionStatus') {
-        return {
-            ...s,
-            webrtcConnectionStatus: a.status
-        }
-    }
-    else if (a.type === 'setUsingProxy') {
-        return {
-            ...s,
-            usingProxy: a.usingProxy
-        }
-    }
-    else if (a.type === 'appendSequenceData') {
-        const sequenceStatsKey = `${a.runId}/${a.chainId}/${a.variableName}`
-        const variableStatsKey = `${a.runId}/${a.variableName}`
-        return {
-            ...s,
-            sequenceStats: invalidateStats(s.sequenceStats, sequenceStatsKey),
-            variableStats: invalidateStats(s.variableStats, variableStatsKey),
-            sequences: s.sequences.map(x => (
-                (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
-                    x : {...x, data: appendData(x.data, a.position, a.data)}
-            ))
-        }
-    }
-    else if (a.type === 'markSequenceAsUpdated') {
-        return {
-            ...s,
-            sequences: s.sequences.map(x => (
-                (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
-                    x : {...x, updateRequested: false}
-            ))
-        }
-    }
-    else if (a.type === 'updateSequence') {
-        if (!s.sequences.find(x => (x.runId === a.runId && x.chainId === a.chainId && x.variableName === a.variableName))) {
+    switch (a.type) {
+        case "setRuns": {
+            const runIds = a.runs.map(r => (r.runId))
             return {
                 ...s,
-                sequences: [...s.sequences, {
-                    runId: a.runId,
-                    chainId: a.chainId,
-                    variableName: a.variableName,
-                    data: [],
-                    updateRequested: true
-                }]
+                runs: a.runs,
+                chains: s.chains.filter(c => (runIds.includes(c.runId)))
             }
+            break
         }
-        else {
+        case "setChainsForRun": {
+            return doChainUpdate(s, a.runId, a.chains)
+            break
+        }
+        case "updateChainsForRun": {
+            const hadUpdates = chainsWereUpdated(a.chains, s.chains)
+            if (!hadUpdates) return s // preserve reference equality if nothing changed
+            return doChainUpdate(s, a.runId, a.chains)
+            break
+        }
+        case "setSelectedVariableNames": {
+            const sortedVariableNames = [...a.variableNames].sort()
+            if (sortedListsAreEqual(sortedVariableNames, s.selectedVariableNames)) return s
+            const newState = {...s, selectedVariableNames: sortedVariableNames}
+            addNovelSequences(newState)
+            return newState
+            break
+        }
+        case "setSelectedChainIds": {
+            const sortedChainIds = [...a.chainIds].sort()
+            if (sortedListsAreEqual(sortedChainIds, s.selectedChainIds)) return s
+            const newData = { ...s, selectedChainIds: sortedChainIds }
+            addNovelSequences(newData)
+            return newData
+            break
+        }
+        case "setSelectedRunId": {
+            if (s.selectedRunId === a.runId) return s
+            const newData = { ...s, selectedRunId: a.runId}
+            addNovelSequences(newData)
+            return newData
+            break
+        }
+        case "setConnectedToService": {
+            return {
+                ...s,
+                connectedToService: a.connected
+            }
+            break
+        }
+        case "setServiceProtocolVersion": {
+            return {
+                ...s,
+                serviceProtocolVersion: a.version
+            }
+            break
+        }
+        case "setWebrtcConnectionStatus": {
+            return {
+                ...s,
+                webrtcConnectionStatus: a.status
+            }
+            break
+        }
+        case "setUsingProxy": {
+            return {
+                ...s,
+                usingProxy: a.usingProxy
+            }
+            break
+        }
+        case "updateSequenceData": {
+            if (a.sequences.length === 0) return s
+            return doSequenceUpdate(s, a.sequences)
+            break
+        }
+        case "requestSequenceUpdate": {
             return {
                 ...s,
                 sequences: s.sequences.map(x => (
-                    (x.runId !== a.runId || x.chainId !== a.chainId || x.variableName !== a.variableName) ?
+                    (x.runId !== a.runId) ?
                         x : {...x, updateRequested: true}
                 ))
             }
+            break
         }
-    }
-    else if (a.type === 'updateExistingSequences') {
-        return {
-            ...s,
-            sequences: s.sequences.map(x => (
-                (x.runId !== a.runId) ?
-                    x : {...x, updateRequested: true}
-            ))
-        }
-    }
-    else if (a.type === 'setGeneralOpts') {
-        const effectiveWarmupIterations = computeEffectiveWarmupIterations(s, a.opts.requestedInitialDrawsToExclude)
-        const recalc = effectiveWarmupIterations !== s.effectiveInitialDrawsToExclude
-        return {
-            ...s,
-            sequenceStats: recalc ? invalidateStats(s.sequenceStats) : s.sequenceStats,
-            variableStats: recalc ? invalidateStats(s.variableStats) : s.variableStats,
-            effectiveInitialDrawsToExclude: effectiveWarmupIterations,
-            generalOpts: a.opts
-        }
-    }
-    else if (a.type === 'setSequenceStats') {
-        const k = `${a.runId}/${a.chainId}/${a.variableName}`
-        return {
-            ...s,
-            sequenceStats: {
-                ...s.sequenceStats,
-                [k]: a.stats
+        case "setGeneralOpts": {
+            const effectiveWarmupIterations = computeEffectiveWarmupIterations(s, a.opts.requestedInitialDrawsToExclude)
+            const recalc = effectiveWarmupIterations !== s.effectiveInitialDrawsToExclude
+            return {
+                ...s,
+                sequenceStats: recalc ? invalidateStats(s.sequenceStats) : s.sequenceStats,
+                variableStats: recalc ? invalidateStats(s.variableStats) : s.variableStats,
+                effectiveInitialDrawsToExclude: effectiveWarmupIterations,
+                generalOpts: a.opts
             }
+            break
         }
-    }
-    else if (a.type === 'setVariableStats') {
-        const k = `${a.runId}/${a.variableName}`
-        return {
-            ...s,
-            variableStats: {
-                ...s.variableStats,
-                [k]: a.stats
+        case "setSequenceStats": {
+            const k = `${a.runId}/${a.chainId}/${a.variableName}`
+            return {
+                ...s,
+                sequenceStats: {
+                    ...s.sequenceStats,
+                    [k]: a.stats
+                }
             }
+            break
+        }
+        case "setVariableStats": {
+            const k = `${a.runId}/${a.variableName}`
+            return {
+                ...s,
+                variableStats: {
+                    ...s.variableStats,
+                    [k]: a.stats
+                }
+            }
+            break
+        }
+        default: {
+            throw Error(`Unknown reducer action ${a}`)
         }
     }
-    else return s
 }
 
 
 export const detectedWarmupIterationCount = (chains: MCMCChain[]): number | undefined => {
     const observedCount = chains.filter(c => c.excludedInitialIterationCount !== undefined)[0]?.excludedInitialIterationCount
     return observedCount
+}
+
+
+const doSequenceUpdate = (s: MCMCMonitorData, sequences: MCMCSequenceUpdate[]): MCMCMonitorData => {
+    const knownSequences: Map<string, MCMCSequence> = new Map()
+    s.sequences.forEach(seq => knownSequences.set(getSequenceIdentifier(seq), seq))
+
+    const updatedSequences: Map<string, MCMCSequence> = new Map()
+    const unmodifiedSequences: Map<string, MCMCSequence> = new Map()
+    const sequenceStatsToExpire: string[] = []
+    const variableStatsToExpire: string[] = []
+    sequences.forEach(update => {
+        const key = getSequenceIdentifier(update)
+        const known = knownSequences.get(key)
+        if (!known) throw Error("Attempt to update unknown sequence, should not be possible")
+        knownSequences.delete(key)
+
+        if (update.data.length === 0) {
+            known.updateRequested = false   // modifies original data structure in-place
+            unmodifiedSequences.set(key, known)
+            return
+        }
+        sequenceStatsToExpire.push(`${update.runId}/${update.chainId}/${update.variableName}`)
+        variableStatsToExpire.push(`${update.runId}/${update.variableName}`)
+        // consider assert that key does not already exist--it shouldn't
+        updatedSequences.set(key, {...known, data: appendData(known.data, update.position, update.data)})
+    })
+    if (updatedSequences.size === 0) return s // no data changes, so don't change reference equality: no need to trigger update
+
+    const newSequences = [...knownSequences.values(), ...unmodifiedSequences.values(), ...updatedSequences.values()]
+    sequenceStatsToExpire.map(key => invalidateStats(s.sequenceStats, key))
+    variableStatsToExpire.map(key => invalidateStats(s.variableStats, key))
+
+    return {
+        ...s,
+        sequences: newSequences
+    }
+}
+
+
+const addNovelSequences = (data: MCMCMonitorData) => {
+    const runId = data.selectedRunId
+    if (!runId) return
+    if (data.selectedChainIds.length === 0 || data.selectedVariableNames.length === 0) return
+
+    // TODO: cache this? It's not like the list ever gets shorter
+    const knownSequences = new Map<string, MCMCSequence>()
+    data.sequences.forEach(s => {
+        knownSequences.set(getSequenceIdentifier(s), s)
+    })
+    const unknownSequences = new Map<string, MCMCSequence>()
+    for (const chainId of data.selectedChainIds) {
+        for (const variableName of data.selectedVariableNames) {
+            const key = getSequenceIdentifier({runId, chainId, variableName})
+            if (knownSequences.has(key)) continue
+            if (unknownSequences.has(key)) {
+                throw Error(`Key collision in data from sequence update. This shouldn't be possible.`)
+            }
+            unknownSequences.set(key, {runId, chainId, variableName, data: [], updateRequested: true})
+        }
+    }
+    if (unknownSequences.size > 0) {
+        data.sequences = [...data.sequences, ...unknownSequences.values()]
+    }
 }
 
 
