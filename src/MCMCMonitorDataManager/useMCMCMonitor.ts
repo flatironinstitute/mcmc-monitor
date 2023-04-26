@@ -1,7 +1,8 @@
 import { useCallback, useContext, useMemo } from 'react'
 import { GetChainsForRunRequest, GetRunsRequest, MCMCChain, MCMCRun, isGetChainsForRunResponse, isGetRunsResponse } from '../../service/src/types'
 import postApiRequest from '../networking/postApiRequest'
-import { GeneralOpts, MCMCMonitorContext, detectedWarmupIterationCount } from './MCMCMonitorData'
+import { MCMCMonitorContext, detectedWarmupIterationCount } from './MCMCMonitorData'
+import { GeneralOpts } from './MCMCMonitorDataTypes'
 import updateChains from './updateChains'
 
 const defaultInitialDrawExclusionOptions = [ 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 ]
@@ -61,7 +62,7 @@ export const useMCMCMonitor = () => {
     const updateKnownData = useCallback((runId: string) => {
         updateChains(runId, dispatch)
         dispatch({
-            type: 'updateExistingSequences',
+            type: 'requestSequenceUpdate',
             runId
         })
     }, [dispatch])

@@ -203,3 +203,11 @@ export const isWebsocketMessage = (x: any): x is WebsocketMessage => (
         signal: isString
     })
 )
+
+// Type utilities
+
+export const getSequenceIdentifier = (sequenceIdentifiers: {runId: string, chainId: string, variableName: string}): string => {
+    const delimiter = "%%%"
+    const keys: string[] = [sequenceIdentifiers.runId, sequenceIdentifiers.chainId, sequenceIdentifiers.variableName]
+    return keys.join(delimiter)
+}

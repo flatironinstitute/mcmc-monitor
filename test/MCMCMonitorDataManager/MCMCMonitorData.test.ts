@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 import { MCMCChain } from '../../service/src/types'
-import { MCMCMonitorData, SequenceStatsDict, VariableStatsDict, appendData_TEST, chainsWereUpdated_TEST, computeEffectiveWarmupIterations_TEST, detectedWarmupIterationCount, doChainUpdate_TEST, initialMCMCMonitorData, invalidateStats_TEST } from '../../src/MCMCMonitorDataManager/MCMCMonitorData'
+import { appendData_TEST, chainsWereUpdated_TEST, computeEffectiveWarmupIterations_TEST, detectedWarmupIterationCount, doChainUpdate_TEST, initialMCMCMonitorData, invalidateStats_TEST } from '../../src/MCMCMonitorDataManager/MCMCMonitorData'
+import { MCMCMonitorData, SequenceStatsDict, VariableStatsDict } from '../../src/MCMCMonitorDataManager/MCMCMonitorDataTypes'
 
 describe("Detected warmup iteration count", () => {
     let chains: MCMCChain[]
