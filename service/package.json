@@ -10,7 +10,7 @@
     "build": "tsc",
     "dev": "nodemon src/index.ts start --v --dir ../examples/example-output --enable-remote-access",
     "start-demo": "node src/index.ts start --v --dir ./example-output",
-    "release": "yarn build && npm publish && git tag $npm_package_version && git push --tags",
+    "release": "yarn build && yarn coverage && npm publish && git tag $npm_package_version && git push --tags",
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },
