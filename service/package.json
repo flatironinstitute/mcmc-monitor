@@ -10,7 +10,9 @@
     "build": "tsc",
     "dev": "nodemon src/index.ts start --v --dir ../examples/example-output --enable-remote-access",
     "start-demo": "node src/index.ts start --v --dir ./example-output",
-    "release": "yarn build && npm publish && git tag $npm_package_version && git push --tags"
+    "release": "yarn build && npm publish && git tag $npm_package_version && git push --tags",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "author": "Jeremy Magland",
   "license": "Apache-2.0",
@@ -23,7 +25,8 @@
     "node-pre-gyp": "^0.17.0",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.3",
+    "vitest": "^0.30.1"
   },
   "dependencies": {
     "@types/js-yaml": "^4.0.5",
