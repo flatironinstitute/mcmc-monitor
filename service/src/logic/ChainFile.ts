@@ -278,5 +278,6 @@ const isEmptyComment = (line: string): boolean => {
     return trimmed.length === 0
 }
 
+export { isComment as TEST_isComment, isEmptyComment as TEST_isEmptyComment }
 
 export default ChainFile

@@ -4,12 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist --no-history",
-    "dev-deploy": "tsc && vite --config vite.dev-config.ts build && gh-pages -d dev-dist --no-history --dest dev",
-    "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "predeploy": "npm run build && npm run coverage",
+    "deploy": "gh-pages -d dist --no-history",
+    "predev-deploy": "tsc && vite --config vite.dev-config.ts build && npm run coverage",
+    "dev-deploy": "gh-pages -d dev-dist --no-history --dest dev",
+    "dev": "vite",
+    "preview": "vite preview",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -35,11 +38,13 @@
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "@vitejs/plugin-react": "^3.0.0",
+    "@vitest/coverage-c8": "^0.30.1",
     "eslint": "^8.32.0",
     "eslint-plugin-react": "^7.32.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "gh-pages": "^5.0.0",
     "typescript": "^4.9.3",
-    "vite": "^4.0.0"
+    "vite": "^4.0.0",
+    "vitest": "^0.30.1"
   }
 }

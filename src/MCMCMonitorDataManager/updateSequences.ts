@@ -22,7 +22,6 @@ export default async function updateSequences(data: MCMCMonitorData, dispatch: (
     }
 
     const X = data.sequences.filter(s => (s.updateRequested))
-    const timer = Date.now()
     if (X.length > 0) {
         const req: GetSequencesRequest = {
             type: 'getSequencesRequest',

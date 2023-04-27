@@ -32,6 +32,17 @@ If you are developing on the client side, you'll mainly be
 interested in the `src` directory; if you're working on the service,
 the contents of interest are in the `service/` directory.
 
+## Testing
+
+This project uses [vitest](https://vitest.dev/) as a testing environment, which integrates nicely with the rest
+of the `vite` tooling and has good support for ESM modules. Tests are located in the `test/` directory at
+the top level of the project and should be laid out to match the corresponding source code files.
+
+To run tests for the project, execute `yarn test` from project root. This will drop the terminal into a
+continuous (hot-reloading) test environment that will rerun affected tests as files change. Alternatively,
+`yarn coverage` will execute existing tests and then exit. (Despite the name, both commands will generate test
+coverage reports in the `coverage/` top-level directory). Coverage reports are configured to work nicely with
+the VSCode coverage-gutters plugin.
 
 ## Running changes locally
 

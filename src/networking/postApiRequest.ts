@@ -17,9 +17,9 @@ const postApiRequest = async (request: MCMCMonitorRequest): Promise<MCMCMonitorR
         }
     )
     const response = await rr.json()
-    if (!isMCMCMonitorResponse) {
+    if (!isMCMCMonitorResponse(response)) {
         console.warn(response)
-        throw Error('Unexpected api response')
+        throw TypeError('Unexpected api response')
     }
     return response
 }
