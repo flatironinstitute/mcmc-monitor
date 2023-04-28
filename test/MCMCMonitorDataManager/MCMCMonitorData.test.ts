@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { MCMCChain } from '../../service/src/types'
-import { appendData_TEST, chainsWereUpdated_TEST, computeEffectiveWarmupIterations_TEST, detectedWarmupIterationCount, doChainUpdate_TEST, initialMCMCMonitorData, invalidateStats_TEST } from '../../src/MCMCMonitorDataManager/MCMCMonitorData'
+import { addNovelSequences_TEST, appendData_TEST, chainsWereUpdated_TEST, computeEffectiveWarmupIterations_TEST, detectedWarmupIterationCount, doChainUpdate_TEST, initialMCMCMonitorData, invalidateStats_TEST } from '../../src/MCMCMonitorDataManager/MCMCMonitorData'
 import { MCMCMonitorData, SequenceStatsDict, VariableStatsDict } from '../../src/MCMCMonitorDataManager/MCMCMonitorDataTypes'
 
 describe("Detected warmup iteration count", () => {
@@ -32,6 +32,80 @@ describe("Detected warmup iteration count", () => {
 
 
 // Tests for private functions--MCMCMonitorData.ts
+
+describe("Novel sequence addition function", () => {
+    let mockGetSeqId
+    let data: MCMCMonitorData
+    const baseSequences = [{
+        runId: "2",
+        chainId: "chain1",
+        variableName: "var1"
+    },
+    {
+        runId: "1",
+        chainId: "chain1",
+        variableName: "var1"
+    }]
+    const baseChainIds = ["chain1", "chain2"]
+    const baseVariables = ["var1", "var2"]
+    const mockId = () => {
+        mockGetSeqId = vi.fn()
+        vi.doMock('../../service/src/types/MCMCMonitorTypes', () => {
+            return {
+                __esModule: true,
+                getSequenceIdentifier: mockGetSeqId
+            }
+        })
+    }
+    beforeEach(() => {
+        data = {
+            sequences: baseSequences,
+            selectedRunId: "1",
+            selectedChainIds: baseChainIds,
+            selectedVariableNames: baseVariables
+        } as unknown as MCMCMonitorData
+    })
+    afterEach(() => {
+        vi.resetModules()
+    })
+    test("Short-circuits if no runId is selected", async () => {
+        mockId()
+        const addNovelSequences = (await import("../../src/MCMCMonitorDataManager/MCMCMonitorData")).addNovelSequences_TEST
+        data.selectedRunId = undefined
+        addNovelSequences(data)
+        expect(mockGetSeqId).toHaveBeenCalledTimes(0)
+    })
+    test("Short-circuits if no chain IDs are selected", async () => {
+        mockId()
+        const addNovelSequences = (await import("../../src/MCMCMonitorDataManager/MCMCMonitorData")).addNovelSequences_TEST
+        data.selectedChainIds = []
+        addNovelSequences(data)
+        expect(mockGetSeqId).toHaveBeenCalledTimes(0)
+    })
+    test("Short-circuits if no variable names are selected", async () => {
+        mockId()
+        const addNovelSequences = (await import("../../src/MCMCMonitorDataManager/MCMCMonitorData")).addNovelSequences_TEST
+        data.selectedVariableNames = []
+        addNovelSequences(data)
+        expect(mockGetSeqId).toHaveBeenCalledTimes(0)
+    })
+    test("Throws if chain ID or variable name are repeated in selection", () => {
+        data.selectedVariableNames = [...data.selectedVariableNames, "var3", "var3"]
+        expect(() => addNovelSequences_TEST(data)).toThrow(/Key collision/)
+    })
+    test("Adds missing sequences to input object", () => {
+        expect(data.selectedChainIds.length).toBe(2)
+        expect(data.selectedVariableNames.length).toBe(2)
+        expect(data.sequences.length).toBe(2)
+        expect(data.sequences.filter(s =>
+            s.runId === data.selectedRunId
+            && data.selectedChainIds.includes(s.chainId)
+            && data.selectedVariableNames.includes(s.variableName))
+            .length).toBe(1)
+        addNovelSequences_TEST(data)
+        expect(data.sequences.length).toBe(5)
+    })
+})
 
 describe("Data appending function", () => {
     const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
