@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { MCMCMonitorRequest, isMCMCMonitorResponse } from '../../service/src/types/MCMCMonitorRequest'
+import { MCMCMonitorRequest, isMCMCMonitorResponse } from '../../service/src/types'
 import WebrtcConnectionToService from '../../src/networking/WebrtcConnectionToService'
 
 

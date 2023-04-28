@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { MCMCChain, MCMCRun } from "../../service/src/types/MCMCMonitorTypes";
+import { MCMCChain, MCMCRun } from "../../service/src/types";
 import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import ConnectionTab from "../components/ConnectionTab";

@@ -1,6 +1,5 @@
 import { useCallback, useContext, useMemo } from 'react'
-import { GetChainsForRunRequest, GetRunsRequest, isGetChainsForRunResponse, isGetRunsResponse } from '../../service/src/types/MCMCMonitorRequest'
-import { MCMCChain, MCMCRun } from '../../service/src/types/MCMCMonitorTypes'
+import { GetChainsForRunRequest, GetRunsRequest, MCMCChain, MCMCRun, isGetChainsForRunResponse, isGetRunsResponse } from '../../service/src/types'
 import postApiRequest from '../networking/postApiRequest'
 import { GeneralOpts, MCMCMonitorContext, detectedWarmupIterationCount } from './MCMCMonitorData'
 import updateChains from './updateChains'

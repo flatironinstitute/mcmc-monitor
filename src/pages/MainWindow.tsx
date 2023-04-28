@@ -1,5 +1,5 @@
 import { Fragment, FunctionComponent, PropsWithChildren, useEffect } from "react";
-import { protocolVersion } from "../../service/src/types/MCMCMonitorRequest";
+import { protocolVersion } from "../../service/src/types";
 import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import Hyperlink from "../components/Hyperlink";
