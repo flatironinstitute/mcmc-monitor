@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,7 +9,8 @@ export default defineConfig({
         enabled: true,
         provider: "c8",
         reporter: ['text', 'lcov']
-    }
+    },
+    exclude: [...configDefaults.exclude, "service/**"]
   },
   plugins: [react()],
   base: "https://flatironinstitute.github.io/mcmc-monitor",
