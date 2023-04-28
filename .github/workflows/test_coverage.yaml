@@ -44,7 +44,7 @@ jobs:
     #     fail_ci_if_error: true
     #     file: ./service/coverage/lcov*.info
     #     flags: svc_tests
-    - name Upload to Codecov
+    - name: Upload to Codecov
       run: |
         pip install codecov
         codecov --token {{ secrets.CODECOV_TOKEN }} --flags gui_units --file ./coverage/lcov.info
