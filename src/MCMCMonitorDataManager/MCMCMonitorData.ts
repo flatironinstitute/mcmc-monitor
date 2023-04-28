@@ -1,12 +1,8 @@
 import React from 'react'
-<<<<<<< HEAD
-import { MCMCChain, MCMCRun, MCMCSequence } from '../../service/src/types'
-=======
+import { MCMCChain, MCMCSequence, getSequenceIdentifier } from '../../service/src/types'
 import { MCMCSequenceUpdate } from '../../service/src/types/MCMCMonitorRequest'
-import { MCMCChain, MCMCSequence, getSequenceIdentifier } from '../../service/src/types/MCMCMonitorTypes'
 import sortedListsAreEqual from '../util/sortedListsAreEqual'
 import { MCMCMonitorAction, MCMCMonitorData, SequenceStatsDict, VariableStatsDict } from './MCMCMonitorDataTypes'
->>>>>>> 2a24564 (Swap reducer to case. Refactor logic to larger units of work.)
 
 
 export const initialMCMCMonitorData: MCMCMonitorData = {
@@ -322,6 +318,7 @@ const invalidateStats = <T extends SequenceStatsDict | VariableStatsDict>(statsD
 }
 
 export {
-    appendData as appendData_TEST, chainsWereUpdated as chainsWereUpdated_TEST,
-    computeEffectiveWarmupIterations as computeEffectiveWarmupIterations_TEST, doChainUpdate as doChainUpdate_TEST, invalidateStats as invalidateStats_TEST
+    addNovelSequences as addNovelSequences_TEST, appendData as appendData_TEST, chainsWereUpdated as chainsWereUpdated_TEST,
+    computeEffectiveWarmupIterations as computeEffectiveWarmupIterations_TEST, doChainUpdate as doChainUpdate_TEST, doSequenceUpdate as doSequenceUpdate_TEST, invalidateStats as invalidateStats_TEST
 }
+
