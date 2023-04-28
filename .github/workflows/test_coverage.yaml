@@ -29,18 +29,24 @@ jobs:
       run: |
         ls -la ./coverage/lcov*.info
         ls -la ./service/coverage/lcov*.info
-    - name: Upload to Codecov (GUI)
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: true
-        file: ./coverage/lcov*.info
-        flags: gui_tests
-    - name: Upload to Codecov (Service)
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: true
-        file: ./service/coverage/lcov*.info
-        flags: svc_tests
+    #   Codecov's action is notoriously flaky
+    # - name: Upload to Codecov (GUI)
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     fail_ci_if_error: true
+    #     file: ./coverage/lcov*.info
+    #     flags: gui_tests
+    # - name: Upload to Codecov (Service)
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     fail_ci_if_error: true
+    #     file: ./service/coverage/lcov*.info
+    #     flags: svc_tests
+    - name Upload to Codecov
+      run: |
+        pip install codecov
+        codecov --token {{ secrets.CODECOV_TOKEN }} --flags gui_units --file ./coverage/lcov.info
+        codecov --token {{ secrets.CODECOV_TOKEN }} --flags svc_units --file ./service/coverage/lcov.info
 
