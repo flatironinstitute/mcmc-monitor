@@ -1,12 +1,21 @@
 import react from '@vitejs/plugin-react'
-import { configDefaults, defineConfig } from 'vitest/config'
+import { configDefaults, coverageConfigDefaults, defineConfig } from 'vitest/config'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   test: {
     mockReset: true,
     coverage: {
+        all: true,
         enabled: true,
+        exclude: [
+            ...coverageConfigDefaults.exclude,
+            "**/*Types.ts",
+            "index.ts",
+            "service/*",
+            "dev-dist/*",
+            "vite*ts"
+        ],
         provider: "c8",
         reporter: ['text', 'lcov']
     },
