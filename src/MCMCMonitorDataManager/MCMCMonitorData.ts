@@ -183,7 +183,7 @@ const doSequenceUpdate = (s: MCMCMonitorData, sequences: MCMCSequenceUpdate[]): 
         sequenceStatsToExpire.push(`${update.runId}/${update.chainId}/${update.variableName}`)
         variableStatsToExpire.push(`${update.runId}/${update.variableName}`)
         // consider assert that key does not already exist--it shouldn't
-        updatedSequences.set(key, {...known, data: appendData(known.data, update.position, update.data)})
+        updatedSequences.set(key, {...known, updateRequested: false, data: appendData(known.data, update.position, update.data)})
     })
     if (updatedSequences.size === 0) return s // no data changes, so don't change reference equality: no need to trigger update
 
