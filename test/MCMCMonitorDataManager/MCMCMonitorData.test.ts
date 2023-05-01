@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { MCMCChain } from '../../service/src/types'
-import { addNovelSequences_TEST, appendData_TEST, chainsWereUpdated_TEST, computeEffectiveWarmupIterations_TEST, detectedWarmupIterationCount, doChainUpdate_TEST, initialMCMCMonitorData, invalidateStats_TEST } from '../../src/MCMCMonitorDataManager/MCMCMonitorData'
-import { MCMCMonitorData, SequenceStatsDict, VariableStatsDict } from '../../src/MCMCMonitorDataManager/MCMCMonitorDataTypes'
+import { MCMCChain, MCMCSequence } from '../../service/src/types'
+import { MCMCSequenceUpdate } from '../../service/src/types/MCMCMonitorRequest'
+import { addNovelSequences_TEST, appendData_TEST, chainsWereUpdated_TEST, computeEffectiveWarmupIterations_TEST, detectedWarmupIterationCount, doChainUpdate_TEST, doSequenceUpdate_TEST, initialMCMCMonitorData, invalidateStats_TEST } from '../../src/MCMCMonitorDataManager/MCMCMonitorData'
+import { MCMCMonitorData, SequenceStats, SequenceStatsDict, VariableStats, VariableStatsDict } from '../../src/MCMCMonitorDataManager/MCMCMonitorDataTypes'
+
+
 
 describe("Detected warmup iteration count", () => {
     let chains: MCMCChain[]
@@ -32,6 +35,112 @@ describe("Detected warmup iteration count", () => {
 
 
 // Tests for private functions--MCMCMonitorData.ts
+
+describe("Sequence update function", () => {
+    let data: MCMCMonitorData
+    let baseSequences: MCMCSequence[]
+
+    const makeUpdateFromBase = (base: MCMCSequence, newData: number[], position?: number): MCMCSequenceUpdate => {
+        return {
+            runId: base.runId,
+            chainId: base.chainId,
+            variableName: base.variableName,
+            position: position ?? base.data.length,
+            data: newData
+        }
+    }
+    beforeEach(() => {
+        baseSequences = [
+            {
+                runId: "1",
+                chainId: "chain1",
+                variableName: "var1",
+                data: [1, 2, 3],
+                updateRequested: true
+            },
+            {
+                runId: "1",
+                chainId: "chain2",
+                variableName: "var1",
+                data: [1, 2, 3, 4, 5],
+                updateRequested: true
+            },
+            {
+                runId: "1",
+                chainId: "chain1",
+                variableName: "var2",
+                data: [1, 2, 3, 4],
+                updateRequested: true
+            }
+        ]
+    
+        const seqStatsDict: SequenceStatsDict = baseSequences.reduce((o, baseSeq) => ({...o, [`${baseSeq.runId}/${baseSeq.chainId}/${baseSeq.variableName}`]: { isUpToDate: true } as any as SequenceStats}), {})
+        const varStatsDict: VariableStatsDict = baseSequences.reduce((o, baseSeq) => ({...o, [`${baseSeq.runId}/${baseSeq.variableName}`]: { isUpToDate: true } as any as VariableStats}), {})
+        data = {
+            sequenceStats: seqStatsDict,
+            variableStats: varStatsDict,
+            sequences: baseSequences
+        } as any as MCMCMonitorData
+    })
+
+    test("Throws if update set contains an unknown key", () => {
+        const unknownNewSequence: MCMCSequenceUpdate[] = [
+            makeUpdateFromBase(baseSequences[0], [1, 2])
+        ]
+        unknownNewSequence[0].runId += "NOT-FOUND"
+        expect(() => doSequenceUpdate_TEST(data, unknownNewSequence)).toThrow(/unknown sequence/)
+    })
+    test("Returns original object if no effective updates", () => {
+        const ineffectiveUpdate = [
+            makeUpdateFromBase(baseSequences[0], [])
+        ]
+        const response = doSequenceUpdate_TEST(data, ineffectiveUpdate)
+        expect(response).toBe(data)
+    })
+    test("Seen sequences without modification have update-requested flag set to false", () => {
+        const ineffectiveUpdate = [
+            makeUpdateFromBase(baseSequences[0], [])
+        ]
+        const response = doSequenceUpdate_TEST(data, ineffectiveUpdate)
+        expect(response.sequences[0].updateRequested).toBeFalsy()
+    })
+    test("Returns a mix of unmodified and updated sequences when sequences have updates", () => {
+        const update = [
+            makeUpdateFromBase(baseSequences[0], [4, 5, 6]),
+            makeUpdateFromBase(baseSequences[2], [4, 5, 6], baseSequences[2].data.length - 1)
+        ]
+        const response = doSequenceUpdate_TEST(data, update)
+        expect(response.sequences.length).toEqual(3)
+        const firstUpdate = response.sequences.filter(s => s.runId === update[0].runId
+            && s.chainId === update[0].chainId && s.variableName === update[0].variableName)[0]
+        const secondUpdate = response.sequences.filter(s => s.runId === update[1].runId
+            && s.chainId === update[1].chainId && s.variableName === update[1].variableName)[0]
+        const unchanged = response.sequences.filter(s => s.updateRequested)[0]
+        expect(firstUpdate.updateRequested).toBeFalsy()
+        expect(secondUpdate.updateRequested).toBeFalsy()
+        expect(unchanged).toBe(baseSequences[1])
+        expect(firstUpdate.data).toEqual([1, 2, 3, 4, 5, 6])
+        expect(secondUpdate.data).toEqual([1, 2, 3, 4, 5, 6])
+    })
+    test("Invalidates statistics of updated sequences/variables", () => {
+        const update = [
+            makeUpdateFromBase(baseSequences[0], [4, 5, 6]),
+            makeUpdateFromBase(baseSequences[2], [4, 5, 6], baseSequences[2].data.length - 1)
+        ]
+        expect(Object.keys(data.sequenceStats).length).toBe(3)
+        expect(Object.keys(data.variableStats).length).toBe(2)
+        const response = doSequenceUpdate_TEST(data, update)
+        expect(Object.keys(response.sequenceStats).length).toBe(3)
+        expect(Object.keys(response.variableStats).length).toBe(2)
+        const updatedSequenceKeys = update.map(u => `${u.runId}/${u.chainId}/${u.variableName}`)
+        const updatedVariableKeys = [...new Set(update.map(u => `${u.runId}/${u.variableName}`))]
+        const unupdatedSequenceKey = `${baseSequences[1].runId}/${baseSequences[1].chainId}/${baseSequences[1].variableName}`
+
+        updatedSequenceKeys.map(k => expect(response.sequenceStats[k].isUpToDate).toBeFalsy())
+        updatedVariableKeys.map(k => expect(response.variableStats[k].isUpToDate).toBeFalsy())
+        expect(response.sequenceStats[unupdatedSequenceKey].isUpToDate).toBeTruthy()
+    })
+})
 
 describe("Novel sequence addition function", () => {
     let mockGetSeqId
