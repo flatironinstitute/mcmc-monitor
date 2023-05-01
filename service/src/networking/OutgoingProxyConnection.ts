@@ -62,6 +62,12 @@ class OutgoingProxyConnection {
             this.#webSocket = undefined
             this.#acknowledged = false
         })
+        ws.on('error', err => {
+            console.error(err)
+            console.warn('Websocket error.')
+            this.#webSocket = undefined
+            this.#acknowledged = false
+        })
         ws.on('message', msg => {                
             const messageJson = msg.toString()
             let message: any
