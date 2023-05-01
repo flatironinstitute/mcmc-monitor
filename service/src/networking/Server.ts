@@ -5,7 +5,7 @@ import fs from 'fs';
 import * as http from 'http';
 import YAML from 'js-yaml';
 import OutputManager from '../logic/OutputManager';
-import { isMCMCMonitorRequest, protocolVersion } from '../types/MCMCMonitorRequest';
+import { isMCMCMonitorRequest, protocolVersion } from '../types/MCMCMonitorRequestTypes';
 import OutgoingProxyConnection from './OutgoingProxyConnection';
 import getPeer from './RemotePeer';
 import SignalCommunicator, { sleepMsec } from './SignalCommunicator';

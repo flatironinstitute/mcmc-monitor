@@ -1,0 +1,52 @@
+name: test coverage
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+    - uses: actions/checkout@v3
+    # TODO: Consider caching dependencies
+    # - uses: actions/cache@v3
+    #   with:
+    #     path: ~/.npm
+    #     key: ${{ runnrer.os }}-node=${{ hashFiles('**/package-lock.json') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-node-
+    - name: Install Dependencies
+      run: |
+        yarn install
+        cd service
+        yarn install
+    - name: Run tests with coverage
+      run: |
+        yarn coverage
+        cd service
+        yarn coverage
+    - name: Prove files exist
+      run: |
+        ls -la ./coverage/lcov*.info
+        ls -la ./service/coverage/lcov*.info
+    #   Codecov's action is notoriously flaky
+    # - name: Upload to Codecov (GUI)
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     fail_ci_if_error: true
+    #     file: ./coverage/lcov*.info
+    #     flags: gui_tests
+    # - name: Upload to Codecov (Service)
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     fail_ci_if_error: true
+    #     file: ./service/coverage/lcov*.info
+    #     flags: svc_tests
+    - name: Upload to Codecov
+      run: |
+        pip install codecov
+        codecov --token ${{ secrets.CODECOV_TOKEN }} --flags gui_units --file ./coverage/lcov.info
+        codecov --token ${{ secrets.CODECOV_TOKEN }} --flags svc_units --file ./service/coverage/lcov.info
+

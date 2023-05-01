@@ -1,7 +1,7 @@
 import WebSocket from 'ws'
 import OutputManager from '../logic/OutputManager'
 import { InitializeMessageFromService, isAcknowledgeMessageToService, isRequestFromClient, PingMessageFromService, RequestFromClient, ResponseToClient } from '../types/ConnectorHttpProxyTypes'
-import { isMCMCMonitorRequest, MCMCMonitorResponse } from '../types/MCMCMonitorRequest'
+import { isMCMCMonitorRequest, MCMCMonitorResponse } from '../types/MCMCMonitorRequestTypes'
 import { handleApiRequest } from './handleApiRequest'
 import SignalCommunicator from './SignalCommunicator'
 

@@ -1,4 +1,4 @@
-import { MCMCMonitorRequest, MCMCMonitorResponse, isMCMCMonitorResponse } from "../../service/src/types/MCMCMonitorRequest"
+import { MCMCMonitorRequest, MCMCMonitorResponse, isMCMCMonitorResponse } from "../../service/src/types"
 import { serviceBaseUrl, useWebrtc, webrtcConnectionToService } from "../config"
 
 const postApiRequest = async (request: MCMCMonitorRequest): Promise<MCMCMonitorResponse> => {
