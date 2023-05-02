@@ -1,6 +1,6 @@
 import { AcknowledgeMessageToService, InitializeMessageFromService, PingMessageFromService, RequestFromClient, ResponseToClient } from "./ConnectorHttpProxyTypes"
 import { MCMCMonitorPeerRequest, MCMCMonitorPeerResponse } from "./MCMCMonitorPeerRequestTypes"
-import { GetChainsForRunRequest, GetChainsForRunResponse, GetRunsRequest, GetRunsResponse, GetSequencesRequest, GetSequencesResponse, MCMCMonitorRequest, MCMCMonitorResponse, ProbeRequest, ProbeResponse, WebrtcSignalingRequest, WebrtcSignalingResponse } from "./MCMCMonitorRequestTypes"
+import { GetChainsForRunRequest, GetChainsForRunResponse, GetRunsRequest, GetRunsResponse, GetSequencesRequest, GetSequencesResponse, MCMCMonitorRequest, MCMCMonitorResponse, MCMCSequenceUpdate, ProbeRequest, ProbeResponse, WebrtcSignalingRequest, WebrtcSignalingResponse } from "./MCMCMonitorRequestTypes"
 import { MCMCChain, MCMCRun, MCMCSequence } from "./MCMCMonitorTypes"
 import { WebsocketMessage } from "./WebsocketMessageTypes"
 import validateObject, { isArrayOf, isBoolean, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
@@ -121,13 +121,17 @@ export const isGetSequencesRequest = (x: any): x is GetSequencesRequest => (
 export const isGetSequencesResponse = (x: any): x is GetSequencesResponse => (
     validateObject(x, {
         type: isEqualTo('getSequencesResponse'),
-        sequences: isArrayOf(y => (validateObject(y, {
-            runId: isString,
-            chainId: isString,
-            variableName: isString,
-            position: isNumber,
-            data: () => (true)
-        })))
+        sequences: isArrayOf(isMCMCSequenceUpdate)
+    })
+)
+
+export const isMCMCSequenceUpdate = (x: any): x is MCMCSequenceUpdate => (
+    validateObject(x, {
+        runId: isString,
+        chainId: isString,
+        variableName: isString,
+        position: isNumber,
+        data: () => (true)
     })
 )
 

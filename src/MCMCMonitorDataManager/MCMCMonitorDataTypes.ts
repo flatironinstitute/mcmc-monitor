@@ -1,4 +1,4 @@
-import { MCMCSequenceUpdate } from '../../service/src/types/MCMCMonitorRequest'
+import { MCMCSequenceUpdate } from '../../service/src/types/'
 import { MCMCChain, MCMCRun, MCMCSequence } from '../../service/src/types/MCMCMonitorTypes'
 
 export type GeneralOpts = {

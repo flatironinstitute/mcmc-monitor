@@ -44,13 +44,16 @@ export type GetSequencesRequest = {
 
 export type GetSequencesResponse = {
     type: 'getSequencesResponse'
-    sequences: {
-        runId: string
-        chainId: string
-        variableName: string
-        position: number
-        data: number[]
-    }[]
+    sequences: MCMCSequenceUpdate[]
+}
+
+
+export type MCMCSequenceUpdate = {
+    runId: string
+    chainId: string
+    variableName: string
+    position: number
+    data: number[]
 }
 
 

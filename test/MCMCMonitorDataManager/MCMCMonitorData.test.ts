@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { MCMCChain, MCMCSequence } from '../../service/src/types'
-import { MCMCSequenceUpdate } from '../../service/src/types/MCMCMonitorRequest'
+import { MCMCChain, MCMCSequence, MCMCSequenceUpdate } from '../../service/src/types'
 import { addNovelSequences_TEST, appendData_TEST, chainsWereUpdated_TEST, computeEffectiveWarmupIterations_TEST, detectedWarmupIterationCount, doChainUpdate_TEST, doSequenceUpdate_TEST, initialMCMCMonitorData, invalidateStats_TEST, mcmcMonitorReducer } from '../../src/MCMCMonitorDataManager/MCMCMonitorData'
 import { MCMCMonitorAction, MCMCMonitorData, SequenceStats, SequenceStatsDict, VariableStats, VariableStatsDict } from '../../src/MCMCMonitorDataManager/MCMCMonitorDataTypes'
 
