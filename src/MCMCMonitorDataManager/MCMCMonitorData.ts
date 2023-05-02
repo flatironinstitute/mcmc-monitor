@@ -1,6 +1,5 @@
 import React from 'react'
-import { MCMCChain, MCMCSequence, getSequenceIdentifier } from '../../service/src/types'
-import { MCMCSequenceUpdate } from '../../service/src/types/MCMCMonitorRequest'
+import { MCMCChain, MCMCSequence, MCMCSequenceUpdate, getSequenceIdentifier } from '../../service/src/types'
 import sortedListsAreEqual from '../util/sortedListsAreEqual'
 import { MCMCMonitorAction, MCMCMonitorData, SequenceStatsDict, VariableStatsDict } from './MCMCMonitorDataTypes'
 
