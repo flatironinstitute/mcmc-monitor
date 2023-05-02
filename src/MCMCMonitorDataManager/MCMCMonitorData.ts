@@ -36,17 +36,14 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
                 runs: a.runs,
                 chains: s.chains.filter(c => (runIds.includes(c.runId)))
             }
-            break
         }
         case "setChainsForRun": {
             return doChainUpdate(s, a.runId, a.chains)
-            break
         }
         case "updateChainsForRun": {
-            const hadUpdates = chainsWereUpdated(a.chains, s.chains)
+            const hadUpdates = chainsWereUpdated(a.runId, a.chains, s.chains)
             if (!hadUpdates) return s // preserve reference equality if nothing changed
             return doChainUpdate(s, a.runId, a.chains)
-            break
         }
         case "setSelectedVariableNames": {
             const sortedVariableNames = [...a.variableNames].sort()
@@ -54,7 +51,6 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
             const newState = {...s, selectedVariableNames: sortedVariableNames}
             addNovelSequences(newState)
             return newState
-            break
         }
         case "setSelectedChainIds": {
             const sortedChainIds = [...a.chainIds].sort()
@@ -62,57 +58,36 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
             const newData = { ...s, selectedChainIds: sortedChainIds }
             addNovelSequences(newData)
             return newData
-            break
         }
         case "setSelectedRunId": {
             if (s.selectedRunId === a.runId) return s
             const newData = { ...s, selectedRunId: a.runId}
             addNovelSequences(newData)
             return newData
-            break
         }
         case "setConnectedToService": {
             return {
                 ...s,
                 connectedToService: a.connected
             }
-            break
         }
         case "setServiceProtocolVersion": {
             return {
                 ...s,
                 serviceProtocolVersion: a.version
             }
-            break
         }
         case "setWebrtcConnectionStatus": {
             return {
                 ...s,
                 webrtcConnectionStatus: a.status
             }
-            break
         }
         case "setUsingProxy": {
             return {
                 ...s,
                 usingProxy: a.usingProxy
             }
-            break
-        }
-        case "updateSequenceData": {
-            if (a.sequences.length === 0) return s
-            return doSequenceUpdate(s, a.sequences)
-            break
-        }
-        case "requestSequenceUpdate": {
-            return {
-                ...s,
-                sequences: s.sequences.map(x => (
-                    (x.runId !== a.runId) ?
-                        x : {...x, updateRequested: true}
-                ))
-            }
-            break
         }
         case "setGeneralOpts": {
             const effectiveWarmupIterations = computeEffectiveWarmupIterations(s, a.opts.requestedInitialDrawsToExclude)
@@ -124,7 +99,19 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
                 effectiveInitialDrawsToExclude: effectiveWarmupIterations,
                 generalOpts: a.opts
             }
-            break
+        }
+        case "updateSequenceData": {
+            if (a.sequences.length === 0) return s
+            return doSequenceUpdate(s, a.sequences)
+        }
+        case "requestSequenceUpdate": {
+            return {
+                ...s,
+                sequences: s.sequences.map(x => (
+                    (x.runId !== a.runId) ?
+                        x : {...x, updateRequested: true}
+                ))
+            }
         }
         case "setSequenceStats": {
             const k = `${a.runId}/${a.chainId}/${a.variableName}`
@@ -135,7 +122,6 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
                     [k]: a.stats
                 }
             }
-            break
         }
         case "setVariableStats": {
             const k = `${a.runId}/${a.variableName}`
@@ -146,10 +132,9 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
                     [k]: a.stats
                 }
             }
-            break
         }
         default: {
-            throw Error(`Unknown reducer action ${a}`)
+            throw Error(`Unknown reducer action ${JSON.stringify(a)}`)
         }
     }
 }
@@ -272,11 +257,11 @@ const doChainUpdate = (s: MCMCMonitorData, runId: string, newChains: MCMCChain[]
 }
 
 
-const chainsWereUpdated = (newChains: MCMCChain[], oldChains: MCMCChain[]): boolean => {
+const chainsWereUpdated = (runId: string, newChains: MCMCChain[], oldChains: MCMCChain[]): boolean => {
     const known: Map<string, number> = new Map()
-    oldChains.forEach(c => known.set(c.chainId, c.lastChangeTimestamp))
-    // There is an update if there are any new chains for which either a) the chain ID was
-    // not yet encountered ( hence "|| -1" ) or b) the new chain update stamp is greater than the old one
+    oldChains.filter(c => c.runId === runId).forEach(c => known.set(c.chainId, c.lastChangeTimestamp))
+    // There is an update if there are any new chains for which either a) the chain ID is not known
+    // (hence "|| -1") or b) the new chain update timestamp is greater (more recent) than the old one
     return (newChains.some(newChain => newChain.lastChangeTimestamp > (known.get(newChain.chainId) || -1)))
 }
 
