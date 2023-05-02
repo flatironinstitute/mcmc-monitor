@@ -19,8 +19,8 @@ export type SequenceStats = {
 export type VariableStats = {
     mean?: number
     stdev?: number
-    ess?: number
     count?: number
+    ess?: number
     rhat?: number
     isUpToDate?: boolean
 }
@@ -28,10 +28,12 @@ export type VariableStats = {
 export type SequenceStatsDict = { [key: string]: SequenceStats }
 export type VariableStatsDict = { [key: string]: VariableStats }
 
+export type WebrtcConnectionStatus = 'unused' | 'pending' | 'connected' | 'error'
+
 export type MCMCMonitorData = {
     connectedToService: boolean | undefined
     serviceProtocolVersion: string | undefined
-    webrtcConnectionStatus: 'unused' | 'pending' | 'connected' | 'error'
+    webrtcConnectionStatus: WebrtcConnectionStatus
     usingProxy: boolean | undefined
     runs: MCMCRun[]
     chains: MCMCChain[]
