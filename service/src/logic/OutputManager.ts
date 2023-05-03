@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { MCMCChain, MCMCRun } from '../types/MCMCMonitorTypes'
+import { MCMCChain, MCMCRun } from '../types'
 import ChainFile from './ChainFile'
 
 class OutputManager {

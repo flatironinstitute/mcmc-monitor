@@ -1,5 +1,4 @@
-import { MCMCSequenceUpdate } from '../../service/src/types/'
-import { MCMCChain, MCMCRun, MCMCSequence } from '../../service/src/types/MCMCMonitorTypes'
+import { MCMCChain, MCMCRun, MCMCSequence, MCMCSequenceUpdate } from '../../service/src/types'
 
 export type GeneralOpts = {
     dataRefreshMode: 'auto' | 'manual'

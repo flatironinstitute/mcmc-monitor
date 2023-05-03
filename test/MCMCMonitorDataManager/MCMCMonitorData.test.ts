@@ -691,7 +691,7 @@ describe("Novel sequence addition function", () => {
     const baseVariables = ["var1", "var2"]
     const mockId = () => {
         mockGetSeqId = vi.fn()
-        vi.doMock('../../service/src/types/MCMCMonitorTypes', () => {
+        vi.doMock('../../service/src/types', () => {
             return {
                 __esModule: true,
                 getSequenceIdentifier: mockGetSeqId
