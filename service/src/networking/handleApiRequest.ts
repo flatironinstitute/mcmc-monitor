@@ -1,6 +1,5 @@
 import OutputManager from "../logic/OutputManager";
-import { isGetChainsForRunRequest, isGetRunsRequest, isGetSequencesRequest, isProbeRequest, isWebrtcSignalingRequest, protocolVersion } from "../types";
-import { GetChainsForRunRequest, GetChainsForRunResponse, GetRunsResponse, GetSequencesRequest, GetSequencesResponse, MCMCMonitorRequest, MCMCMonitorResponse, ProbeResponse, WebrtcSignalingRequest, WebrtcSignalingResponse } from "../types/MCMCMonitorRequestTypes";
+import { GetChainsForRunRequest, GetChainsForRunResponse, GetRunsResponse, GetSequencesRequest, GetSequencesResponse, MCMCMonitorRequest, MCMCMonitorResponse, ProbeResponse, WebrtcSignalingRequest, WebrtcSignalingResponse, isGetChainsForRunRequest, isGetRunsRequest, isGetSequencesRequest, isProbeRequest, isWebrtcSignalingRequest, protocolVersion } from "../types";
 import SignalCommunicator from "./SignalCommunicator";
 
 type apiRequestOptions = {
