@@ -5,11 +5,11 @@ import fs from 'fs';
 import * as http from 'http';
 import YAML from 'js-yaml';
 import OutputManager from '../logic/OutputManager';
-import { isMCMCMonitorRequest, protocolVersion } from '../types/MCMCMonitorRequestTypes';
 import OutgoingProxyConnection from './OutgoingProxyConnection';
 import getPeer from './RemotePeer';
 import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
+import { isMCMCMonitorRequest, protocolVersion } from '../types';
 
 const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173', 'http://localhost:5173']
 const PATH_TO_PACKAGE_JSON = '../../package.json'
