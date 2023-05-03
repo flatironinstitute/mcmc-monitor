@@ -62,7 +62,16 @@ class Server {
                 const outgoingProxyConnection = new OutgoingProxyConnection(publicId, privateId, this.#outputManager, signalCommunicator, {verbose: this.a.verbose, webrtc: true})
                 this.#outgoingProxyConnection = outgoingProxyConnection
                 const proxyUrl = outgoingProxyConnection.url
-                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=1`
+                let canImportWrtc: boolean
+                try {
+                    await import('wrtc')
+                    canImportWrtc = true
+                }
+                catch(err) {
+                    console.warn('Unable to import wrtc')
+                    canImportWrtc = false
+                }
+                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=${canImportWrtc ? "1" : "0"}`
                 console.info('')
                 console.info(`Connect on remote machine: ${urlRemote}`)
                 console.info('')
