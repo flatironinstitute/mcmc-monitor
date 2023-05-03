@@ -1,7 +1,7 @@
-import { WebrtcSignalingRequest, WebrtcSignalingResponse } from "../types/MCMCMonitorRequestTypes";
+import { WebrtcSignalingRequest, WebrtcSignalingResponse } from "../types";
 
 class SignalCommunicator {
-    #onConnectionCallbacks: ((connection: SignalCommunicatorConnection) => void)[] = []
+    #onConnectionCallbacks: ((connection: SignalCommunicatorConnection) => Promise<void>)[] = []
     #connections: {[clientId: string]: SignalCommunicatorConnection} = {}
     async handleRequest(request: WebrtcSignalingRequest): Promise<WebrtcSignalingResponse> {
         if (!(request.clientId in this.#connections)) {
@@ -12,11 +12,11 @@ class SignalCommunicator {
                     delete this.#connections[request.clientId]
                 }
             })
-            this.#onConnectionCallbacks.forEach(cb => {cb(cc)})
+            await Promise.all(this.#onConnectionCallbacks.map(cb => cb(cc)))
         }
         return await this.#connections[request.clientId].handleRequest(request)
     }
-    onConnection(cb: (connection: SignalCommunicatorConnection) => void) {
+    onConnection(cb: (connection: SignalCommunicatorConnection) => Promise<void>) {
         this.#onConnectionCallbacks.push(cb)
     }
 }

@@ -6,7 +6,7 @@ import * as http from 'http';
 import YAML from 'js-yaml';
 import OutputManager from '../logic/OutputManager';
 import OutgoingProxyConnection from './OutgoingProxyConnection';
-import getPeer from './RemotePeer';
+import createPeer from './RemotePeer';
 import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
 import { isMCMCMonitorRequest, protocolVersion } from '../types';
@@ -49,7 +49,7 @@ class Server {
         })
         const signalCommunicator = new SignalCommunicator()
         if (a.enableRemoteAccess) {
-            signalCommunicator.onConnection(connection => { return getPeer(connection, this.#outputManager, signalCommunicator)})
+            signalCommunicator.onConnection(async connection => {createPeer(connection, this.#outputManager, signalCommunicator)})
         }
         const urlLocal = `https://flatironinstitute.github.io/mcmc-monitor?s=http://localhost:${this.a.port}`
         console.info('')
@@ -62,7 +62,16 @@ class Server {
                 const outgoingProxyConnection = new OutgoingProxyConnection(publicId, privateId, this.#outputManager, signalCommunicator, {verbose: this.a.verbose, webrtc: true})
                 this.#outgoingProxyConnection = outgoingProxyConnection
                 const proxyUrl = outgoingProxyConnection.url
-                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=1`
+                let canImportWrtc: boolean
+                try {
+                    await import('wrtc')
+                    canImportWrtc = true
+                }
+                catch(err) {
+                    console.warn('Unable to import wrtc')
+                    canImportWrtc = false
+                }
+                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=${canImportWrtc ? "1" : "0"}`
                 console.info('')
                 console.info(`Connect on remote machine: ${urlRemote}`)
                 console.info('')
