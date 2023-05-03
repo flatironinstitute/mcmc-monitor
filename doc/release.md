@@ -20,7 +20,8 @@ have been made to the service.
 then update the version of the service on NPM:
     - `$ npm login`
     - `$ export TAG=A.B.C # where A.B.C should match the version in package.json`
-    - `$ yarn build && npm publish && git tag $TAG && git push --tags`
+    - Manually enter the command in the "release" verb from `service/package.json`, i.e.:
+    - `$ yarn build && yarn coverage && npm publish && git tag $TAG && git push --tags`
 
 The last command builds and publishes the service and tags the deployed version
 of the code in one serial set of operations.
