@@ -1,4 +1,4 @@
-import { WebrtcSignalingRequest, WebrtcSignalingResponse } from "../types/MCMCMonitorRequestTypes";
+import { WebrtcSignalingRequest, WebrtcSignalingResponse } from "../types";
 
 class SignalCommunicator {
     #onConnectionCallbacks: ((connection: SignalCommunicatorConnection) => Promise<void>)[] = []
@@ -12,9 +12,7 @@ class SignalCommunicator {
                     delete this.#connections[request.clientId]
                 }
             })
-            for (const cb of this.#onConnectionCallbacks) {
-                await cb(cc)
-            }
+            await Promise.all(this.#onConnectionCallbacks.map(cb => cb(cc)))
         }
         return await this.#connections[request.clientId].handleRequest(request)
     }
