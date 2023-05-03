@@ -1,5 +1,4 @@
 import SimplePeer from 'simple-peer';
-import wrtc from 'wrtc';
 import OutputManager from '../logic/OutputManager';
 import { MCMCMonitorPeerResponse, isMCMCMonitorPeerRequest } from '../types';
 import SignalCommunicator, { SignalCommunicatorConnection } from './SignalCommunicator';
@@ -15,7 +14,18 @@ type callbackProps = {
 }
 
 
-const getPeer = (connection: SignalCommunicatorConnection, outputMgr: OutputManager, signalCommunicator: SignalCommunicator) => {
+const createPeer = async (connection: SignalCommunicatorConnection, outputMgr: OutputManager, signalCommunicator: SignalCommunicator): Promise<SimplePeer.Instance | undefined> => {
+    // wrtc is a conditional dependency (doesn't install on some versions of mac os). If it's not available, we can't use webrtc.
+    let wrtc: any
+    try {
+        wrtc = await import('wrtc')
+    }
+    catch(err) {
+        console.error(err)
+        console.warn('Problem importing wrtc. Falling back to non-webrtc connection.')
+        return undefined
+    }
+
     const peer = new SimplePeer({initiator: false, wrtc})
     const id = Math.random().toString(36).substring(2, 10)
     const props: callbackProps = {
@@ -113,4 +123,4 @@ const onConnectionSignal = (signal: string, props: callbackProps) => {
 }
 
 
-export default getPeer
+export default createPeer

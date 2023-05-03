@@ -6,7 +6,7 @@ import * as http from 'http';
 import YAML from 'js-yaml';
 import OutputManager from '../logic/OutputManager';
 import OutgoingProxyConnection from './OutgoingProxyConnection';
-import getPeer from './RemotePeer';
+import createPeer from './RemotePeer';
 import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
 import { isMCMCMonitorRequest, protocolVersion } from '../types';
@@ -49,7 +49,7 @@ class Server {
         })
         const signalCommunicator = new SignalCommunicator()
         if (a.enableRemoteAccess) {
-            signalCommunicator.onConnection(connection => { return getPeer(connection, this.#outputManager, signalCommunicator)})
+            signalCommunicator.onConnection(async connection => {createPeer(connection, this.#outputManager, signalCommunicator)})
         }
         const urlLocal = `https://flatironinstitute.github.io/mcmc-monitor?s=http://localhost:${this.a.port}`
         console.info('')
