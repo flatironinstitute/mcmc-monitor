@@ -82,12 +82,22 @@ describe("Post API Request function", () => {
         expect(nonProbeResponse).toBe(webrtcMockResponse)
     })
 
-    test("postApiRequest webrtc throws if invalid connection to service", async () => {
+    test("postApiRequest webrtc falls back to http if service connection is invalid", async () => {
+        const myFetch = vi.fn(fetchFactory())
+        global.fetch = myFetch
         mockConfig(true, true)
         const postApiRequest = await importFunctionUnderTest()
-        await expect(() => postApiRequest(myNonProbeRequest)).rejects.toThrow(/No webrtc connection/)
-        vi.spyOn(console, 'warn').mockRestore()
+        const resp = await postApiRequest(myNonProbeRequest)
+        expect(myFetch).toHaveBeenCalledOnce()
+        expect(isMCMCMonitorResponse(resp)).toBeTruthy()
     })
+
+    // test("postApiRequest webrtc throws if invalid connection to service", async () => {
+    //     mockConfig(true, true)
+    //     const postApiRequest = await importFunctionUnderTest()
+    //     await expect(() => postApiRequest(myNonProbeRequest)).rejects.toThrow(/No webrtc connection/)
+    //     vi.spyOn(console, 'warn').mockRestore()
+    // })
 
     test("postApiRequest with webrtc uses non-webrtc for probe or signaling request", async () => {
         const myFetch = vi.fn(fetchFactory())
