@@ -1,10 +1,9 @@
 import SimplePeer from 'simple-peer';
 import wrtc from 'wrtc';
 import OutputManager from '../logic/OutputManager';
-import { MCMCMonitorPeerResponse } from '../types/MCMCMonitorPeerRequestTypes';
+import { MCMCMonitorPeerResponse, isMCMCMonitorPeerRequest } from '../types';
 import SignalCommunicator, { SignalCommunicatorConnection } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
-import { isMCMCMonitorPeerRequest } from '../types';
 
 
 type callbackProps = {

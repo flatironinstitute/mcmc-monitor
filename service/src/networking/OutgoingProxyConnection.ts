@@ -1,10 +1,8 @@
 import WebSocket from 'ws'
 import OutputManager from '../logic/OutputManager'
-import { isAcknowledgeMessageToService, isMCMCMonitorRequest, isRequestFromClient } from '../types'
-import { InitializeMessageFromService, PingMessageFromService, RequestFromClient, ResponseToClient } from '../types/ConnectorHttpProxyTypes'
-import { MCMCMonitorResponse } from '../types/MCMCMonitorRequestTypes'
-import { handleApiRequest } from './handleApiRequest'
+import { InitializeMessageFromService, MCMCMonitorResponse, PingMessageFromService, RequestFromClient, ResponseToClient, isAcknowledgeMessageToService, isMCMCMonitorRequest, isRequestFromClient } from '../types'
 import SignalCommunicator from './SignalCommunicator'
+import { handleApiRequest } from './handleApiRequest'
 
 const proxyUrl = process.env['MCMC_MONITOR_PROXY'] || `https://mcmc-monitor-proxy.herokuapp.com`
 const proxySecret = process.env['MCMC_MONITOR_PROXY_SECRET'] || 'mcmc-monitor-no-secret'
