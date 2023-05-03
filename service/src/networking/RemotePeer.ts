@@ -4,6 +4,7 @@ import OutputManager from '../logic/OutputManager';
 import { MCMCMonitorPeerResponse, isMCMCMonitorPeerRequest } from '../types';
 import SignalCommunicator, { SignalCommunicatorConnection } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
+import { isMCMCMonitorPeerRequest } from '../types';
 
 
 type callbackProps = {
