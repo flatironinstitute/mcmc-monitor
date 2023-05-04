@@ -7,9 +7,6 @@ const handleAcceptCookie = () => {
     const analyticsTag = import.meta.env.VITE_GOOGLE_ANALYTICS_ID
     if (analyticsTag) {
         ReactGA.initialize(analyticsTag)
-        console.log(`Recorded page view with configured analytics tag ${analyticsTag}`)
-    } else {
-        console.log(`Analytics ID not defined: error in deployment`)
     }
 }
 
