@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react'
 import { configDefaults, coverageConfigDefaults, defineConfig } from 'vitest/config'
+// import { VitePluginRadar } from 'vite-plugin-radar'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -21,7 +22,14 @@ export default defineConfig({
     },
     exclude: [...configDefaults.exclude, "service/**"]
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    // VitePluginRadar({
+    //     analytics: [{
+    //         id: 'G-33SWX083FG'
+    //     }]
+    // })
+],
   base: "https://flatironinstitute.github.io/mcmc-monitor",
   resolve: {
     alias: {
