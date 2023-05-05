@@ -33,8 +33,7 @@ const CookieBanner: FunctionComponent = () => {
             onDecline={handleDeclineCookie}
         >
             This website uses an analytics cookie to count page views and estimate
-            the size of the user base. No advertising information is collected, but
-            you may opt out entirely if you wish.
+            the size of the user base. No advertising information is collected.
         </CookieConsent>
     )
 }
