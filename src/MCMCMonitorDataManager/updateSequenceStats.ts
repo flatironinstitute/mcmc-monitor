@@ -1,4 +1,4 @@
-import { MCMCMonitorAction, MCMCMonitorData, SequenceStats } from "./MCMCMonitorData";
+import { MCMCMonitorAction, MCMCMonitorData, SequenceStats } from "./MCMCMonitorDataTypes";
 import { ess } from "./stats/ess";
 
 const CALCULATION_BUDGET_MS = 200

@@ -1,4 +1,4 @@
-import { MCMCMonitorAction, MCMCMonitorData, SequenceStats, VariableStats } from "./MCMCMonitorData";
+import { MCMCMonitorAction, MCMCMonitorData, SequenceStats, VariableStats } from "./MCMCMonitorDataTypes";
 import { computeMean, computeStdev } from "./updateSequenceStats";
 
 export default async function updateVariableStats(data: MCMCMonitorData, dispatch: (a: MCMCMonitorAction) => void) {
