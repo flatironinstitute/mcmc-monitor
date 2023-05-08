@@ -1,8 +1,9 @@
 import { KeyboardArrowDown, KeyboardArrowRight } from "@mui/icons-material";
 import { Checkbox, FormControlLabel, Grid, IconButton } from "@mui/material";
-import { FunctionComponent, useMemo, useReducer, useState } from "react";
+import { FunctionComponent, useReducer, useState } from "react";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import AutocorrelationPlot from "../components/AutocorrelationPlot";
+import { useSequenceDrawRange } from "./DiagnosticsTab";
 import { PlotSize, PlotSizeSelector } from "./ScatterplotsTab";
 
 type Props = {
@@ -10,16 +11,6 @@ type Props = {
 	numDrawsForRun: number
 	width: number
 	height: number
-}
-
-export const useSequenceDrawRange = (numDrawsForRun: number) => {
-	const {effectiveInitialDrawsToExclude} = useMCMCMonitor()
-
-	const sequenceDrawRange: [number, number] | undefined = useMemo(() => {
-		return [Math.min(effectiveInitialDrawsToExclude, numDrawsForRun), numDrawsForRun]
-	}, [numDrawsForRun, effectiveInitialDrawsToExclude])
-
-	return sequenceDrawRange
 }
 
 // Todo: repurpose this for whether or not to display the warmup iterations

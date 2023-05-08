@@ -4,15 +4,7 @@ import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import RunControlPanel from "../components/RunControlPanel";
 import Splitter from "../components/Splitter";
-import AutoCorrelationTab from "../tabs/AutoCorrelationTab";
-import ConnectionTab from "../tabs/ConnectionTab";
-import Diagnostics from "../tabs/DiagnosticsTab";
-import ExportTab from "../tabs/ExportTab";
-import HistogramTab from "../tabs/HistogramTab";
-import RunInfoTab from "../tabs/RunInfoTab";
-import ScatterplotsTab from "../tabs/ScatterplotsTab";
-import TabWidget from "../tabs/TabWidget/TabWidget";
-import TablesTab from "../tabs/TablesTab/TablesTab";
+import { AutoCorrelationTab, ConnectionTab, Diagnostics, ExportTab, HistogramTab, RunInfoTab, ScatterplotsTab, TabWidget, TablesTab } from "../tabs";
 import { chainColorForIndex } from "../util/chainColorList";
 import useWindowDimensions from "../util/useWindowDimensions";
 
