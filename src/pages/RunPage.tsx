@@ -145,12 +145,14 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, numD
                 width={0}
                 height={0}
                 runId={runId}
+                chainColors={chainColors}
                 numDrawsForRun={numDrawsForRun}
             />
             <HistogramTab
                 width={0}
                 height={0}
                 runId={runId}
+                chainColors={chainColors}
                 numDrawsForRun={numDrawsForRun}
             />
 			<RunInfoTab

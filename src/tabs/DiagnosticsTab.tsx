@@ -1,143 +1,70 @@
-import { KeyboardArrowDown, KeyboardArrowRight } from "@mui/icons-material";
-import { Checkbox, FormControlLabel, Grid, IconButton } from "@mui/material";
+import { Grid } from "@mui/material";
 import { FunctionComponent, useMemo, useReducer, useState } from "react";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
+import CollapsibleElement from '../components/CollapsibleElement';
 import SequencePlot from "../components/SequencePlot";
-import { PlotSize, PlotSizeSelector } from "./ScatterplotsTab";
+import DiagnosticsTabFrame from "./DiagnosticsTabFrame";
+import { CollapsibleContentTabProps, PlotSize, collapsedVariablesReducer, scaleForPlotSize, useSequenceDrawRange } from "./TabsUtility";
 
-type Props = {
-	runId: string
-	numDrawsForRun: number
-	chainColors: {[chainId: string]: string}
-	width: number
-	height: number
+
+type DiagnosticPlotProps = CollapsibleContentTabProps & {
+    sizeScale: number
+    selectedVariableName: string
 }
 
-export const useSequenceDrawRange = (numDrawsForRun: number) => {
-	const {effectiveInitialDrawsToExclude} = useMCMCMonitor()
+const DiagnosticPlot: FunctionComponent<DiagnosticPlotProps> = (props) => {
+    const { runId, chainColors, numDrawsForRun, sizeScale, selectedVariableName, width } = props
+    const { selectedChainIds, effectiveInitialDrawsToExclude } = useMCMCMonitor()
+    const samplesRange = useSequenceDrawRange(numDrawsForRun, effectiveInitialDrawsToExclude)
 
-	const sequenceDrawRange: [number, number] | undefined = useMemo(() => {
-		return [Math.min(effectiveInitialDrawsToExclude, numDrawsForRun), numDrawsForRun]
-	}, [numDrawsForRun, effectiveInitialDrawsToExclude])
-
-	return sequenceDrawRange
+    return (
+        <Grid item key="sequence-plot">
+            <SequencePlot
+                runId={runId}
+                chainIds={selectedChainIds}
+                chainColors={chainColors}
+                variableName={selectedVariableName}
+                highlightDrawRange={samplesRange}
+                width={Math.min(width, 700 * sizeScale)}
+                height={450 * sizeScale}
+            />
+        </Grid>
+    )
 }
 
-// Todo: repurpose this for whether or not to display the warmup iterations
-// as part of the graphs
-type DiagnosticsSelection = {
-	timeseries: boolean
-}
+const Diagnostics: FunctionComponent<CollapsibleContentTabProps> = (props) => {
+    const { width, height } = props
+    const {selectedVariableNames } = useMCMCMonitor()
+    const [collapsedVariables, collapsedVariablesDispatch] = useReducer(collapsedVariablesReducer, {})
+    const [plotSize, setPlotSize] = useState<PlotSize>('medium')
+    const sizeScale = useMemo(() => scaleForPlotSize(plotSize), [plotSize])
+    
+    const plots = selectedVariableNames.map(v => {
+        return (
+            <CollapsibleElement
+                key={v}
+                variableName={v}
+                isCollapsed={collapsedVariables[v]}
+                collapsedDispatch={collapsedVariablesDispatch}
+            >
+                <DiagnosticPlot
+                    {...props}
+                    selectedVariableName={v}
+                    sizeScale={sizeScale}
+                />
+            </CollapsibleElement>)
+    })
 
-const initialDiagnosticsSelection: DiagnosticsSelection = {
-	timeseries: true,
-}
-
-type CollapsedVariablesState = {[variableName: string]: boolean}
-
-type CollapsedVariablesAction = {
-	type: 'toggle'
-	variableName: string
-}
-
-const collapsedVariablesReducer = (s: CollapsedVariablesState, a: CollapsedVariablesAction): CollapsedVariablesState => {
-	if (a.type === 'toggle') {
-		return {
-			...s,
-			[a.variableName]: s[a.variableName] ? false : true
-		}
-	}
-	else return s
-}
-
-const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColors, width, height}) => {
-	const {selectedVariableNames, selectedChainIds} = useMCMCMonitor()
-
-	const [collapsedVariables, collapsedVariablesDispatch] = useReducer(collapsedVariablesReducer, {})
-
-	const sequenceHistogramDrawRange = useSequenceDrawRange(numDrawsForRun)
-
-	const [diagnosticsSelection, setDiagnosticsSelection] = useState<DiagnosticsSelection>(initialDiagnosticsSelection)
-
-	const [plotSize, setPlotSize] = useState<PlotSize>('medium')
-
-	const sizeScale = plotSize === 'small' ? 0.7 : plotSize === 'medium' ? 1 : plotSize === 'large' ? 1.3 : plotSize === 'xlarge' ? 1.6 : 1
-
-	return (
-		<div style={{position: 'absolute', width, height, overflowY: 'auto'}}>
-			<Grid container>
-				<DiagnosticsSelectionSelector diagnosticsSelection={diagnosticsSelection} setDiagnosticsSelection={setDiagnosticsSelection} />
-				<PlotSizeSelector plotSize={plotSize} setPlotSize={setPlotSize} />
-			</Grid>
-			{
-				selectedVariableNames.map(v => (
-					<div key={v}>
-						<div style={{position: 'relative', border: 'solid 2px gray', paddingLeft: 12}}>
-							<h2>
-								<CollapseControl collapsed={collapsedVariables[v]} onToggle={() => collapsedVariablesDispatch({type: 'toggle', variableName: v})} />
-								{v}
-							</h2>
-							{
-								!collapsedVariables[v] &&
-								<Grid container spacing={3}>
-									<Grid item key="sequence-plot">
-										<SequencePlot
-											runId={runId}
-											chainIds={selectedChainIds}
-											chainColors={chainColors}
-											variableName={v}
-											highlightDrawRange={sequenceHistogramDrawRange}
-											width={Math.min(width, 700 * sizeScale)}
-											height={450 * sizeScale}
-										/>
-									</Grid>
-								</Grid>
-							}
-						</div>
-						<div>&nbsp;</div>
-					</div>
-				))
-			}
-			<div>&nbsp;</div>
-		</div>
-	)
-}
-
-const CollapseControl: FunctionComponent<{collapsed: boolean, onToggle: () => void}> = ({collapsed, onToggle}) => {
-	if (collapsed) {
-		return <IconButton onClick={onToggle}><KeyboardArrowRight /></IconButton>
-	}
-	else {
-		return <IconButton onClick={onToggle}><KeyboardArrowDown /></IconButton>
-	}
-}
-
-const selectorItems = [
-	{
-		key: 'timeseries',
-		label: 'show timeseries'
-	},
-]
-
-const DiagnosticsSelectionSelector: FunctionComponent<{diagnosticsSelection: DiagnosticsSelection, setDiagnosticsSelection: (a: DiagnosticsSelection) => void}> = ({diagnosticsSelection, setDiagnosticsSelection}) => {
-	return (
-		<div>
-			{
-				selectorItems.map(item => (
-					<FormControlLabel
-						key={item.key}
-						control={
-							<Checkbox
-								checked={(diagnosticsSelection as any)[item.key]}
-								onClick={() => setDiagnosticsSelection({...diagnosticsSelection, [item.key]: !(diagnosticsSelection as any)[item.key]})}
-							/>
-						}
-						label={item.label}
-					/>
-				))
-			}
-		</div>
-	)
+    return (
+        <DiagnosticsTabFrame
+            width={width}
+            height={height}
+            plotSize={plotSize}
+            setPlotSize={setPlotSize}
+        >
+            {plots}
+        </DiagnosticsTabFrame>
+    )
 }
 
 export default Diagnostics
