@@ -1,5 +1,7 @@
 import SimplePeer from "simple-peer";
 import { MCMCMonitorPeerRequest, MCMCMonitorRequest, MCMCMonitorResponse, WebrtcSignalingRequest, isMCMCMonitorPeerResponse } from "../../service/src/types";
+import randomAlphaString from "../util/randomAlphaString";
+import sleepMsec from "../util/sleepMsec";
 import postApiRequest from "./postApiRequest";
 
 class WebrtcConnectionToService {
@@ -95,26 +97,6 @@ class WebrtcConnectionToService {
     public get status() {
         return this.#status
     }
-}
-
-export const randomAlphaString = (num_chars: number) => {
-    if (!num_chars) {
-        throw Error('randomAlphaString: num_chars needs to be a positive integer.')
-    }
-    let text = ""
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    for (let i = 0; i < num_chars; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length))
-    }
-    return text
-}
-
-export const sleepMsec = async (msec: number): Promise<void> => {
-    return new Promise<void>((resolve) => {
-        setTimeout(() => {
-            resolve()
-        }, msec)
-    })
 }
 
 export default WebrtcConnectionToService
