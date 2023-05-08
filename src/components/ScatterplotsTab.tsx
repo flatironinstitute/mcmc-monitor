@@ -3,7 +3,6 @@ import { FunctionComponent, useMemo, useState } from "react";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import { useSequenceDrawRange } from "./DiagnosticsTab";
 import MatrixOfPlots from "./MatrixOfPlots";
-import SequenceHistogram from "./SequenceHistogram";
 import SequenceScatterplot from "./SequenceScatterplot";
 import SequenceScatterplot3D from "./SequenceScatterplot3D";
 
@@ -18,6 +17,10 @@ type Props = {
 type Mode = '2d-matrix' | '2d' | '3d'
 
 export type PlotSize = 'small' | 'medium' | 'large' | 'xlarge'
+
+const MAX_2D_PLOTS = 20
+const MAX_2D_MATRIX_PLOTS = 5
+const MAX_3D_PLOTS = 10
 
 function sizeForPlotSize(ps: PlotSize) {
 	if (ps === 'small') return { x: 200, y: 200 }
@@ -47,7 +50,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 
 	const variablePairs = useMemo(() => {
 		let ret: { v1: string, v2: string, show: boolean }[] = []
-		const vnames = mode === '2d-matrix' ? selectedVariableNames.slice(0, 5) : selectedVariableNames
+		const vnames = mode === '2d-matrix' ? selectedVariableNames.slice(0, MAX_2D_MATRIX_PLOTS) : selectedVariableNames
 		if (mode === '2d-matrix') {
 			if (vnames.length > 1) {
 				for (let i = 0; i < vnames.length; i++) {
@@ -66,12 +69,14 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 		}
 
 		if (mode === '2d-matrix') {
-			if (selectedVariableNames.length > 5) {
+			if (selectedVariableNames.length > MAX_2D_MATRIX_PLOTS) {
 				setTooMany(true)	
-			}
+			} else {
+                setTooMany(false)
+            }
 		}
-		else if (ret.length > 20) {
-			ret = ret.slice(0, 20)
+		else if (ret.length > MAX_2D_PLOTS) {
+			ret = ret.slice(0, MAX_2D_PLOTS)
 			setTooMany(true)
 		}
 		else setTooMany(false)
@@ -87,8 +92,8 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 				}
 			}
 		}
-		if (ret.length > 10) {
-			ret = ret.slice(0, 10)
+		if (ret.length > MAX_3D_PLOTS) {
+			ret = ret.slice(0, MAX_3D_PLOTS)
 			setTooMany3D(true)
 		}
 		else setTooMany3D(false)
@@ -106,17 +111,17 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 			<div style={{ position: 'absolute', top: 70, width, height: height - 100, overflowY: 'auto' }}>
 				{
 					tooMany && (mode === '2d') && (
-						<div>Too many variables selected, only showing first 20 plots.</div>
+						<div>Too many variables selected, only showing first {MAX_2D_PLOTS} plots.</div>
 					)
 				}
 				{
 					tooMany && (mode === '2d-matrix') && (
-						<div>Too many variables selected, only showing first 5 variables.</div>
+						<div>Too many variables selected, only showing first {MAX_2D_MATRIX_PLOTS} variables.</div>
 					)
 				}
 				{
 					tooMany3D && (mode === '3d') && (
-						<div>Too many variables selected, only showing first 10 3D plots.</div>
+						<div>Too many variables selected, only showing first {MAX_3D_PLOTS} 3D plots.</div>
 					)
 				}
 				{
@@ -128,47 +133,38 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 						<Grid container spacing={3}>
 							{
 								['2d-matrix'].includes(mode) &&
-								<MatrixOfPlots
-									numColumns={Math.min(5, selectedVariableNames.length)}
-									width={width}
-								>
-									{
-										variablePairs.map(({ v1, v2, show }, ii) => (
-											show ? (
-												v1 != v2 ? (
-													<SequenceScatterplot
-														key={ii}
-														runId={runId}
-														chainIds={selectedChainIds}
-														xVariableName={v1}
-														yVariableName={v2}
-														highlightDrawRange={sequenceHistogramDrawRange}
-														chainColors={chainColors}
-														width={0}
-														height={0}
-													/>
-												) : (
-													<SequenceHistogram
-														key={ii}
-														runId={runId}
-														chainId={selectedChainIds}
-														title=""
-														variableName={v1}
-														drawRange={sequenceHistogramDrawRange}
-														width={0}
-														height={0}
-													/>
-												)
-											) : (
-												<EmptyPlotItem
-													key={ii}
-													width={0}
-													height={0}
-												/>
-											)
-										))
-									}
-								</MatrixOfPlots>
+                                <div style={{paddingTop: 24}}>
+                                    <MatrixOfPlots
+                                        numColumns={Math.min(5, selectedVariableNames.length)}
+                                        width={width}
+                                    >
+                                        {
+                                            variablePairs.map(({ v1, v2, show }, ii) => (
+                                                show ?
+                                                    (v1 != v2 ? (
+                                                        <SequenceScatterplot
+                                                            key={ii}
+                                                            runId={runId}
+                                                            chainIds={selectedChainIds}
+                                                            xVariableName={v1}
+                                                            yVariableName={v2}
+                                                            highlightDrawRange={sequenceHistogramDrawRange}
+                                                            chainColors={chainColors}
+                                                            width={0}
+                                                            height={0}
+                                                        />
+                                                    ) : <div />)
+                                                : (
+                                                    <EmptyPlotItem
+                                                        key={ii}
+                                                        width={0}
+                                                        height={0}
+                                                    />
+                                                )
+                                            ))
+                                        }
+                                    </MatrixOfPlots>
+                                </div>
 							}
 							{
 								['2d'].includes(mode) && variablePairs.map(({ v1, v2 }, ii) => (
