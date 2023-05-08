@@ -8,7 +8,6 @@ import { PlotSize, PlotSizeSelector } from "./ScatterplotsTab";
 type Props = {
 	runId: string
 	numDrawsForRun: number
-	chainColors: {[chainId: string]: string}
 	width: number
 	height: number
 }
@@ -24,7 +23,7 @@ export const useSequenceDrawRange = (numDrawsForRun: number) => {
 }
 
 // Todo: repurpose this for whether or not to display the warmup iterations
-// as part of the graphs
+// as part of the dataset
 type DiagnosticsSelection = {
 	acf: boolean
 }
@@ -116,14 +115,6 @@ const CollapseControl: FunctionComponent<{collapsed: boolean, onToggle: () => vo
 }
 
 const selectorItems = [
-	{
-		key: 'timeseries',
-		label: 'show timeseries'
-	},
-	{
-		key: 'histogram',
-		label: 'show histograms'
-	},
 	{
 		key: 'acf',
 		label: 'show ACFs'

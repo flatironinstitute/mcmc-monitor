@@ -1,11 +1,11 @@
 import { FormControl, Grid, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { FunctionComponent, useMemo, useState } from "react";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
+import MatrixOfPlots from "../components/MatrixOfPlots";
+import SequenceHistogram from "../components/SequenceHistogram";
+import SequenceScatterplot from "../components/SequenceScatterplot";
+import SequenceScatterplot3D from "../components/SequenceScatterplot3D";
 import { useSequenceDrawRange } from "./DiagnosticsTab";
-import MatrixOfPlots from "./MatrixOfPlots";
-import SequenceHistogram from "./SequenceHistogram";
-import SequenceScatterplot from "./SequenceScatterplot";
-import SequenceScatterplot3D from "./SequenceScatterplot3D";
 
 type Props = {
 	runId: string

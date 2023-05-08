@@ -4,9 +4,11 @@ import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import RunControlPanel from "../components/RunControlPanel";
 import Splitter from "../components/Splitter";
+import AutoCorrelationTab from "../tabs/AutoCorrelationTab";
 import ConnectionTab from "../tabs/ConnectionTab";
 import Diagnostics from "../tabs/DiagnosticsTab";
 import ExportTab from "../tabs/ExportTab";
+import HistogramTab from "../tabs/HistogramTab";
 import RunInfoTab from "../tabs/RunInfoTab";
 import ScatterplotsTab from "../tabs/ScatterplotsTab";
 import TabWidget from "../tabs/TabWidget/TabWidget";
@@ -119,6 +121,8 @@ type RightContentProps = {
 const tabs = [
 	{label: 'Diagnostics', closeable: false},
 	{label: 'Tables', closeable: false},
+    {label: 'Autocorrelations', closeable: false},
+    {label: 'Histograms', closeable: false},
 	{label: 'Run Info', closeable: false},
 	{label: 'Scatterplots', closeable: false},
 	{label: 'Export', closeable: false},
@@ -145,6 +149,18 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, numD
 				width={0}
 				height={0}
 			/>
+            <AutoCorrelationTab
+                width={0}
+                height={0}
+                runId={runId}
+                numDrawsForRun={numDrawsForRun}
+            />
+            <HistogramTab
+                width={0}
+                height={0}
+                runId={runId}
+                numDrawsForRun={numDrawsForRun}
+            />
 			<RunInfoTab
 				width={0}
 				height={0}
