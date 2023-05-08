@@ -2,10 +2,8 @@ import { KeyboardArrowDown, KeyboardArrowRight } from "@mui/icons-material";
 import { Checkbox, FormControlLabel, Grid, IconButton } from "@mui/material";
 import { FunctionComponent, useMemo, useReducer, useState } from "react";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
-import AutocorrelationPlot from "./AutocorrelationPlot";
+import SequenceHistogram from "../components/SequenceHistogram";
 import { PlotSize, PlotSizeSelector } from "./ScatterplotsTab";
-import SequenceHistogram from "./SequenceHistogram";
-import SequencePlot from "./SequencePlot";
 
 type Props = {
 	runId: string
@@ -25,16 +23,14 @@ export const useSequenceDrawRange = (numDrawsForRun: number) => {
 	return sequenceDrawRange
 }
 
+// Todo: repurpose this for whether or not to display the warmup iterations
+// as part of the graphs
 type DiagnosticsSelection = {
-	timeseries: boolean
 	histogram: boolean
-	acf: boolean
 }
 
 const initialDiagnosticsSelection: DiagnosticsSelection = {
-	timeseries: true,
 	histogram: true,
-	acf: true
 }
 
 type CollapsedVariablesState = {[variableName: string]: boolean}
@@ -54,7 +50,7 @@ const collapsedVariablesReducer = (s: CollapsedVariablesState, a: CollapsedVaria
 	else return s
 }
 
-const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColors, width, height}) => {
+const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, width, height}) => {
 	const {selectedVariableNames, selectedChainIds} = useMCMCMonitor()
 
 	const [collapsedVariables, collapsedVariablesDispatch] = useReducer(collapsedVariablesReducer, {})
@@ -84,20 +80,9 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 							{
 								!collapsedVariables[v] &&
 								<Grid container spacing={3}>
-									<Grid item key="sequence-plot">
-										{diagnosticsSelection.timeseries && <SequencePlot
-											runId={runId}
-											chainIds={selectedChainIds}
-											chainColors={chainColors}
-											variableName={v}
-											highlightDrawRange={sequenceHistogramDrawRange}
-											width={Math.min(width, 700 * sizeScale)}
-											height={450 * sizeScale}
-										/>}
-									</Grid>
 									{
 										// histograms for individual chains
-										diagnosticsSelection.histogram && selectedChainIds.map(chainId => (
+										selectedChainIds.map(chainId => (
 											<Grid item key={chainId}>
 												<SequenceHistogram
 													runId={runId}
@@ -113,33 +98,17 @@ const Diagnostics: FunctionComponent<Props> = ({runId, numDrawsForRun, chainColo
 									}
 									{
 										// histogram for all chains
-										diagnosticsSelection.histogram && (
-											<Grid item key={"___all_chains"}>
-												<SequenceHistogram
-													runId={runId}
-													chainId={selectedChainIds}
-													title="All selected chains"
-													variableName={v}
-													drawRange={sequenceHistogramDrawRange}
-													width={Math.min(width, 300 * sizeScale)}
-													height={450 * sizeScale}
-												/>
-											</Grid>
-										)
-									}
-									{
-										diagnosticsSelection.acf && selectedChainIds.map(chainId => (
-											<Grid item key={chainId}>
-												<AutocorrelationPlot
-													runId={runId}
-													chainId={chainId}
-													variableName={v}
-													drawRange={sequenceHistogramDrawRange}
-													width={Math.min(width, 300 * sizeScale)}
-													height={450 * sizeScale}
-												/>
-											</Grid>
-										))
+                                        <Grid item key={"___all_chains"}>
+                                            <SequenceHistogram
+                                                runId={runId}
+                                                chainId={selectedChainIds}
+                                                title="All selected chains"
+                                                variableName={v}
+                                                drawRange={sequenceHistogramDrawRange}
+                                                width={Math.min(width, 300 * sizeScale)}
+                                                height={450 * sizeScale}
+                                            />
+                                        </Grid>
 									}
 								</Grid>
 							}
