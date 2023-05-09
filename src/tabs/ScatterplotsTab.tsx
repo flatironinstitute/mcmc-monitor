@@ -135,7 +135,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
                                                             width={0}
                                                             height={0}
                                                         />
-                                                    ) : <div />)
+                                                    ) : <div key={`${v1}-${v2}`} />)
                                                 : (
                                                     <EmptyPlotItem
                                                         key={ii}

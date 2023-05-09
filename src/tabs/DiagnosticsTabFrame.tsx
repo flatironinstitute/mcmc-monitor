@@ -20,7 +20,7 @@ const DiagnosticsTabFrame: FunctionComponent<PropsWithChildren<DiagnosticsTabFra
                 <ExcludeWarmupsSelector excludeWarmups={excludeWarmups} setExcludeWarmups={setExcludeWarmups} />
                 <PlotSizeSelector plotSize={plotSize} setPlotSize={setPlotSize} />
             </Grid>
-            {children}
+                {children}
             <div>&nbsp;</div>
         </div>
     )
