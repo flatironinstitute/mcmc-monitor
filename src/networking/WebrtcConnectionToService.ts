@@ -101,7 +101,6 @@ class WebrtcConnectionToService {
     }
 }
 
-<<<<<<< HEAD
 export const sendWebrtcSignal = async (clientId: string, peer: SimplePeer.Instance, s: SimplePeer.SignalData | undefined) => {
     const request: WebrtcSignalingRequest = {
         type: 'webrtcSignalingRequest',
@@ -118,6 +117,4 @@ export const sendWebrtcSignal = async (clientId: string, peer: SimplePeer.Instan
     }
 }
 
-=======
->>>>>>> 3258797 (Separate utility functions. Outline tests for web rtc cnxn.)
 export default WebrtcConnectionToService
