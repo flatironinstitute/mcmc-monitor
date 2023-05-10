@@ -3,7 +3,7 @@ import { Fragment, FunctionComponent, useMemo, useReducer, useState } from "reac
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import CollapsibleElement from "../components/CollapsibleElement";
 import SequenceHistogram from "../components/SequenceHistogram";
-import DiagnosticsTabFrame from "./DiagnosticsTabFrame";
+import CollapsibleTabFrame from "./CollapsibleTabFrame";
 import { CollapsibleContentTabProps, PlotSize, collapsedVariablesReducer, scaleForPlotSize, useSequenceDrawRange } from "./TabsUtility";
 
 type HistogramProps = CollapsibleContentTabProps & {
@@ -80,14 +80,14 @@ const HistogramTab: FunctionComponent<CollapsibleContentTabProps> = (props) => {
     })
 
     return (
-        <DiagnosticsTabFrame
+        <CollapsibleTabFrame
             width={width}
             height={height}
             plotSize={plotSize}
             setPlotSize={setPlotSize}
         >
             {plots}
-        </DiagnosticsTabFrame>
+        </CollapsibleTabFrame>
     )
 }
 

@@ -2,14 +2,14 @@ import { Grid } from "@mui/material";
 import { Dispatch, FunctionComponent, PropsWithChildren, SetStateAction, useState } from "react";
 import { ExcludeWarmups, ExcludeWarmupsSelector, PlotSize, PlotSizeSelector, initialWarmupInclusionSelection } from "./TabsUtility";
 
-type DiagnosticsTabFrameProps = {
+type CollapsibleTabFrameProps = {
     width: number,
     height: number,
     plotSize: PlotSize,
     setPlotSize: Dispatch<SetStateAction<PlotSize>>
 }
 
-const DiagnosticsTabFrame: FunctionComponent<PropsWithChildren<DiagnosticsTabFrameProps>> = (props) => {
+const CollapsibleTabFrame: FunctionComponent<PropsWithChildren<CollapsibleTabFrameProps>> = (props) => {
     const {width, height, plotSize, setPlotSize, children} = props
     // The exclude-warmups state will probably also move up in a future iteration
     const [excludeWarmups, setExcludeWarmups] = useState<ExcludeWarmups>(initialWarmupInclusionSelection)
@@ -26,4 +26,4 @@ const DiagnosticsTabFrame: FunctionComponent<PropsWithChildren<DiagnosticsTabFra
     )
 }
 
-export default DiagnosticsTabFrame
+export default CollapsibleTabFrame

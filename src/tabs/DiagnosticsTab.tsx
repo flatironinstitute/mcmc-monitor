@@ -3,16 +3,16 @@ import { FunctionComponent, useMemo, useReducer, useState } from "react";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import CollapsibleElement from '../components/CollapsibleElement';
 import SequencePlot from "../components/SequencePlot";
-import DiagnosticsTabFrame from "./DiagnosticsTabFrame";
+import CollapsibleTabFrame from "./CollapsibleTabFrame";
 import { CollapsibleContentTabProps, PlotSize, collapsedVariablesReducer, scaleForPlotSize, useSequenceDrawRange } from "./TabsUtility";
 
 
-type DiagnosticPlotProps = CollapsibleContentTabProps & {
+type TimeSeriesPlotProps = CollapsibleContentTabProps & {
     sizeScale: number
     selectedVariableName: string
 }
 
-const DiagnosticPlot: FunctionComponent<DiagnosticPlotProps> = (props) => {
+const TimeSeriesPlot: FunctionComponent<TimeSeriesPlotProps> = (props) => {
     const { runId, chainColors, numDrawsForRun, sizeScale, selectedVariableName, width } = props
     const { selectedChainIds, effectiveInitialDrawsToExclude } = useMCMCMonitor()
     const samplesRange = useSequenceDrawRange(numDrawsForRun, effectiveInitialDrawsToExclude)
@@ -32,7 +32,7 @@ const DiagnosticPlot: FunctionComponent<DiagnosticPlotProps> = (props) => {
     )
 }
 
-const Diagnostics: FunctionComponent<CollapsibleContentTabProps> = (props) => {
+const TimeSeries: FunctionComponent<CollapsibleContentTabProps> = (props) => {
     const { width, height } = props
     const {selectedVariableNames } = useMCMCMonitor()
     const [collapsedVariables, collapsedVariablesDispatch] = useReducer(collapsedVariablesReducer, {})
@@ -47,7 +47,7 @@ const Diagnostics: FunctionComponent<CollapsibleContentTabProps> = (props) => {
                 isCollapsed={collapsedVariables[v]}
                 collapsedDispatch={collapsedVariablesDispatch}
             >
-                <DiagnosticPlot
+                <TimeSeriesPlot
                     {...props}
                     selectedVariableName={v}
                     sizeScale={sizeScale}
@@ -56,15 +56,15 @@ const Diagnostics: FunctionComponent<CollapsibleContentTabProps> = (props) => {
     })
 
     return (
-        <DiagnosticsTabFrame
+        <CollapsibleTabFrame
             width={width}
             height={height}
             plotSize={plotSize}
             setPlotSize={setPlotSize}
         >
             {plots}
-        </DiagnosticsTabFrame>
+        </CollapsibleTabFrame>
     )
 }
 
-export default Diagnostics
+export default TimeSeries

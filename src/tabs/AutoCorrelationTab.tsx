@@ -3,7 +3,7 @@ import { Fragment, FunctionComponent, useMemo, useReducer, useState } from "reac
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import AutocorrelationPlot from "../components/AutocorrelationPlot";
 import CollapsibleElement from "../components/CollapsibleElement";
-import DiagnosticsTabFrame from "./DiagnosticsTabFrame";
+import CollapsibleTabFrame from "./CollapsibleTabFrame";
 import { CollapsibleContentTabProps, PlotSize, collapsedVariablesReducer, scaleForPlotSize, useSequenceDrawRange } from "./TabsUtility";
 
 type AcfProps = CollapsibleContentTabProps & {
@@ -64,14 +64,14 @@ const AutoCorrelationTab: FunctionComponent<CollapsibleContentTabProps> = (props
     })
 
     return (
-        <DiagnosticsTabFrame
+        <CollapsibleTabFrame
             width={width}
             height={height}
             plotSize={plotSize}
             setPlotSize={setPlotSize}
         >
             {plots}
-        </DiagnosticsTabFrame>
+        </CollapsibleTabFrame>
     )
 }
 
