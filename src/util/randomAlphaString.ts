@@ -1,5 +1,5 @@
 const randomAlphaString = (num_chars: number) => {
-    if (!num_chars) {
+    if (!num_chars || num_chars < 0) {
         throw Error('randomAlphaString: num_chars needs to be a positive integer.')
     }
     let text = ""
