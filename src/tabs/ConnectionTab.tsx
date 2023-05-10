@@ -1,5 +1,5 @@
 import { FunctionComponent } from "react";
-import ConnectionStatusWidget from "./ConnectionStatusWidget";
+import ConnectionStatusWidget from "../components/ConnectionStatusWidget";
 
 type Props = any
 

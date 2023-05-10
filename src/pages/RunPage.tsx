@@ -2,15 +2,9 @@ import { FunctionComponent, useEffect, useMemo } from "react";
 import { MCMCChain, MCMCRun } from "../../service/src/types";
 import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
-import ConnectionTab from "../components/ConnectionTab";
-import Diagnostics from "../components/DiagnosticsTab";
-import ExportTab from "../components/ExportTab";
 import RunControlPanel from "../components/RunControlPanel";
-import RunInfoTab from "../components/RunInfoTab";
-import ScatterplotsTab from "../components/ScatterplotsTab";
 import Splitter from "../components/Splitter";
-import TabWidget from "../components/TabWidget/TabWidget";
-import TablesTab from "../components/TablesTab/TablesTab";
+import { AutoCorrelationTab, ConnectionTab, ExportTab, HistogramTab, RunInfoTab, ScatterplotsTab, TabWidget, TablesTab, TimeSeries } from "../tabs";
 import { chainColorForIndex } from "../util/chainColorList";
 import useWindowDimensions from "../util/useWindowDimensions";
 
@@ -117,8 +111,10 @@ type RightContentProps = {
 }
 
 const tabs = [
-	{label: 'Diagnostics', closeable: false},
+	{label: 'Time Series', closeable: false},
 	{label: 'Tables', closeable: false},
+    {label: 'Autocorrelations', closeable: false},
+    {label: 'Histograms', closeable: false},
 	{label: 'Run Info', closeable: false},
 	{label: 'Scatterplots', closeable: false},
 	{label: 'Export', closeable: false},
@@ -134,7 +130,7 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, numD
 			width={width}
 			height={height}
 		>
-			<Diagnostics
+			<TimeSeries
 				width={0}
 				height={0}
 				runId={runId}
@@ -145,6 +141,20 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, numD
 				width={0}
 				height={0}
 			/>
+            <AutoCorrelationTab
+                width={0}
+                height={0}
+                runId={runId}
+                chainColors={chainColors}
+                numDrawsForRun={numDrawsForRun}
+            />
+            <HistogramTab
+                width={0}
+                height={0}
+                runId={runId}
+                chainColors={chainColors}
+                numDrawsForRun={numDrawsForRun}
+            />
 			<RunInfoTab
 				width={0}
 				height={0}
