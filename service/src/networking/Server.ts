@@ -5,11 +5,11 @@ import fs from 'fs';
 import * as http from 'http';
 import YAML from 'js-yaml';
 import OutputManager from '../logic/OutputManager';
+import { isMCMCMonitorRequest, protocolVersion } from '../types';
 import OutgoingProxyConnection from './OutgoingProxyConnection';
 import createPeer from './RemotePeer';
 import SignalCommunicator, { sleepMsec } from './SignalCommunicator';
 import { handleApiRequest } from './handleApiRequest';
-import { isMCMCMonitorRequest, protocolVersion } from '../types';
 
 const allowedOrigins = ['https://flatironinstitute.github.io', 'http://127.0.0.1:5173', 'http://localhost:5173']
 const PATH_TO_PACKAGE_JSON = '../../package.json'
@@ -71,7 +71,9 @@ class Server {
                     console.warn('Unable to import wrtc')
                     canImportWrtc = false
                 }
-                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=${canImportWrtc ? "1" : "0"}`
+                // restore this line once we're configured to fall back to http while webrtc sets up
+                // const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=${canImportWrtc ? "1" : "0"}`
+                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=0`
                 console.info('')
                 console.info(`Connect on remote machine: ${urlRemote}`)
                 console.info('')
