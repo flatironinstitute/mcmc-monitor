@@ -37,7 +37,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 			if (vnames.length > 1) {
 				for (let i = 0; i < vnames.length; i++) {
 					for (let j = 0; j < vnames.length; j++) {
-						ret.push({ v1: selectedVariableNames[j], v2: selectedVariableNames[i], show: j >= i })
+						ret.push({ v1: selectedVariableNames[j], v2: selectedVariableNames[i], show: j > i })
 					}
 				}
 			}
