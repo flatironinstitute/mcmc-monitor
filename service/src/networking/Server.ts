@@ -71,7 +71,11 @@ class Server {
                     console.warn('Unable to import wrtc')
                     canImportWrtc = false
                 }
-                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=${canImportWrtc ? "1" : "0"}`
+
+                // For now, let's hard-code webrtc=0 until we get the fallback-to-http in place. That way, people shouldn't ever get a dead page.
+                // const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=${canImportWrtc ? "1" : "0"}`                
+                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=0`
+
                 console.info('')
                 console.info(`Connect on remote machine: ${urlRemote}`)
                 console.info('')
