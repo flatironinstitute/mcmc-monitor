@@ -2,7 +2,9 @@
 
 MCMC Monitor enables tracking and visualization of MCMC processes executed with [Stan](https://mc-stan.org/) in local or remote web browsers. When you run a sampler, you can configure Stan to generate output to a directory on your computer. MCMC Monitor reads this output and displays it in the web app, with real-time updates. As you track the progress of the run, MCMC provides diagnostic plots and statistics.
 
-How it works:
+![image](https://github.com/flatironinstitute/mcmc-monitor/assets/3679296/d998f86d-2e81-457a-987b-9d5e290d9acc)
+
+## How it works:
 
 1. [Run the mcmc-monitor service](#running-the-monitor-service) on your local computer (see below), configuring it to monitor an output directory.
 2. [Run a Stan program](#running-a-stan-program), configuring it to write output to a subdirectory of the output directory.
