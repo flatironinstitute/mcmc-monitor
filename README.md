@@ -19,6 +19,8 @@ You can optionally configure MCMC Monitor to enable monitoring from a remote com
 * [Installing cmdstan and cmdstanpy](#installing-cmdstan-and-cmdstanpy)
 * [Including and excluding parameters](#including-and-excluding-parameters)
 
+[Miscellaneous screenshots](https://github.com/flatironinstitute/mcmc-monitor/wiki/Miscellaneous-screenshots)
+
 ### Quick Demo
 
 To see MCMC-Monitor in action against sample data, follow this
