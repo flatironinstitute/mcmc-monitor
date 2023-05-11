@@ -20,8 +20,7 @@ You can optionally configure MCMC Monitor to enable monitoring from a remote com
 ### Quick Demo
 
 To see MCMC-Monitor in action against sample data, follow this
-[link to the current client version](https://flatironinstitute.github.io/mcmc-monitor/) and then click the
-link that reads "View Example Data".
+[link to a demo version](https://flatironinstitute.github.io/mcmc-monitor/?s=https://lit-bayou-76056.herokuapp.com).
 
 ### Feedback welcome!
 
