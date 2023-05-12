@@ -35,8 +35,8 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 		const vnames = mode === '2d-matrix' ? selectedVariableNames.slice(0, MAX_2D_MATRIX_PLOTS) : selectedVariableNames
 		if (mode === '2d-matrix') {
 			if (vnames.length > 1) {
-				for (let i = 0; i < vnames.length; i++) {
-					for (let j = 0; j < vnames.length; j++) {
+				for (let i = 0; i < vnames.length - 1; i++) {
+					for (let j = 1; j < vnames.length; j++) {
 						ret.push({ v1: selectedVariableNames[j], v2: selectedVariableNames[i], show: j > i })
 					}
 				}
@@ -117,13 +117,12 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
 								['2d-matrix'].includes(mode) &&
                                 <div style={{paddingTop: 24}}>
                                     <MatrixOfPlots
-                                        numColumns={Math.min(5, selectedVariableNames.length)}
+                                        numColumns={Math.min(MAX_2D_MATRIX_PLOTS, selectedVariableNames.length) - 1}
                                         width={width}
                                     >
                                         {
                                             variablePairs.map(({ v1, v2, show }, ii) => (
-                                                show ?
-                                                    (v1 != v2 ? (
+                                                show ? (
                                                         <SequenceScatterplot
                                                             key={ii}
                                                             runId={runId}
@@ -135,7 +134,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
                                                             width={0}
                                                             height={0}
                                                         />
-                                                    ) : <div key={`${v1}-${v2}`} />)
+                                                    )
                                                 : (
                                                     <EmptyPlotItem
                                                         key={ii}
