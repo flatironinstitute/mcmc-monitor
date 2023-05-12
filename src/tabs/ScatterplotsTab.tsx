@@ -122,8 +122,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
                                     >
                                         {
                                             variablePairs.map(({ v1, v2, show }, ii) => (
-                                                show ?
-                                                    (v1 != v2 ? (
+                                                show ? (
                                                         <SequenceScatterplot
                                                             key={ii}
                                                             runId={runId}
@@ -135,7 +134,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
                                                             width={0}
                                                             height={0}
                                                         />
-                                                    ) : <div key={`${v1}-${v2}`} />)
+                                                    )
                                                 : (
                                                     <EmptyPlotItem
                                                         key={ii}
