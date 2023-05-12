@@ -118,7 +118,7 @@ const ScatterplotsTab: FunctionComponent<Props> = ({ runId, numDrawsForRun, chai
                                 <div style={{paddingTop: 24}}>
                                     <MatrixOfPlots
                                         numColumns={Math.min(MAX_2D_MATRIX_PLOTS, selectedVariableNames.length) - 1}
-                                        width={width - 10}
+                                        width={width}
                                     >
                                         {
                                             variablePairs.map(({ v1, v2, show }, ii) => (
