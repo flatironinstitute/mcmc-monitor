@@ -83,7 +83,7 @@ const RunPage: FunctionComponent<Props> = ({runId, dataManager}) => {
 		<div style={{position: 'absolute', width: width - 40, height: height - 40, margin: 20, overflow: 'hidden'}}>
 			<Splitter
 				width={width - 30}
-				height={height}
+				height={height - 40}
 				initialPosition={500}
 			>
 				<RunControlPanel
