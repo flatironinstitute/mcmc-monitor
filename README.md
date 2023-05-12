@@ -1,5 +1,11 @@
 # MCMC Monitor
 
+![tests](https://github.com/flatironinstitute/mcmc-monitor/actions/workflows/test_coverage.yaml/badge.svg)
+[![npm version](https://badge.fury.io/js/mcmc-monitor.svg)](https://badge.fury.io/js/mcmc-monitor)
+
+<!-- Wait until we have more coverage before we show the percent coverage badge. -->
+<!-- [![codecov](https://codecov.io/gh/flatironinstitute/mcmc-monitor/branch/main/graph/badge.svg)](https://codecov.io/gh/flatironinstitute/mcmc-monitor) -->
+
 MCMC Monitor enables tracking and visualization of MCMC processes executed with [Stan](https://mc-stan.org/) in local or remote web browsers. When you run a sampler, you can configure Stan to generate output to a directory on your computer. MCMC Monitor reads this output and displays it in the web app, with real-time updates. As you track the progress of the run, MCMC provides diagnostic plots and statistics.
 
 ![image](https://github.com/flatironinstitute/mcmc-monitor/assets/3679296/d998f86d-2e81-457a-987b-9d5e290d9acc)
