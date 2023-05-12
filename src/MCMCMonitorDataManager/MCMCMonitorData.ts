@@ -7,7 +7,6 @@ import { MCMCMonitorAction, MCMCMonitorData, SequenceStatsDict, VariableStatsDic
 export const initialMCMCMonitorData: MCMCMonitorData = {
     connectedToService: undefined,
     serviceProtocolVersion: undefined,
-    webrtcConnectionStatus: 'pending',
     usingProxy: undefined,
     runs: [],
     chains: [],
@@ -74,12 +73,6 @@ export const mcmcMonitorReducer = (s: MCMCMonitorData, a: MCMCMonitorAction): MC
             return {
                 ...s,
                 serviceProtocolVersion: a.version
-            }
-        }
-        case "setWebrtcConnectionStatus": {
-            return {
-                ...s,
-                webrtcConnectionStatus: a.status
             }
         }
         case "setUsingProxy": {
@@ -265,19 +258,30 @@ const chainsWereUpdated = (runId: string, newChains: MCMCChain[], oldChains: MCM
 }
 
 
+/**
+ * Given a data set, compute how many warm-up iterations to actually skip.
+ * (If the user requests that the number of warm-up iterations be read from the data file,
+ * it may not match the number in the dropdown menu.)
+ * 
+ * A request for a data-determined number of warm-up iterations is identified by the signal
+ * value of -1 for the requested iteration count. If this is passed, we need to look at the
+ * data and set the real warm-up count to either 0 (if the actual number is not yet known)
+ * or to the observed value (by inspecting the chains).
+ * 
+ * At present, we assume that the value will be the same for any chain, so we can look at
+ * any arbitrary chain.
+ * 
+ * During live monitoring, as data comes in, we will need to re-evaluate this (even though
+ * the requested value has not changed) because the number may not initially be present in
+ * the output data.
+ * On the other hand, if any value other than -1 is requested, we just use that number directly.
+ * 
+ * @param data The data cache, which includes chain files.
+ * @param requested The requested number of warmup iterations from the front-end (-1 if it is
+ * to be read from the file).
+ * @returns A nonnegative number of initial samples to mark as warmup.
+ */
 const computeEffectiveWarmupIterations = (data: MCMCMonitorData, requested: number): number => {
-    // Given a data set, compute how many warm-up iterations to actually skip.
-    // This needs to be done because the user can request that the number of warm-up iterations
-    // be read from the file, in which case it will not match the number in the dropdown menu.
-    // A request for a data-determined number of warm-up iterations is identified by the signal
-    // value of -1 for the requested iteration count. If this is passed, we need to look at the
-    // data and set the real warm-up count to either 0 (if the actual number is not yet known)
-    // or to the observed value (by inspecting the chains).
-    // At present, we assume that the value will be the same for any chain, so we can look at
-    // any arbitrary chain.
-    // Note that as data comes in, we will need to re-evaluate this (even though the requested
-    // value has not changed) because we start out not knowing the number.
-    // On the other hand, if any value other than -1 is requested, we just use that number directly.
     if (requested === -1) {
         const observedCount = detectedWarmupIterationCount(data.chains)
         return observedCount ?? 0

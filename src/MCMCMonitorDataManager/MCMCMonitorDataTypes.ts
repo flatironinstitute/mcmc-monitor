@@ -32,7 +32,6 @@ export type WebrtcConnectionStatus = 'unused' | 'pending' | 'connected' | 'error
 export type MCMCMonitorData = {
     connectedToService: boolean | undefined
     serviceProtocolVersion: string | undefined
-    webrtcConnectionStatus: WebrtcConnectionStatus
     usingProxy: boolean | undefined
     runs: MCMCRun[]
     chains: MCMCChain[]

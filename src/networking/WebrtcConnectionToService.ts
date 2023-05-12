@@ -17,10 +17,12 @@ class WebrtcConnectionToService {
     #requestCallbacks: callbacksQueueType = {}
     #clientId = 'ID-PENDING'
     #status: webrtcConnectionStatus = 'pending'
+    #timer: number | undefined
     constructor(peer: SimplePeer.Instance, callbacksQueue?: callbacksQueueType) {
         this.#clientId = randomAlphaString(10)
         this.#peer = peer
         this.#requestCallbacks = callbacksQueue ?? {}
+        this.#timer = undefined
     }
     configurePeer() {
         if (this.#peer === undefined) {
@@ -54,18 +56,20 @@ class WebrtcConnectionToService {
             console.warn("Attempt to connect using uninitialized SimplePeer instance.")
             return
         }
-        const timer = Date.now()
-        while (this.#status === 'pending') {
-            const elapsed = Date.now() - timer
-            if (elapsed > WEBRTC_CONNECTION_TIMEOUT_INTERVAL_MS) {
-                this.#status = 'error'
-                console.warn('Unable to establish webrtc connection.')
-                break   
-            }
-            await sleepMsec(WEBRTC_CONNECTION_RETRY_INTERVAL_MS)
-            if (this.#status === 'pending') {
-                sendWebrtcSignal(this.#clientId, this.#peer, undefined)
-            }
+        this.#timer = this.#timer ?? Date.now()
+        const elapsed = Date.now() - this.#timer
+        if (elapsed > WEBRTC_CONNECTION_TIMEOUT_INTERVAL_MS) {
+            this.#status = 'error'
+            console.warn('Unable to establish webrtc connection.')
+            return
+        }
+        if (this.#status === 'pending') {
+            sendWebrtcSignal(this.#clientId, this.#peer, undefined)
+            setTimeout(() => {
+                if (this.#status === 'pending') {
+                    this.connect()
+                }
+            }, WEBRTC_CONNECTION_RETRY_INTERVAL_MS)
         }
     }
     async postApiRequest(request: MCMCMonitorRequest): Promise<MCMCMonitorResponse> {
@@ -107,6 +111,7 @@ export const sendWebrtcSignal = async (clientId: string, peer: SimplePeer.Instan
         clientId,
         signal: s === undefined ? undefined : JSON.stringify(s)
     }
+    if (!postApiRequest) return
     const response = await postApiRequest(request)
     if (response.type !== 'webrtcSignalingResponse') {
         console.warn(response)

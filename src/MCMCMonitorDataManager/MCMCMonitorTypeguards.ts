@@ -1,11 +1,6 @@
 import { isMCMCChain, isMCMCRun, isMCMCSequence } from '../../service/src/types'
 import validateObject, { isArrayOf, isBoolean, isNumber, isString, optional } from "../../service/src/types/validateObject"
-import { GeneralOpts, MCMCMonitorData, SequenceStats, SequenceStatsDict, VariableStats, VariableStatsDict, WebrtcConnectionStatus } from "./MCMCMonitorDataTypes"
-
-export const isWebrtcConnectionStatus = (x: any): x is WebrtcConnectionStatus => {
-    const validStatuses = ['unused', 'pending', 'connected', 'error']
-    return validStatuses.includes(x)
-}
+import { GeneralOpts, MCMCMonitorData, SequenceStats, SequenceStatsDict, VariableStats, VariableStatsDict } from "./MCMCMonitorDataTypes"
 
 export const isMCMCSequenceStats = (x: any): x is SequenceStats => {
     return validateObject(x, {
@@ -49,7 +44,6 @@ export const isMCMCMonitorData = (x: any): x is MCMCMonitorData => {
     return validateObject(x, {
         connectedToService: optional(isBoolean),
         serviceProtocolVersion: optional(isString),
-        webrtcConnectionStatus: isWebrtcConnectionStatus,
         usingProxy: optional(isBoolean),
         runs: isArrayOf(isMCMCRun),
         chains: isArrayOf(isMCMCChain),

@@ -46,7 +46,8 @@ describe("Post API Request function", () => {
             ? useUndefinedWebrtcConnection
                 ? undefined
                 : {
-                    postApiRequest: mockWebrtcPostApiRequest
+                    postApiRequest: mockWebrtcPostApiRequest,
+                    status: 'connected'
                 } as unknown as WebrtcConnectionToService
             : undefined
         vi.doMock('../../src/config', () => {
@@ -74,7 +75,28 @@ describe("Post API Request function", () => {
         expect(isMCMCMonitorResponse(resp)).toBeTruthy()
     })
 
-    test("postApiRequest uses web rtc if configured", async () => {
+    test("postApiRequest falls back to http if web rtc is configured but not in connected status", async () => {
+        const myFetch = vi.fn(fetchFactory())
+        global.fetch = myFetch
+        const rtcCnxn = {
+            postApiRequest: mockWebrtcPostApiRequest,
+            status: 'pending'
+        } as unknown as WebrtcConnectionToService
+        vi.doMock('../../src/config', () => {
+            return {
+                __esModule: true,
+                serviceBaseUrl: myBaseUrl,
+                useWebrtc: true,
+                webrtcConnectionToService: rtcCnxn
+            }
+        })
+        const postApiRequest = await importFunctionUnderTest()
+        await postApiRequest(myNonProbeRequest)
+        expect(mockWebrtcPostApiRequest).toHaveBeenCalledTimes(0)
+        expect(myFetch).toHaveBeenCalledOnce()
+    })
+
+    test("postApiRequest uses web rtc if configured and connected", async () => {
         mockConfig(true)
         const postApiRequest = await importFunctionUnderTest()
         const nonProbeResponse = await postApiRequest(myNonProbeRequest)
@@ -91,13 +113,6 @@ describe("Post API Request function", () => {
         expect(myFetch).toHaveBeenCalledOnce()
         expect(isMCMCMonitorResponse(resp)).toBeTruthy()
     })
-
-    // test("postApiRequest webrtc throws if invalid connection to service", async () => {
-    //     mockConfig(true, true)
-    //     const postApiRequest = await importFunctionUnderTest()
-    //     await expect(() => postApiRequest(myNonProbeRequest)).rejects.toThrow(/No webrtc connection/)
-    //     vi.spyOn(console, 'warn').mockRestore()
-    // })
 
     test("postApiRequest with webrtc uses non-webrtc for probe or signaling request", async () => {
         const myFetch = vi.fn(fetchFactory())

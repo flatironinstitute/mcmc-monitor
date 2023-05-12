@@ -18,8 +18,13 @@ export const useWebrtc = queryParams.webrtc === '1'
 
 export let webrtcConnectionToService: WebrtcConnectionToService | undefined
 
-if ((useWebrtc) && (!webrtcConnectionToService)) {
-    const peerInstance = new SimplePeer({initiator: true})
-    webrtcConnectionToService = new WebrtcConnectionToService(peerInstance).configurePeer()
-    webrtcConnectionToService?.connect()
-}
+setTimeout(() => {
+    // setting the timeout allows the import of postApiRequest to complete before it gets
+    // called in the connect() method.
+    // Otherwise, you get an (apparently ignorable, but annoying) error during connection setup.
+    if ((useWebrtc) && (!webrtcConnectionToService)) {
+        const peerInstance = new SimplePeer({initiator: true})
+        webrtcConnectionToService = new WebrtcConnectionToService(peerInstance).configurePeer()
+        webrtcConnectionToService?.connect()
+    }
+}, 0)

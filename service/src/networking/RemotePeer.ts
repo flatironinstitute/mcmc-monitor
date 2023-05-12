@@ -18,6 +18,7 @@ const createPeer = async (connection: SignalCommunicatorConnection, outputMgr: O
     // wrtc is a conditional dependency (doesn't install on some versions of mac os). If it's not available, we can't use webrtc.
     let wrtc: any
     try {
+        // throw Error('Manually bypassing webrtc support')
         wrtc = await import('wrtc')
     }
     catch(err) {

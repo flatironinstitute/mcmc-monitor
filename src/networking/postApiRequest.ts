@@ -4,7 +4,7 @@ import { serviceBaseUrl, useWebrtc, webrtcConnectionToService } from "../config"
 const postApiRequest = async (request: MCMCMonitorRequest): Promise<MCMCMonitorResponse> => {
     // Note: we always use http for probe requests and webrtc signaling requests
     if ((useWebrtc) && (request.type !== 'probeRequest') && (request.type !== 'webrtcSignalingRequest')) {
-        if (webrtcConnectionToService) {
+        if (webrtcConnectionToService && webrtcConnectionToService.status === 'connected') {
             // if we have a webrtc connection, post the request via webrtc
             return webrtcConnectionToService.postApiRequest(request)
         }
