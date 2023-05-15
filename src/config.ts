@@ -1,3 +1,4 @@
+import SimplePeer from "simple-peer"
 import WebrtcConnectionToService from "./networking/WebrtcConnectionToService"
 
 const urlSearchParams = new URLSearchParams(window.location.search)
@@ -18,5 +19,7 @@ export const useWebrtc = queryParams.webrtc === '1'
 export let webrtcConnectionToService: WebrtcConnectionToService | undefined
 
 if ((useWebrtc) && (!webrtcConnectionToService)) {
-    webrtcConnectionToService = new WebrtcConnectionToService()
+    const peerInstance = new SimplePeer({initiator: true})
+    webrtcConnectionToService = new WebrtcConnectionToService(peerInstance).configurePeer()
+    webrtcConnectionToService?.connect()
 }

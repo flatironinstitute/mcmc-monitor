@@ -1,29 +1,34 @@
 import SimplePeer from "simple-peer";
 import { MCMCMonitorPeerRequest, MCMCMonitorRequest, MCMCMonitorResponse, WebrtcSignalingRequest, isMCMCMonitorPeerResponse } from "../../service/src/types";
+import randomAlphaString from "../util/randomAlphaString";
+import sleepMsec from "../util/sleepMsec";
 import postApiRequest from "./postApiRequest";
+
+type webrtcConnectionStatus = 'pending' | 'connected' | 'error'
+
+export const WEBRTC_CONNECTION_RETRY_INTERVAL_MS = 3000
+export const WEBRTC_CONNECTION_TIMEOUT_INTERVAL_MS = 15000
+export const WEBRTC_CONNECTION_PENDING_API_WAIT_INTERVAL_MS = 100
+
+type callbacksQueueType = {[requestId: string]: (response: MCMCMonitorResponse) => void}
 
 class WebrtcConnectionToService {
     #peer: SimplePeer.Instance | undefined
-    #requestCallbacks: {[requestId: string]: (response: MCMCMonitorResponse) => void} = {}
-    #status: 'pending' | 'connected' | 'error' = 'pending'
-    constructor() {
-        const clientId = randomAlphaString(10)
-        const peer = new SimplePeer({initiator: true})
-        peer.on('signal', async s => {
-            const request: WebrtcSignalingRequest = {
-                type: 'webrtcSignalingRequest',
-                clientId,
-                signal: JSON.stringify(s)
-            }
-            const response = await postApiRequest(request)
-            if (response.type !== 'webrtcSignalingResponse') {
-                console.warn(response)
-                throw Error('Unexpected webrtc signaling response')
-            }
-            for (const sig0 of response.signals) {
-                peer.signal(sig0)
-            }
-        })
+    #requestCallbacks: callbacksQueueType = {}
+    #clientId = 'ID-PENDING'
+    #status: webrtcConnectionStatus = 'pending'
+    constructor(peer: SimplePeer.Instance, callbacksQueue?: callbacksQueueType) {
+        this.#clientId = randomAlphaString(10)
+        this.#peer = peer
+        this.#requestCallbacks = callbacksQueue ?? {}
+    }
+    configurePeer() {
+        if (this.#peer === undefined) {
+            console.warn(`Attempt to configure uninitialized peer.`)
+            return this
+        }
+        const peer = this.#peer
+        peer.on('signal', async s => sendWebrtcSignal(this.#clientId, peer, s))
         peer.on('connect', () => {
             console.info('Webrtc connection established')
             this.#status = 'connected'
@@ -42,42 +47,35 @@ class WebrtcConnectionToService {
             delete this.#requestCallbacks[dd.requestId]
             cb(dd.response)
         })
-        this.#peer = peer
-        ;(async () => {
-            const timer = Date.now()
-            while (this.#status === 'pending') {
-                const elapsed = Date.now() - timer
-                if (elapsed > 15000) {
-                    this.#status = 'error'
-                    console.warn('Unable to establish webrtc connection.')
-                    break   
-                }
-                await sleepMsec(3000)
-                if (this.#status === 'pending') {
-                    const request: WebrtcSignalingRequest = {
-                        type: 'webrtcSignalingRequest',
-                        clientId,
-                        signal: undefined
-                    }
-                    const response = await postApiRequest(request)
-                    if (response.type !== 'webrtcSignalingResponse') {
-                        throw Error('Unexpected webrtc signaling response')
-                    }
-                    for (const sig0 of response.signals) {
-                        peer.signal(sig0)
-                    }
-                }
+        return this
+    }
+    async connect() {
+        if (this.#peer === undefined) {
+            console.warn("Attempt to connect using uninitialized SimplePeer instance.")
+            return
+        }
+        const timer = Date.now()
+        while (this.#status === 'pending') {
+            const elapsed = Date.now() - timer
+            if (elapsed > WEBRTC_CONNECTION_TIMEOUT_INTERVAL_MS) {
+                this.#status = 'error'
+                console.warn('Unable to establish webrtc connection.')
+                break   
             }
-        })()
+            await sleepMsec(WEBRTC_CONNECTION_RETRY_INTERVAL_MS)
+            if (this.#status === 'pending') {
+                sendWebrtcSignal(this.#clientId, this.#peer, undefined)
+            }
+        }
     }
     async postApiRequest(request: MCMCMonitorRequest): Promise<MCMCMonitorResponse> {
+        if (!this.#peer) throw Error('No peer')
         if (this.status === 'error') {
             throw Error('Error in webrtc connection')
         }
         while (this.status === 'pending') {
-            await sleepMsec(100)
+            await sleepMsec(WEBRTC_CONNECTION_PENDING_API_WAIT_INTERVAL_MS)
         }
-        if (!this.#peer) throw Error('No peer')
         const peer = this.#peer
         const requestId = randomAlphaString(10)
         const rr: MCMCMonitorPeerRequest = {
@@ -95,26 +93,28 @@ class WebrtcConnectionToService {
     public get status() {
         return this.#status
     }
+    public get clientId() {
+        return this.#clientId
+    }
+    public setErrorStatus() {
+        this.#status = 'error'
+    }
 }
 
-export const randomAlphaString = (num_chars: number) => {
-    if (!num_chars) {
-        throw Error('randomAlphaString: num_chars needs to be a positive integer.')
+export const sendWebrtcSignal = async (clientId: string, peer: SimplePeer.Instance, s: SimplePeer.SignalData | undefined) => {
+    const request: WebrtcSignalingRequest = {
+        type: 'webrtcSignalingRequest',
+        clientId,
+        signal: s === undefined ? undefined : JSON.stringify(s)
     }
-    let text = ""
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    for (let i = 0; i < num_chars; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length))
+    const response = await postApiRequest(request)
+    if (response.type !== 'webrtcSignalingResponse') {
+        console.warn(response)
+        throw Error('Unexpected webrtc signaling response')
     }
-    return text
-}
-
-export const sleepMsec = async (msec: number): Promise<void> => {
-    return new Promise<void>((resolve) => {
-        setTimeout(() => {
-            resolve()
-        }, msec)
-    })
+    for (const sig0 of response.signals) {
+        peer.signal(sig0)
+    }
 }
 
 export default WebrtcConnectionToService
