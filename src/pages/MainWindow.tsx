@@ -50,11 +50,11 @@ const MainWindow: FunctionComponent<Props> = (props: Props) => {
     }
 }
 
-const WebRtcError: FunctionComponent = () => {
-    return (
-        <div>Unable to connect to service using WebRTC: {serviceBaseUrl}</div>
-    )
-}
+// const WebRtcError: FunctionComponent = () => {
+//     return (
+//         <div>Unable to connect to service using WebRTC: {serviceBaseUrl}</div>
+//     )
+// }
 
 const ConnectionInProgress: FunctionComponent = () => {
     return (
