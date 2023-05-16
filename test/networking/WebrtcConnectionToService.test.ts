@@ -235,21 +235,20 @@ describe("WebrtcConnectionToService peer connection", () => {
         vi.spyOn(console, 'warn').mockRestore()
         vi.spyOn(Date, 'now').mockRestore()
     })
-    test("Connection object sleeps and resignals while in pending status", async () => {
-        const mockSleep = vi.fn().mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('break loop'))
-        vi.doMock('../../src/util/sleepMsec', () => {
-            return {
-                __esModule: true,
-                default: mockSleep
-            }
-        })
-        mockPostApiRequest.mockResolvedValue({ type: 'webrtcSignalingResponse', signals: [] })
+    test("Connection resignals on pending status", async () => {
+        vi.useFakeTimers()
+        mockPostApiRequest.mockReturnValue({type: "webrtcSignalingResponse", signals: []})
         const mockImport = (await import('../../src/networking/WebrtcConnectionToService'))
-        const cnxn = new mockImport.default(mockPeer as unknown as SimplePeer.Instance)
+        const sut = mockImport.default
+        const cnxn = new sut(mockPeer as unknown as SimplePeer.Instance)
         
         expect(cnxn.status).toBe('pending')
-        expect(() => cnxn.connect()).rejects.toThrow(/break loop/)
-        expect(cnxn.status).toBe('pending')
+        const spy = vi.spyOn(cnxn, "connect")
+        cnxn.connect()
+        vi.advanceTimersToNextTimer()
+        expect(spy).toHaveBeenCalledTimes(2)
+
+        vi.useRealTimers()
     })
 })
 

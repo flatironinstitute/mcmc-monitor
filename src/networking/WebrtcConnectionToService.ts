@@ -111,7 +111,6 @@ export const sendWebrtcSignal = async (clientId: string, peer: SimplePeer.Instan
         clientId,
         signal: s === undefined ? undefined : JSON.stringify(s)
     }
-    if (!postApiRequest) return
     const response = await postApiRequest(request)
     if (response.type !== 'webrtcSignalingResponse') {
         console.warn(response)
