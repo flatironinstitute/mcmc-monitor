@@ -2,6 +2,9 @@ import { Checkbox, FormControlLabel } from "@mui/material";
 import { FunctionComponent } from "react";
 import { MCMCChain } from "../../service/src/types";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
+import toggleListItem from "../util/toggleListItem";
+
+const SOLID_SQUARE = "\u25A0" // equivalent to HTML entity &#9632;
 
 type Props = {
 	chains: MCMCChain[]
@@ -24,10 +27,10 @@ const ChainsSelector: FunctionComponent<Props> = ({chains, allChainIds, chainCol
 								control={
 									<Checkbox
 										style={{padding: 1, transform: 'scale(0.8)'}}
-										onClick={() => setSelectedChainIds(toggle(selectedChainIds, c.chainId))}
+										onClick={() => setSelectedChainIds(toggleListItem(selectedChainIds, c.chainId))}
 										checked={selectedChainIds.includes(c.chainId)} />
 								}
-								label={<span><span style={{color: chainColors[c.chainId] || 'black'}}>&#9632;</span> {c.chainId}</span>}
+								label={<span><span style={{color: chainColors[c.chainId] || 'black'}}>{SOLID_SQUARE}</span> {c.chainId}</span>}
 							/>
 							<br />
 						</span>
@@ -36,11 +39,6 @@ const ChainsSelector: FunctionComponent<Props> = ({chains, allChainIds, chainCol
 			</div>
 		</div>
 	)
-}
-
-function toggle(x: string[], y: string) {
-	if (x.includes(y)) return x.filter(a => (a !== y))
-	else return [...x, y]
 }
 
 export default ChainsSelector
