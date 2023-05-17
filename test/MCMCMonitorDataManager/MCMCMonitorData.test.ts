@@ -308,17 +308,6 @@ describe("MCMCMonitorData reducer connection accounting", () => {
         ceterisParibus(data, res, ["serviceProtocolVersion"])
         expect(res.serviceProtocolVersion).toBe(newProtocol)
     })
-    test("Setting Web RTC connection persists", () => {
-        const newStatus = "pending"
-        expect(data.webrtcConnectionStatus !== newStatus).toBeTruthy()
-        const action = {
-            type: "setWebrtcConnectionStatus",
-            status: newStatus
-        } as any as MCMCMonitorAction
-        const res = mcmcMonitorReducer(data, action)
-        ceterisParibus(data, res, ["webrtcConnectionStatus"])
-        expect(res.webrtcConnectionStatus).toBe(newStatus)
-    })
     test("Setting proxy status persists", () => {
         const newProxy = !data.usingProxy
         const action = {

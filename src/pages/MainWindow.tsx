@@ -17,16 +17,10 @@ type Props = {
 const MainWindow: FunctionComponent<Props> = (props: Props) => {
     const { dataManager } = props
 	const { route } = useRoute()
-	const { updateRuns, serviceProtocolVersion } = useMCMCMonitor()
+	const { updateRuns, serviceProtocolVersion, connectedToService } = useMCMCMonitor()
 	useEffect(() => {
 		updateRuns()
 	}, [updateRuns])
-
-	const {connectedToService, webrtcConnectionStatus} = useMCMCMonitor()
-
-	if (webrtcConnectionStatus === 'error') {
-        return <WebRtcError />
-	}
 
 	if (connectedToService === undefined) {
         return <ConnectionInProgress />
@@ -54,12 +48,6 @@ const MainWindow: FunctionComponent<Props> = (props: Props) => {
         default:
             return <span />
     }
-}
-
-const WebRtcError: FunctionComponent = () => {
-    return (
-        <div>Unable to connect to service using WebRTC: {serviceBaseUrl}</div>
-    )
 }
 
 const ConnectionInProgress: FunctionComponent = () => {

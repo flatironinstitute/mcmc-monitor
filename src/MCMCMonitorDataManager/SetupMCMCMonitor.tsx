@@ -1,6 +1,5 @@
 import { Dispatch, FunctionComponent, PropsWithChildren, SetStateAction, useCallback, useEffect, useMemo, useReducer, useState } from "react"
 import { ProbeRequest, isProbeResponse, protocolVersion } from "../../service/src/types"
-import { useWebrtc, webrtcConnectionToService } from "../config"
 import postApiRequest from "../networking/postApiRequest"
 import { MCMCMonitorContext, initialMCMCMonitorData, mcmcMonitorReducer } from "./MCMCMonitorData"
 import MCMCDataManager from "./MCMCMonitorDataManager"
@@ -39,43 +38,13 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren<SetupMcmcMonitorProp
         checkConnectionStatus
     }), [data, dataDispatch, checkConnectionStatus])
 
-    // wait for webrtc connection (if using)
-    const [webrtcConnectionStatus, setWebrtcConnectionStatus] = useState<'pending' | 'connected' | 'error' | 'unused'>('pending')
-    useEffect(() => {
-        let canceled = false
-        if (!useWebrtc) {
-            setWebrtcConnectionStatus('unused')
-            return
-        }
-        function check() {
-            if (canceled) return
-            const ss = webrtcConnectionToService?.status || 'pending'
-            if ((ss === 'connected') || (ss === 'error')) {
-                setWebrtcConnectionStatus(ss)
-                return
-            }
-            setTimeout(() => {
-                check()
-            }, 100)
-        }
-        check()
-        return () => {canceled = true}
-    }, [])
-
-    useEffect(() => {
-        dataDispatch({type: 'setWebrtcConnectionStatus', status: webrtcConnectionStatus})
-    }, [webrtcConnectionStatus])
-
     useEffect(() => {
         dataDispatch({type: 'setUsingProxy', usingProxy})
     }, [usingProxy])
 
     // check whether we are connected
+    // TODO: consider alternate mechanism for refresh other than manual check-again button
     useEffect(() => {
-        if ((webrtcConnectionStatus === 'connected') || (webrtcConnectionStatus === 'unused')) {
-            // the following line causes some undesired effects in the GUI when clicking the "check connection status" button
-            // dataDispatch({type: 'setConnectedToService', connected: undefined})
-
             setUsingProxy(undefined)
             ;(async () => {
                 try {
@@ -99,8 +68,7 @@ const SetupMCMCMonitor: FunctionComponent<PropsWithChildren<SetupMcmcMonitorProp
                     dataDispatch({type: 'setConnectedToService', connected: false})
                 }
             })()
-        }
-    }, [webrtcConnectionStatus, connectionCheckRefreshCode])
+    }, [connectionCheckRefreshCode])
 
     return (
         <MCMCMonitorContext.Provider value={value}>

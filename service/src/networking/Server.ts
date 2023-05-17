@@ -49,7 +49,9 @@ class Server {
         })
         const signalCommunicator = new SignalCommunicator()
         if (a.enableRemoteAccess) {
-            signalCommunicator.onConnection(async connection => {createPeer(connection, this.#outputManager, signalCommunicator)})
+            signalCommunicator.onConnection(async connection => {
+                createPeer(connection, this.#outputManager, signalCommunicator)
+            })
         }
         const urlLocal = `https://flatironinstitute.github.io/mcmc-monitor?s=http://localhost:${this.a.port}`
         console.info('')
@@ -71,9 +73,7 @@ class Server {
                     console.warn('Unable to import wrtc')
                     canImportWrtc = false
                 }
-                // restore this line once we're configured to fall back to http while webrtc sets up
-                // const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=${canImportWrtc ? "1" : "0"}`
-                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=0`
+                const urlRemote = `https://flatironinstitute.github.io/mcmc-monitor?s=${proxyUrl}&webrtc=${canImportWrtc ? "1" : "0"}`
                 console.info('')
                 console.info(`Connect on remote machine: ${urlRemote}`)
                 console.info('')
