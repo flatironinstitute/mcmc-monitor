@@ -1,5 +1,5 @@
 import { Tab, Tabs } from '@mui/material';
-import { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent } from 'react';
 
 type Props = {
     tabs: {
@@ -11,13 +11,6 @@ type Props = {
 }
 
 const TabWidgetTabBar: FunctionComponent<Props> = ({ tabs, currentTabIndex, onCurrentTabIndexChanged }) => {
-    useEffect(() => {
-        if (currentTabIndex === undefined) {
-            if (tabs.length > 0) {
-                onCurrentTabIndexChanged(0)
-            }
-        }
-    }, [currentTabIndex, onCurrentTabIndexChanged, tabs.length])
     const classes = ['ViewContainerTabBar']
     return (
         <Tabs
