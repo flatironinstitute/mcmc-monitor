@@ -69,13 +69,14 @@ vi.mock('react-router-dom', async () => {
 })
 
 describe("Navigation hook--route-setting callback", () => {
+    let user
     afterEach(() => cleanup())
     beforeEach(() => {
         vi.resetAllMocks()
+        user = userEvent.setup()
     })
     test("Navigates to empty path if route page is home", async () => {
         render(<Consumer location="/not-run/" navigationTarget='/home/123' />)
-        const user = userEvent.setup()
         await user.click(screen.getByRole('button'))
         expect(mockNavigate).toHaveBeenCalledOnce()
         const lastCall = mockNavigate.mock.lastCall[0]
@@ -83,7 +84,6 @@ describe("Navigation hook--route-setting callback", () => {
     })
     test("Navigates to run page if route page is run", async () => {
         render(<Consumer location="/not-run/" navigationTarget='/run/123' />)
-        const user = userEvent.setup()
         await user.click(screen.getByRole('button'))
         expect(mockNavigate).toHaveBeenCalledOnce()
         const lastCall = mockNavigate.mock.lastCall[0]
@@ -91,7 +91,6 @@ describe("Navigation hook--route-setting callback", () => {
     })
     test("Does nothing if route page is something else", async () => {
         render(<Consumer location="/not-run/" navigationTarget='/bad-address/123' />)
-        const user = userEvent.setup()
         await user.click(screen.getByRole('button'))
         expect(mockNavigate).toHaveBeenCalledTimes(0)
     })
