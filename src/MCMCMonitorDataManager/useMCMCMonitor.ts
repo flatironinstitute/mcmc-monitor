@@ -1,5 +1,6 @@
 import { useCallback, useContext, useMemo } from 'react'
 import { GetChainsForRunRequest, GetRunsRequest, MCMCChain, MCMCRun, isGetChainsForRunResponse, isGetRunsResponse } from '../../service/src/types'
+import { serviceBaseUrl } from '../config'
 import postApiRequest from '../networking/postApiRequest'
 import getSpaChainsForRun from '../spaInterface/getSpaChainsForRun'
 import { MCMCMonitorContext, detectedWarmupIterationCount } from './MCMCMonitorData'
@@ -33,6 +34,7 @@ export const useMCMCMonitor = () => {
 
     const updateRuns = useCallback(() => {
         ; (async () => {
+            if (!serviceBaseUrl) return // for example, spa mode
             const req: GetRunsRequest = {
                 type: 'getRunsRequest'
             }

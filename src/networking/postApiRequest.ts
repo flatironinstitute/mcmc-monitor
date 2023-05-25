@@ -2,6 +2,7 @@ import { MCMCMonitorRequest, MCMCMonitorResponse, isMCMCMonitorResponse } from "
 import { serviceBaseUrl, useWebrtc, webrtcConnectionToService } from "../config"
 
 const postApiRequest = async (request: MCMCMonitorRequest): Promise<MCMCMonitorResponse> => {
+    if (!serviceBaseUrl) throw Error('serviceBaseUrl not set') // for example, if we are in spa mode
     // Note: we always use http for probe requests and webrtc signaling requests
     if ((useWebrtc) && (request.type !== 'probeRequest') && (request.type !== 'webrtcSignalingRequest')) {
         if (webrtcConnectionToService && webrtcConnectionToService.status === 'connected') {

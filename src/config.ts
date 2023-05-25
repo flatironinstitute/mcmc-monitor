@@ -9,7 +9,7 @@ export const defaultServiceBaseUrl = 'http://localhost:61542'
 export const exampleServiceBaseUrl = 'https://lit-bayou-76056.herokuapp.com'
 
 export const serviceBaseUrl = queryParams.s ? (
-    queryParams.s
+    queryParams.s === 'spa' ? '' : queryParams.s // if we are in spa mode, don't use a serviceBaseUrl
 ) : (
     defaultServiceBaseUrl
 )

@@ -22,17 +22,19 @@ const MainWindow: FunctionComponent<Props> = (props: Props) => {
 		updateRuns()
 	}, [updateRuns])
 
-	if (connectedToService === undefined) {
-        return <ConnectionInProgress />
-	}
+    if (serviceBaseUrl) {
+        if (connectedToService === undefined) {
+            return <ConnectionInProgress />
+        }
 
-	if (connectedToService === false) {
-		return (
-            <LogoFrame>
-                <FailedConnection serviceProtocolVersion={serviceProtocolVersion} />
-            </LogoFrame>
-		)
-	}
+        if (connectedToService === false) {
+            return (
+                <LogoFrame>
+                    <FailedConnection serviceProtocolVersion={serviceProtocolVersion} />
+                </LogoFrame>
+            )
+        }
+    }
 
     switch (route.page) {
         case "home":
