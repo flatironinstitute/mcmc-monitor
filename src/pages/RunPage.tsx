@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { MCMCChain, MCMCRun } from "../../service/src/types";
+import { MCMCChain } from "../../service/src/types";
 import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import RunControlPanel from "../components/RunControlPanel";
@@ -14,7 +14,7 @@ type Props = {
 }
 
 const RunPage: FunctionComponent<Props> = ({runId, dataManager}) => {
-	const {runs, chains, sequences, updateChainsForRun, setSelectedChainIds, generalOpts, updateKnownData, setSelectedRunId} = useMCMCMonitor()
+	const {chains, sequences, updateChainsForRun, setSelectedChainIds, generalOpts, updateKnownData, setSelectedRunId} = useMCMCMonitor()
 
     useEffect(() => {
         if (dataManager === undefined) return
@@ -53,7 +53,8 @@ const RunPage: FunctionComponent<Props> = ({runId, dataManager}) => {
 		return Math.max(...a)
 	}, [sequences, runId])
 
-	const run: MCMCRun | undefined = useMemo(() => (runs.filter(r => (r.runId === runId))[0]), [runs, runId])
+	// not actually used
+	// const run: MCMCRun | undefined = useMemo(() => (runs.filter(r => (r.runId === runId))[0]), [runs, runId])
 
 	const chainsForRun = useMemo(() => {
         return (chains.filter(c => (c.runId === runId))
@@ -78,7 +79,8 @@ const RunPage: FunctionComponent<Props> = ({runId, dataManager}) => {
 
 	const {width, height} = useWindowDimensions()
 
-	if (!run) return <span>Run not found: {runId}</span>
+	// this check is unnecessary
+	// if (!run) return <span>Run not found: {runId}</span>
 	return (
 		<div style={{position: 'absolute', width: width - 40, height: height - 40, margin: 20, overflow: 'hidden'}}>
 			<Splitter

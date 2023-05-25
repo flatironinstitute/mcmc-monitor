@@ -1,6 +1,7 @@
 import { useCallback, useContext, useMemo } from 'react'
 import { GetChainsForRunRequest, GetRunsRequest, MCMCChain, MCMCRun, isGetChainsForRunResponse, isGetRunsResponse } from '../../service/src/types'
 import postApiRequest from '../networking/postApiRequest'
+import getSpaChainsForRun from '../spaInterface/getSpaChainsForRun'
 import { MCMCMonitorContext, detectedWarmupIterationCount } from './MCMCMonitorData'
 import { GeneralOpts } from './MCMCMonitorDataTypes'
 import updateChains from './updateChains'
@@ -46,16 +47,24 @@ export const useMCMCMonitor = () => {
 
     const updateChainsForRun = useCallback((runId: string) => {
         ; (async () => {
-            const req: GetChainsForRunRequest = {
-                type: 'getChainsForRunRequest',
-                runId
+            if (runId.startsWith('spa|')) {
+                // handle the special case where we have a stan playground run
+                const chains = await getSpaChainsForRun(runId)
+                setChainsForRun(runId, chains)
             }
-            const resp = await postApiRequest(req)
-            if (!isGetChainsForRunResponse(resp)) {
-                console.warn(JSON.stringify(resp))
-                throw Error('Unexpected getChainsForRun response')
+            else {
+                // handle the usual case
+                const req: GetChainsForRunRequest = {
+                    type: 'getChainsForRunRequest',
+                    runId
+                }
+                const resp = await postApiRequest(req)
+                if (!isGetChainsForRunResponse(resp)) {
+                    console.warn(JSON.stringify(resp))
+                    throw Error('Unexpected getChainsForRun response')
+                }
+                setChainsForRun(runId, resp.chains)
             }
-            setChainsForRun(runId, resp.chains)
         })()
     }, [setChainsForRun])
 

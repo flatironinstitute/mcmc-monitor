@@ -45,6 +45,8 @@ const MainWindow: FunctionComponent<Props> = (props: Props) => {
         case "run":
             return <RunPage runId={route.runId} dataManager={dataManager} />
             break
+        case "spa":
+            return <RunPage runId={`spa|${route.analysisId}|${route.fileName}`} dataManager={dataManager} />
         default:
             return <span />
     }

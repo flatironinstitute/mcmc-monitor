@@ -6,6 +6,10 @@ export type Route = {
 } | {
     page: 'run',
     runId: string
+} | {
+    page: 'spa',
+    analysisId: string
+    fileName: string
 }
 
 const useRoute = () => {
@@ -21,6 +25,16 @@ const useRoute = () => {
                 runId
             }
         }
+        else if (location.pathname.startsWith('/spa/')) {
+            const a = location.pathname.split('/')
+            const analysisId = a[2]
+            const fileName = a[3]
+            return {
+                page: 'spa',
+                analysisId,
+                fileName
+            }
+        }
         else {
             return {
                 page: 'home'
@@ -34,6 +48,9 @@ const useRoute = () => {
         }
         else if (r.page === 'run') {
             navigate({...location, pathname: `/run/${r.runId}`})
+        }
+        else if (r.page === 'spa') {
+            navigate({...location, pathname: `/spa/${r.analysisId}/${r.fileName}`})
         }
     }, [location, navigate])
 
