@@ -4,6 +4,7 @@ import { MCMCMonitorAction, MCMCMonitorData } from '../../src/MCMCMonitorDataMan
 
 type apiEndpoint = (request: MCMCMonitorRequest) => Promise<MCMCMonitorResponse>
 type dispatcher = (a: MCMCMonitorAction) => void
+type spaSequenceUpdates = (runId: string, sequences: MCMCSequence[]) => Promise<MCMCSequenceUpdate[] | undefined>
 
 type mockSequence = {
     runId: string,
@@ -52,6 +53,7 @@ describe("Sequence update request function", () => {
     let mockDispatch: dispatcher
     let mockData: MCMCMonitorData
     let mockResponse: GetSequencesResponse
+    let mockGetSpaSequenceUpdates: Mock
     
     beforeEach(() => {
         mockDispatchBase = vi.fn()
@@ -69,6 +71,14 @@ describe("Sequence update request function", () => {
             return {
                 __esModule: true,
                 default: mockPostApiRequestFn as unknown as apiEndpoint
+            }
+        })
+
+        mockGetSpaSequenceUpdates = vi.fn()
+        vi.doMock('../../src/spaInterface/getSpaSequenceUpdates', () => {
+            return {
+                __esModule: true,
+                default: mockGetSpaSequenceUpdates as unknown as spaSequenceUpdates
             }
         })
     })

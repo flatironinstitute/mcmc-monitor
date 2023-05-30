@@ -21,7 +21,6 @@ export default defineConfig({
         reporter: ['text', 'lcov']
     },
     exclude: [...configDefaults.exclude, "service/**"],
-    environment: 'jsdom'
   },
   plugins: [
     react(),
