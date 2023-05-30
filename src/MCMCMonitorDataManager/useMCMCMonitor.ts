@@ -1,8 +1,9 @@
 import { useCallback, useContext, useMemo } from 'react'
 import { GetChainsForRunRequest, GetRunsRequest, MCMCChain, MCMCRun, isGetChainsForRunResponse, isGetRunsResponse } from '../../service/src/types'
-import { serviceBaseUrl } from '../config'
+import { serviceBaseUrl, spaMode } from '../config'
 import postApiRequest from '../networking/postApiRequest'
 import getSpaChainsForRun from '../spaInterface/getSpaChainsForRun'
+import { isSpaRunId } from '../spaInterface/util'
 import { MCMCMonitorContext, detectedWarmupIterationCount } from './MCMCMonitorData'
 import { GeneralOpts } from './MCMCMonitorDataTypes'
 import updateChains from './updateChains'
@@ -34,7 +35,10 @@ export const useMCMCMonitor = () => {
 
     const updateRuns = useCallback(() => {
         ; (async () => {
-            if (!serviceBaseUrl) return // for example, spa mode
+            if (spaMode) return // no need to update runs in spa mode (we only have one run)
+            if (!serviceBaseUrl) {
+                throw Error('Unexpected: cannot update runs. ServiceBaseUrl not set')
+            }
             const req: GetRunsRequest = {
                 type: 'getRunsRequest'
             }
@@ -49,10 +53,10 @@ export const useMCMCMonitor = () => {
 
     const updateChainsForRun = useCallback((runId: string) => {
         ; (async () => {
-            if (runId.startsWith('spa|')) {
+            let chains: MCMCChain[]
+            if (isSpaRunId(runId)) {
                 // handle the special case where we have a stan playground run
-                const chains = await getSpaChainsForRun(runId)
-                setChainsForRun(runId, chains)
+                chains = await getSpaChainsForRun(runId)
             }
             else {
                 // handle the usual case
@@ -65,8 +69,9 @@ export const useMCMCMonitor = () => {
                     console.warn(JSON.stringify(resp))
                     throw Error('Unexpected getChainsForRun response')
                 }
-                setChainsForRun(runId, resp.chains)
+                chains = resp.chains
             }
+            setChainsForRun(runId, chains)
         })()
     }, [setChainsForRun])
 

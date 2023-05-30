@@ -1,4 +1,5 @@
 import postStanPlaygroundRequest from "./postStanPlaygroundRequest";
+import { parseSpaRunId } from "./util";
 
 export type SpaOutput = {
     chains: {
@@ -18,9 +19,7 @@ export const spaOutputsForRunIds: {[key: string]: {
 }} = {}
 
 export const updateSpaOutputForRun = async (runId: string) => {
-    const a = runId.split('|')
-        const projectId = a[1]
-        const fileName = a[2]
+    const {projectId, fileName} = parseSpaRunId(runId)
     
     // first we need to get the sha1 of the latest file
     const req = {

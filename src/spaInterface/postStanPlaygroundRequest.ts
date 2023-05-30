@@ -1,6 +1,7 @@
+import { stanPlaygroundUrl } from "../config"
+
 const postStanPlaygroundRequest = async (req: any): Promise<any> => {
-    const url = `https://stan-playground.vercel.app/api/playground`
-    // const url = `http://localhost:3000/api/playground`
+    const url = stanPlaygroundUrl
 
     const rr = {
         payload: req

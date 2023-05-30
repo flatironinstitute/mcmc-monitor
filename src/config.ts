@@ -8,11 +8,15 @@ export const defaultServiceBaseUrl = 'http://localhost:61542'
 
 export const exampleServiceBaseUrl = 'https://lit-bayou-76056.herokuapp.com'
 
+export const spaMode = queryParams.s === 'spa'
+
 export const serviceBaseUrl = queryParams.s ? (
-    queryParams.s === 'spa' ? '' : queryParams.s // if we are in spa mode, don't use a serviceBaseUrl
+    spaMode ? '' : queryParams.s // if we are in spa mode, don't use a serviceBaseUrl
 ) : (
     defaultServiceBaseUrl
 )
+
+export const stanPlaygroundUrl = "https://stan-playground.vercel.app/api/playground"
 
 export const useWebrtc = queryParams.webrtc === '1'
 

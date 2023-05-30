@@ -53,9 +53,6 @@ const RunPage: FunctionComponent<Props> = ({runId, dataManager}) => {
 		return Math.max(...a)
 	}, [sequences, runId])
 
-	// not actually used
-	// const run: MCMCRun | undefined = useMemo(() => (runs.filter(r => (r.runId === runId))[0]), [runs, runId])
-
 	const chainsForRun = useMemo(() => {
         return (chains.filter(c => (c.runId === runId))
                       .sort((a, b) => a.chainId.localeCompare(b.chainId)))
@@ -79,8 +76,6 @@ const RunPage: FunctionComponent<Props> = ({runId, dataManager}) => {
 
 	const {width, height} = useWindowDimensions()
 
-	// this check is unnecessary
-	// if (!run) return <span>Run not found: {runId}</span>
 	return (
 		<div style={{position: 'absolute', width: width - 40, height: height - 40, margin: 20, overflow: 'hidden'}}>
 			<Splitter

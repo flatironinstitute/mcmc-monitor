@@ -8,6 +8,7 @@ import useRoute from "../util/useRoute";
 import Home from "./Home";
 import Logo from "./Logo";
 import RunPage from "./RunPage";
+import { constructSpaRunId } from "../spaInterface/util";
 
 
 type Props = {
@@ -48,7 +49,7 @@ const MainWindow: FunctionComponent<Props> = (props: Props) => {
             return <RunPage runId={route.runId} dataManager={dataManager} />
             break
         case "spa":
-            return <RunPage runId={`spa|${route.analysisId}|${route.fileName}`} dataManager={dataManager} />
+            return <RunPage runId={constructSpaRunId(route.projectId, route.fileName)} dataManager={dataManager} />
         default:
             return <span />
     }
