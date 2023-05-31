@@ -8,6 +8,7 @@ import useRoute from "../util/useRoute";
 import Home from "./Home";
 import Logo from "./Logo";
 import RunPage from "./RunPage";
+import { constructSpaRunId } from "../spaInterface/util";
 
 
 type Props = {
@@ -22,17 +23,19 @@ const MainWindow: FunctionComponent<Props> = (props: Props) => {
 		updateRuns()
 	}, [updateRuns])
 
-	if (connectedToService === undefined) {
-        return <ConnectionInProgress />
-	}
+    if (serviceBaseUrl) {
+        if (connectedToService === undefined) {
+            return <ConnectionInProgress />
+        }
 
-	if (connectedToService === false) {
-		return (
-            <LogoFrame>
-                <FailedConnection serviceProtocolVersion={serviceProtocolVersion} />
-            </LogoFrame>
-		)
-	}
+        if (connectedToService === false) {
+            return (
+                <LogoFrame>
+                    <FailedConnection serviceProtocolVersion={serviceProtocolVersion} />
+                </LogoFrame>
+            )
+        }
+    }
 
     switch (route.page) {
         case "home":
@@ -45,6 +48,8 @@ const MainWindow: FunctionComponent<Props> = (props: Props) => {
         case "run":
             return <RunPage runId={route.runId} dataManager={dataManager} />
             break
+        case "spa":
+            return <RunPage runId={constructSpaRunId(route.projectId, route.fileName)} dataManager={dataManager} />
         default:
             return <span />
     }

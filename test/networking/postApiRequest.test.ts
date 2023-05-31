@@ -54,6 +54,7 @@ describe("Post API Request function", () => {
             return {
                 __esModule: true,
                 serviceBaseUrl: myBaseUrl,
+                spaMode: false,
                 useWebrtc,
                 webrtcConnectionToService: rtcCnxn
             }
@@ -86,6 +87,7 @@ describe("Post API Request function", () => {
             return {
                 __esModule: true,
                 serviceBaseUrl: myBaseUrl,
+                spaMode: false,
                 useWebrtc: true,
                 webrtcConnectionToService: rtcCnxn
             }

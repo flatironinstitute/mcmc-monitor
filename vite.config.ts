@@ -20,7 +20,7 @@ export default defineConfig({
         provider: "c8",
         reporter: ['text', 'lcov']
     },
-    exclude: [...configDefaults.exclude, "service/**"]
+    exclude: [...configDefaults.exclude, "service/**"],
   },
   plugins: [
     react(),
