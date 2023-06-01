@@ -134,7 +134,7 @@ describe("Post API Request function", () => {
         expect(isMCMCMonitorResponse(resp)).toBeTruthy()
     })
 
-    test("postApiRequest thrwos on stan-playground mode", async () => {
+    test("postApiRequest throws on stan-playground mode", async () => {
         mockConfig({useStanPlaygroundMode: true})
         const postApiRequest = await importFunctionUnderTest()
         expect(() => postApiRequest(myRequest)).rejects.toThrow(/spa mode/)
