@@ -31,7 +31,7 @@ export const updateSpaOutputForRun = async (runId: string) => {
     const resp = await postStanPlaygroundRequest(req)
     if (resp.type !== 'getProjectFile') {
         console.warn(resp)
-        throw Error('Unexpected response from Stan Playground')
+        throw Error('Unexpected response from Stan Playground while retrieving project file')
     }
     const sha1 = resp.projectFile.contentSha1
 
@@ -51,7 +51,7 @@ export const updateSpaOutputForRun = async (runId: string) => {
     const resp2 = await postStanPlaygroundRequest(req2)
     if (resp2.type !== 'getDataBlob') {
         console.warn(resp2)
-        throw Error('Unexpected response from Stan Playground')
+        throw Error('Unexpected response from Stan Playground while retrieving dataset')
     }
     const x = JSON.parse(resp2.content)
     const spaOutput = x as SpaOutput

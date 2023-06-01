@@ -40,7 +40,15 @@ describe("Post API Request function", () => {
         vi.resetModules()
     })
 
-    const mockConfig = (useWebrtc = false, useUndefinedWebrtcConnection = false) => {
+    type mockConfigProps = {
+        useWebrtc?: boolean,
+        useUndefinedWebrtcConnection?: boolean,
+        useStanPlaygroundMode?: boolean,
+        useEmptyServiceBaseUrl?: boolean
+    }
+
+    const mockConfig = (props: mockConfigProps) => {
+        const { useWebrtc, useUndefinedWebrtcConnection, useStanPlaygroundMode, useEmptyServiceBaseUrl } = props
         mockWebrtcPostApiRequest.mockReturnValue(webrtcMockResponse)
         const rtcCnxn = useWebrtc
             ? useUndefinedWebrtcConnection
@@ -53,8 +61,8 @@ describe("Post API Request function", () => {
         vi.doMock('../../src/config', () => {
             return {
                 __esModule: true,
-                serviceBaseUrl: myBaseUrl,
-                spaMode: false,
+                serviceBaseUrl: useEmptyServiceBaseUrl ? undefined : myBaseUrl,
+                spaMode: useStanPlaygroundMode,
                 useWebrtc,
                 webrtcConnectionToService: rtcCnxn
             }
@@ -67,7 +75,7 @@ describe("Post API Request function", () => {
     test("postApiRequest returns a response from the configured API endpoint", async () => {
         const myFetch = vi.fn(fetchFactory())
         global.fetch = myFetch
-        mockConfig()
+        mockConfig({})
         const postApiRequest = await importFunctionUnderTest()
         const resp = await postApiRequest(myRequest)
         expect(myFetch).toHaveBeenCalledTimes(1)
@@ -99,7 +107,7 @@ describe("Post API Request function", () => {
     })
 
     test("postApiRequest uses web rtc if configured and connected", async () => {
-        mockConfig(true)
+        mockConfig({useWebrtc: true})
         const postApiRequest = await importFunctionUnderTest()
         const nonProbeResponse = await postApiRequest(myNonProbeRequest)
         expect(mockWebrtcPostApiRequest).toHaveBeenCalledTimes(1)
@@ -109,7 +117,7 @@ describe("Post API Request function", () => {
     test("postApiRequest webrtc falls back to http if service connection is invalid", async () => {
         const myFetch = vi.fn(fetchFactory())
         global.fetch = myFetch
-        mockConfig(true, true)
+        mockConfig({useWebrtc: true, useUndefinedWebrtcConnection: true})
         const postApiRequest = await importFunctionUnderTest()
         const resp = await postApiRequest(myNonProbeRequest)
         expect(myFetch).toHaveBeenCalledOnce()
@@ -119,11 +127,23 @@ describe("Post API Request function", () => {
     test("postApiRequest with webrtc uses non-webrtc for probe or signaling request", async () => {
         const myFetch = vi.fn(fetchFactory())
         global.fetch = myFetch
-        mockConfig(true)
+        mockConfig({useWebrtc: true})
         const postApiRequest = await importFunctionUnderTest()
         const resp = await postApiRequest(mySignalingRequest)
         expect(mockWebrtcPostApiRequest).not.lastCalledWith(mySignalingRequest)
         expect(isMCMCMonitorResponse(resp)).toBeTruthy()
+    })
+
+    test("postApiRequest thrwos on stan-playground mode", async () => {
+        mockConfig({useStanPlaygroundMode: true})
+        const postApiRequest = await importFunctionUnderTest()
+        expect(() => postApiRequest(myRequest)).rejects.toThrow(/spa mode/)
+    })
+
+    test("postApiRequest throws on undefined service base url", async () => {
+        mockConfig({useEmptyServiceBaseUrl: true})
+        const postApiRequest = await importFunctionUnderTest()
+        expect(() => postApiRequest(myRequest)).rejects.toThrow(/not set/)
     })
 
     test("postApiRequest throws error on invalid responses", async () => {
@@ -132,7 +152,7 @@ describe("Post API Request function", () => {
         vi.spyOn(console, 'warn').mockImplementation(myMockedWarn)
 
         // module mocking has to happen BEFORE your function-under-test is imported.
-        mockConfig()
+        mockConfig({})
         const postApiRequest = await importFunctionUnderTest()
 
         await expect(() => postApiRequest(myRequest)).rejects.toThrowError(TypeError)
