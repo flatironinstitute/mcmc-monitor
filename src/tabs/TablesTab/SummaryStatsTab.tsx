@@ -19,7 +19,7 @@ const theme = createTheme({
 	}
 });
 
-const TablesTab: FunctionComponent<Props> = ({width, height}) => {
+const SummaryStatsTab: FunctionComponent<Props> = ({width, height}) => {
 	const {selectedVariableNames, selectedChainIds} = useMCMCMonitor()
 
 	return (
@@ -46,4 +46,4 @@ const TablesTab: FunctionComponent<Props> = ({width, height}) => {
 	)
 }
 
-export default TablesTab
+export default SummaryStatsTab
