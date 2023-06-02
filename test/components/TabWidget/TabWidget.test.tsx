@@ -1,12 +1,10 @@
 // @vitest-environment jsdom
 
-// import { Mock, afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-
 import matchers from '@testing-library/jest-dom/matchers'
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { FunctionComponent } from 'react'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import TabWidget from '../../../src/tabs/TabWidget/TabWidget'
 
 expect.extend(matchers)
