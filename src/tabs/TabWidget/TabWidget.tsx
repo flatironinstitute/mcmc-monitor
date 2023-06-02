@@ -16,14 +16,21 @@ const tabBarHeight = 30 + 25
 const TabWidget: FunctionComponent<PropsWithChildren<Props>> = ({children, tabs, width, height}) => {
     const [currentTabIndex, setCurrentTabIndex] = useState<number>(0)
 
-    const tabViews = useMemo(() => Array.isArray(children) ? (children as React.ReactElement[]) : ([children] as React.ReactElement[]), [children])
-    if ((tabViews || []).length !== tabs.length) {
-        throw Error(`TabWidget: incorrect number of tabs ${(tabViews || []).length} <> ${tabs.length}`)
+    const tabViews = useMemo(() => (Array.isArray(children) ? (children) : ([children])), [children]) as React.ReactElement[]
+    if (tabViews.length !== tabs.length) {
+        throw Error(`TabWidget: incorrect number of tabs ${tabViews.length} <> ${tabs.length}`)
+    }
+    if (tabViews.some(v => v == null)) {
+        // Double-equals catches both null and undefined in this context.
+        // This probably can't happen--I've only seen a null in tabViews when there aren't actually any children.
+        // And even then it'd probably get caught by the length comparison. But just in case:
+        throw Error("TabWidget: null or undefined children detected")
     }
 
     const hMargin = 8
     const vMargin = 8
-    const W = (width || 300) - hMargin * 2
+    // const W = (width || 300) - hMargin * 2
+    const W = width - hMargin * 2
     const H = height - vMargin * 2
 
     // TODO: attach this styling into a class rather than hard-coding?
@@ -41,9 +48,6 @@ const TabWidget: FunctionComponent<PropsWithChildren<Props>> = ({children, tabs,
         }),
         [tabViews, H, W]
     )
-    if ((tabViews || []).length === 0) {
-        return <div />
-    }
 
     return (
         <div

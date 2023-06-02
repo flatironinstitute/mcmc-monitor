@@ -6,7 +6,7 @@ type Props = {
         label: string
         closeable: boolean
     }[]
-    currentTabIndex: number | undefined
+    currentTabIndex: number
     onCurrentTabIndexChanged: (i: number) => void
 }
 
@@ -14,7 +14,7 @@ const TabWidgetTabBar: FunctionComponent<Props> = ({ tabs, currentTabIndex, onCu
     const classes = ['ViewContainerTabBar']
     return (
         <Tabs
-            value={currentTabIndex || 0}
+            value={currentTabIndex}
             scrollButtons="auto"
             variant="scrollable"
             className={classes.join(' ')}
