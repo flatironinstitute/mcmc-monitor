@@ -73,8 +73,9 @@ If another process subsequently writes an analysis to `/home/user/examples/analy
 begin displaying a run called `analysis-3` as well.
 
 Note that there is not currently a way to change the monitored directory while the monitor is running.
-Some tools (such as `CmdStanPy` and `CmdStanR`) use `tmp` directories by default; in this case, you will need
-to provide an `output_dir` argument for those packages which should match the path given to `mcmc-monitor`.
+Some tools (such as `CmdStanPy` and `CmdStanR`) use `tmp` directories by default; to monitor the output from
+these programs, you must either tell MCMC Monitor to monitor the `tmp` directory, or use an `output_dir` argument
+to send program output to specified subdirectories under the monitored directory.
 
 To enable remote access (i.e., access this monitor service from a different computer) follow the instructions in the section below.
 
