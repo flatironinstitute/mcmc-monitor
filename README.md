@@ -63,9 +63,18 @@ npx mcmc-monitor@latest start --dir /path/to/parent/output/directory/of/sampler 
 ```
 
 The `--dir` flag tells `mcmc-monitor` which directory to monitor for output, and should correspond to the directory where
-the sampler (Stan, etc) is writing its output files. Note that it may be necessary to give the sampler an explicit output
-directory--for instance, `CmdStanPy` and `CmdStanR` both write to a `tmp` directory by default, so you will need to provide
-an `output_dir` arg for those packages which should match the path given to `mcmc-monitor`.
+the sampler (e.g. Stan) writes its output files. The service expects each subdirectory of `--dir` to contain the output
+CSV files from one execution of a sampler program (a "run"). These runs are the links displayed on the MCMC Monitor home page.
+
+For example, suppose we run `mcmc-monitor` with `--dir /home/user/examples/`, and that this directory contains two
+subdirectories, `multi-normal-1` and `multi-normal-2`, each containing the output of a Stan run (completed or
+still in progress). Then the monitor home page will list two runs, linked as `multi-normal-1` and `multi-normal-2`.
+If another process subsequently writes an analysis to `/home/user/examples/analysis-3`, then the monitor will
+begin displaying a run called `analysis-3` as well.
+
+Note that there is not currently a way to change the monitored directory while the monitor is running.
+Some tools (such as `CmdStanPy` and `CmdStanR`) use `tmp` directories by default; in this case, you will need
+to provide an `output_dir` argument for those packages which should match the path given to `mcmc-monitor`.
 
 To enable remote access (i.e., access this monitor service from a different computer) follow the instructions in the section below.
 
