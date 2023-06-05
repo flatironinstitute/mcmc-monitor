@@ -54,13 +54,28 @@ npm install -g @mapbox/node-pre-gyp
 Start the monitor:
 
 ```bash
-npx mcmc-monitor@latest start --dir /path/to/parent/output/directory --verbose
+npx mcmc-monitor@latest start --dir /path/to/parent/output/directory/of/sampler --verbose
 # The server will start listening for requests
 # Keep this terminal open
 # Open the web app linked above
 
 # Optionally use the --enable-remote-access flag
 ```
+
+The `--dir` flag tells `mcmc-monitor` which directory to monitor for output, and should correspond to the directory where
+the sampler (e.g. Stan) writes its output files. The service expects each subdirectory of `--dir` to contain the output
+CSV files from one execution of a sampler program (a "run"). These runs are the links displayed on the MCMC Monitor home page.
+
+For example, suppose we run `mcmc-monitor` with `--dir /home/user/examples/`, and that this directory contains two
+subdirectories, `multi-normal-1` and `multi-normal-2`, each containing the output of a Stan run (completed or
+still in progress). Then the monitor home page will list two runs, linked as `multi-normal-1` and `multi-normal-2`.
+If another process subsequently writes an analysis to `/home/user/examples/analysis-3`, then the monitor will
+begin displaying a run called `analysis-3` as well.
+
+Note that there is not currently a way to change the monitored directory while the monitor is running.
+Some tools (such as `CmdStanPy` and `CmdStanR`) use `tmp` directories by default; to monitor the output from
+these programs, you must either tell MCMC Monitor to monitor the `tmp` directory, or use an `output_dir` argument
+to send program output to specified subdirectories under the monitored directory.
 
 To enable remote access (i.e., access this monitor service from a different computer) follow the instructions in the section below.
 
