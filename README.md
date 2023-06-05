@@ -54,13 +54,18 @@ npm install -g @mapbox/node-pre-gyp
 Start the monitor:
 
 ```bash
-npx mcmc-monitor@latest start --dir /path/to/parent/output/directory --verbose
+npx mcmc-monitor@latest start --dir /path/to/parent/output/directory/of/sampler --verbose
 # The server will start listening for requests
 # Keep this terminal open
 # Open the web app linked above
 
 # Optionally use the --enable-remote-access flag
 ```
+
+The `--dir` flag tells `mcmc-monitor` which directory to monitor for output, and should correspond to the directory where
+the sampler (Stan, etc) is writing its output files. Note that it may be necessary to give the sampler an explicit output
+directory--for instance, `CmdStanPy` and `CmdStanR` both write to a `tmp` directory by default, so you will need to provide
+an `output_dir` arg for those packages which should match the path given to `mcmc-monitor`.
 
 To enable remote access (i.e., access this monitor service from a different computer) follow the instructions in the section below.
 
