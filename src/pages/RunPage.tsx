@@ -4,7 +4,7 @@ import MCMCDataManager from "../MCMCMonitorDataManager/MCMCMonitorDataManager";
 import { useMCMCMonitor } from "../MCMCMonitorDataManager/useMCMCMonitor";
 import RunControlPanel from "../components/RunControlPanel";
 import Splitter from "../components/Splitter";
-import { AutoCorrelationTab, ConnectionTab, ExportTab, HistogramTab, RunInfoTab, ScatterplotsTab, TabWidget, TablesTab, TimeSeries } from "../tabs";
+import { AutoCorrelationTab, ConnectionTab, ExportTab, HistogramTab, RunInfoTab, ScatterplotsTab, SummaryStatsTab, TabWidget, TracePlotsTab } from "../tabs";
 import { chainColorForIndex } from "../util/chainColorList";
 import useWindowDimensions from "../util/useWindowDimensions";
 
@@ -108,8 +108,8 @@ type RightContentProps = {
 }
 
 const tabs = [
-	{label: 'Time Series', closeable: false},
-	{label: 'Tables', closeable: false},
+	{label: 'Trace Plots', closeable: false},
+	{label: 'Summary Statistics', closeable: false},
     {label: 'Autocorrelations', closeable: false},
     {label: 'Histograms', closeable: false},
 	{label: 'Run Info', closeable: false},
@@ -127,14 +127,14 @@ const RightContent: FunctionComponent<RightContentProps> = ({width, height, numD
 			width={width}
 			height={height}
 		>
-			<TimeSeries
+			<TracePlotsTab
 				width={0}
 				height={0}
 				runId={runId}
 				chainColors={chainColors}
 				numDrawsForRun={numDrawsForRun}
 			/>
-			<TablesTab
+			<SummaryStatsTab
 				width={0}
 				height={0}
 			/>

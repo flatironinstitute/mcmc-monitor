@@ -12,7 +12,7 @@ type TimeSeriesPlotProps = CollapsibleContentTabProps & {
     selectedVariableName: string
 }
 
-const TimeSeriesPlot: FunctionComponent<TimeSeriesPlotProps> = (props) => {
+const TracePlot: FunctionComponent<TimeSeriesPlotProps> = (props) => {
     const { runId, chainColors, numDrawsForRun, sizeScale, selectedVariableName, width } = props
     const { selectedChainIds, effectiveInitialDrawsToExclude } = useMCMCMonitor()
     const samplesRange = useSequenceDrawRange(numDrawsForRun, effectiveInitialDrawsToExclude)
@@ -32,7 +32,7 @@ const TimeSeriesPlot: FunctionComponent<TimeSeriesPlotProps> = (props) => {
     )
 }
 
-const TimeSeries: FunctionComponent<CollapsibleContentTabProps> = (props) => {
+const TracePlotsTab: FunctionComponent<CollapsibleContentTabProps> = (props) => {
     const { width, height } = props
     const {selectedVariableNames } = useMCMCMonitor()
     const [collapsedVariables, collapsedVariablesDispatch] = useReducer(collapsedVariablesReducer, {})
@@ -47,7 +47,7 @@ const TimeSeries: FunctionComponent<CollapsibleContentTabProps> = (props) => {
                 isCollapsed={collapsedVariables[v]}
                 collapsedDispatch={collapsedVariablesDispatch}
             >
-                <TimeSeriesPlot
+                <TracePlot
                     {...props}
                     selectedVariableName={v}
                     sizeScale={sizeScale}
@@ -67,4 +67,4 @@ const TimeSeries: FunctionComponent<CollapsibleContentTabProps> = (props) => {
     )
 }
 
-export default TimeSeries
+export default TracePlotsTab
