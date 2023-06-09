@@ -1,27 +1,20 @@
 import { Tab, Tabs } from '@mui/material';
-import { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent } from 'react';
 
 type Props = {
     tabs: {
         label: string
         closeable: boolean
     }[]
-    currentTabIndex: number | undefined
+    currentTabIndex: number
     onCurrentTabIndexChanged: (i: number) => void
 }
 
 const TabWidgetTabBar: FunctionComponent<Props> = ({ tabs, currentTabIndex, onCurrentTabIndexChanged }) => {
-    useEffect(() => {
-        if (currentTabIndex === undefined) {
-            if (tabs.length > 0) {
-                onCurrentTabIndexChanged(0)
-            }
-        }
-    }, [currentTabIndex, onCurrentTabIndexChanged, tabs.length])
     const classes = ['ViewContainerTabBar']
     return (
         <Tabs
-            value={currentTabIndex || 0}
+            value={currentTabIndex}
             scrollButtons="auto"
             variant="scrollable"
             className={classes.join(' ')}
