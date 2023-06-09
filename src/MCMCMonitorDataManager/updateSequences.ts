@@ -32,7 +32,7 @@ export default async function updateSequences(data: MCMCMonitorData, dispatch: (
             }
             sequenceUpdates = resp.sequences
         }
-        if (sequenceUpdates) {
+        if (sequenceUpdates && sequenceUpdates.length > 0) {
             dispatch({
                 type: "updateSequenceData",
                 sequences: sequenceUpdates

@@ -67,6 +67,14 @@ describe("Chain selection component", () => {
         expect(colorSets.length).toEqual(chains.length)
         colorSets.forEach(cs => expect(chainColorsBase.includes(rgbToHex(cs))).toBeTruthy())
     })
+    test("Renders black color swatch if appropriate color not found", () => {
+        render(<ChainsSelector chains={chains} allChainIds={allChainIds} chainColors={{}} />)
+        const squareSpans = screen.getAllByText(SOLID_SQUARE, {exact: false})
+        expect(squareSpans.length).toEqual(chains.length)
+        const colorSets = squareSpans.map(s => s.style.color)
+        expect(colorSets.length).toEqual(chains.length)
+        colorSets.forEach(cs => expect(cs).toEqual('black'))
+    })
     test("Sets checkbox state to match selected chain ID state", async () => {
         const localImport = (await import('../../src/components/ChainsSelector'))
         const sut = localImport.default

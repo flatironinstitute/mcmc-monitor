@@ -109,6 +109,34 @@ describe("Sequence update request function", () => {
         if (!isGetSequencesRequest(call)) return // should always be true--here just for type narrowing
         expect(call.sequences.length).toBe(sequenceFeedData.filter(s => s.wantsUpdate).length)
     })
+    test("Throws error on mix of stan-playground and non-stan-playground runs", async () => {
+        const mockIsSpaRunId = vi.fn().mockReturnValueOnce(true).mockReturnValue(false)
+        vi.doMock('../../src/spaInterface/util', () => {
+            return {
+                __esModule: true,
+                isSpaRunId: mockIsSpaRunId
+            }
+        })
+        const local_updateSequences = (await import("../../src/MCMCMonitorDataManager/updateSequences")).default
+        vi.spyOn(console, 'warn').mockImplementation(() => {})
+        // Todo: catch and assert on warning? issues with async
+        expect(() => local_updateSequences(mockData, mockDispatch)).rejects.toThrow(/Cannot mix/)
+        vi.spyOn(console, 'warn').mockRestore()
+    })
+    test("Uses stan-playground sequence update fn for stan-playground runs", async () => {
+        const mockIsSpaRunId = vi.fn().mockReturnValue(true)
+        vi.doMock('../../src/spaInterface/util', () => {
+            return {
+                __esModule: true,
+                isSpaRunId: mockIsSpaRunId
+            }
+        })
+        const local_updateSequences = (await import("../../src/MCMCMonitorDataManager/updateSequences")).default
+        mockGetSpaSequenceUpdates.mockResolvedValue([])
+        await local_updateSequences(mockData, mockDispatch)
+        expect(mockGetSpaSequenceUpdates).toHaveBeenCalledOnce()
+        expect(mockDispatch).toHaveBeenCalledTimes(0)
+    })
     test("Throws error on unexpected API request", async () => {
         mockPostApiRequestFn.mockResolvedValue({type: "Not a valid response"})
         const spy = vi.spyOn(console, 'warn').mockImplementation(() => {})
