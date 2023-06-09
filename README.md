@@ -118,6 +118,14 @@ The web app is hosted [here](http://flatironinstitute.github.io/mcmc-monitor).
 
 By default, the web app will attempt to connect to your monitoring service on port 61542 of localhost, but you can configure the GUI to point to other services, including remote services via our proxy server. See [enabling remote access](#enabling-remote-access).
 
+### Note on Safari
+
+Monitoring a local service will not currently work in Safari due to an issue with non-user-configurable security settings. Firefox and Chrome are known to work fine for monitoring local services, including on Mac environments; affected users should use one of these browsers.
+
+Safari can still monitor remote services, as well as services delivered over proxy, without a problem.
+
+Regardless of browser, mobile users will likely need to use landscape orientation.
+
 ## Enabling remote access
 
 To allow remote computers to access your monitoring service, do the following
