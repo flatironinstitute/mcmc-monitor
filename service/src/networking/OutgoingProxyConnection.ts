@@ -4,7 +4,7 @@ import { InitializeMessageFromService, MCMCMonitorResponse, PingMessageFromServi
 import SignalCommunicator from './SignalCommunicator'
 import { handleApiRequest } from './handleApiRequest'
 
-const proxyUrl = process.env['MCMC_MONITOR_PROXY'] || `https://mcmc-monitor-proxy.herokuapp.com`
+const proxyUrl = process.env['MCMC_MONITOR_PROXY'] || `https://mcmc-monitor-proxy-0b1b73a9f2a0.herokuapp.com/`
 const proxySecret = process.env['MCMC_MONITOR_PROXY_SECRET'] || 'mcmc-monitor-no-secret'
 
 class OutgoingProxyConnection {

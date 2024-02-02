@@ -1,6 +1,6 @@
 {
   "name": "mcmc-monitor",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "MCMC Monitor service",
   "main": "dist/src/index.js",
   "bin": {
