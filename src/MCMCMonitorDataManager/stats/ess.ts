@@ -3,6 +3,7 @@
 import { computeMean } from "../updateSequenceStats"
 import { inverseTransform, transform as transformFft } from "./fft"
 
+// Here's the reference implementation from bayes_kit/ess.py
 // def autocorr_fft(chain: VectorType) -> VectorType:
 //     """
 //     Return sample autocorrelations at all lags for the specified sequence.
@@ -20,7 +21,6 @@ import { inverseTransform, transform as transformFft } from "./fft"
 //     N = len(ndata)
 //     acorr = np.fft.ifft(pwr).real / var / N
 //     return acorr
-
 export function autocorr_fft(chain: number[], n: number): number[] {
     const size = Math.round(Math.pow(2, Math.ceil(Math.log2(2 * chain.length - 1))))
     const variance = computeVariance(chain)
@@ -43,9 +43,8 @@ export function autocorr_fft(chain: number[], n: number): number[] {
     return acorrReal.slice(0, n).map(x => (x / variance / N / chain.length))
 }
 
+// not used - fft is used instead
 export function autocorr_slow(chain: number[], n: number): number[] {
-    // todo: use FFT
-
     const mu = chain.length ? sum(chain) / chain.length : 0
     const chain_ctr = chain.map(a => (a - mu))
     const N = chain_ctr.length
@@ -69,6 +68,25 @@ export function autocorr_slow(chain: number[], n: number): number[] {
     return acorrN
 }
 
+// Here's the reference implementation from bayes_kit/ess.py
+// def first_neg_pair_start(chain: VectorType) -> IntType:
+//     """
+//     Return the index of first element of the sequence whose sum with the following
+//     element is negative, or the length of the sequence if there is no such element.
+    
+//     Parameters:
+//     chain: input sequence
+//     Return:
+//     index of first element whose sum with following element is negative, or
+//     the number of elements if there is no such element
+//     """
+//     N = len(chain)
+//     n = 0
+//     while n + 1 < N:
+//         if chain[n] + chain[n + 1] < 0:
+//             return n
+//         n = n + 2
+//     return N
 export function first_neg_pair_start(chain: number[]): number {
     const N = chain.length
     let n = 0
@@ -76,7 +94,7 @@ export function first_neg_pair_start(chain: number[]): number {
         if (chain[n] + chain[n + 1] < 0) {
             return n
         }
-        n = n + 1
+        n = n + 2
     }
     return N
 }
@@ -99,6 +117,40 @@ export function ess_ipse(chain: number[]): number {
     return ess
 }
 
+// Here's the reference implementation from bayes_kit/ess.py (note there is a typo -- minprev should be prev_min)
+// def ess_imse(chain: VectorType) -> FloatType:
+//     """
+//     Return an estimate of the effective sample size (ESS) of the specified Markov chain
+//     using the initial monotone sequence estimator (IMSE).  This is the most accurate
+//     of the available ESS estimators.  Because of the convex minorization used,
+//     this approach is slower than using the IPSE function `ess_ipse`.
+//     This estimator was introduced in the following paper.
+//     Geyer, C.J., 1992. Practical Markov chain Monte Carlo. Statistical Science
+//     7(4):473--483. 
+    
+//     Parameters:
+//     chain: Markov chain whose ESS is returned
+//     Return:
+//     estimated effective sample size for the specified Markov chain
+//     Throws:
+//     ValueError: if there are fewer than 4 elements in the chain
+//     """
+//     if len(chain) < 4:
+//         raise ValueError(f"ess requires len(chains) >=4, but {len(chain) = }")
+//     acor = autocorr(chain)
+//     n = first_neg_pair_start(acor)
+//     prev_min = acor[1] + acor[2]
+//     # convex minorization uses slow loop
+//     accum = prev_min
+//     i = 3
+//     while i + 1 < n:
+//         minprev = min(prev_min, acor[i] + acor[i + 1])
+//         accum = accum + minprev
+//         i = i + 2
+//     # end diff code
+//     sigma_sq_hat = acor[0] + 2 * accum
+//     ess = len(chain) / sigma_sq_hat
+//     return ess
 export function ess_imse(chain: number[]): {ess: number, acor: number[]} {
     if (chain.length < 4) {
         console.warn('ess requires chain.length >=4')
@@ -107,9 +159,9 @@ export function ess_imse(chain: number[]): {ess: number, acor: number[]} {
     // const acor = autocorr_slow(chain, chain.length)
     const acor = autocorr_fft(chain, chain.length)
     const n = first_neg_pair_start(acor)
-    let prev_min = 1
-    let accum = 0
-    let i = 1
+    let prev_min = acor[1] + acor[2]
+    let accum = prev_min
+    let i = 3
     while (i + 1 < n) {
         prev_min = Math.min(prev_min, acor[i] + acor[i + 1])
         accum = accum + prev_min
@@ -118,7 +170,7 @@ export function ess_imse(chain: number[]): {ess: number, acor: number[]} {
 
     const sigma_sq_hat = acor[0] + 2 * accum
     const ess = chain.length / sigma_sq_hat
-    return {ess, acor}
+    return {ess, acor} // also return the acor for use in the plots
 }
 
 export function ess(chain: number[]) {
